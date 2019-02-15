@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -23,6 +25,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
     private EditText Email;
     private EditText Password;
     public TextView textViewSignUp;
+    public TextView textViewForgotPw;
 
     public ProgressDialog progressDialog;
     public FirebaseAuth firebaseauth;
@@ -37,9 +40,11 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         ButtonSignIn = (Button) findViewById(R.id.ButtonSignIn);
         Email = (EditText) findViewById(R.id.Email);
         Password = (EditText) findViewById(R.id.Password);
+        textViewForgotPw = (TextView) findViewById(R.id.textViewForgotPw);
         textViewSignUp = (TextView)findViewById(R.id.textViewSignUp);
 
         ButtonSignIn.setOnClickListener(this);
+        textViewForgotPw.setOnClickListener(this);
         textViewSignUp.setOnClickListener(this);
 
         firebaseauth = FirebaseAuth.getInstance();
@@ -75,13 +80,43 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 });
     }
 
+    private void forgotPw(){
+        String email = Email.getText().toString().trim();
+        if(TextUtils.isEmpty(email)){
+            Toast.makeText(this, "Please enter email!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else{
+            firebaseauth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(SignIn.this, "Please check your email account", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(), SignIn.class));
+                    }
+                    else{
+                        String message = task.getException().getMessage();
+                        Toast.makeText(SignIn.this, "Error: "+message, Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+        }
+
+
+    }
+
     @Override
     public void onClick(View view) {
         if(view == ButtonSignIn){
             signinUser();
         }
-        else{
+        if(view == textViewForgotPw){
+            forgotPw();
+        }
+        if(view == textViewSignUp){
             startActivity(new Intent(getApplicationContext(), SignUp.class));
         }
+
     }
 }

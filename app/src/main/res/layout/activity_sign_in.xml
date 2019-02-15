@@ -37,11 +37,19 @@
             android:text="Signin"></Button>
 
         <TextView
+            android:id="@+id/textViewForgotPw"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:text="Forgot Passsword?"
+            android:textAlignment="center" />
+
+        <TextView
             android:id="@+id/textViewSignUp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            android:text="Have an account? SignUp Here"
+            android:text="Don't Have an account? SignUp Here"
             android:textAlignment="center" />
     </LinearLayout>
 
