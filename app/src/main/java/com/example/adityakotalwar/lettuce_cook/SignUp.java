@@ -14,12 +14,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
@@ -37,6 +42,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     //firebase auth object
     public FirebaseAuth firebaseauth;
+    private FirebaseFirestore db;
 
     // databaseReference Object
     private DatabaseReference databaseReference;
@@ -49,6 +55,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
         progressDialog = new ProgressDialog(this);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
 
         UserName = (EditText) findViewById(R.id.UserName);
         Email = (EditText) findViewById(R.id.Email);
@@ -64,7 +71,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     private void registerUser(){
 
-        String userName = UserName.getText().toString().trim();
+        final String userName = UserName.getText().toString().trim();
         final String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
 
@@ -74,6 +81,10 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
         }
         if(TextUtils.isEmpty(pw)){
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(TextUtils.isEmpty(userName)){
+            Toast.makeText(this, "Please enter Username", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -86,9 +97,31 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressDialog.dismiss();
+                        // If user creation was successful we enter the if
                         if(task.isSuccessful()){
+                            CollectionReference dbUser = db.collection("Users");
+                            String id = firebaseauth.getCurrentUser().getUid();
+                            // Gets the userId of the person loggen in.
+                            UserCollection user = new UserCollection(email, userName, id);
+                            // store the user details in a userCollection class
+                            dbUser.add(user)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(SignUp.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                            // stores the user information if a failure pops a toast
                             finish();
+                            // finishes the current activity
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            //redirects to MainActivity
                         }
                         else{
                             Toast.makeText(SignUp.this, "Not Registered!", Toast.LENGTH_SHORT).show();
