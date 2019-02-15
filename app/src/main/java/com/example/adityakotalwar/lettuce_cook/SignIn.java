@@ -1,5 +1,6 @@
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -80,14 +81,8 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 });
     }
 
-    private void forgotPw(){
-        String email = Email.getText().toString().trim();
-        if(TextUtils.isEmpty(email)){
-            Toast.makeText(this, "Please enter email!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        else{
-            firebaseauth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+    private void forgotPw(String EmailReset){
+        firebaseauth.sendPasswordResetEmail(EmailReset).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
@@ -101,9 +96,6 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
 
                 }
             });
-        }
-
-
     }
 
     @Override
@@ -112,7 +104,30 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
             signinUser();
         }
         if(view == textViewForgotPw){
-            forgotPw();
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(SignIn.this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_forgot_pw, null);
+
+            final EditText EmailReset = (EditText) mView.findViewById(R.id.EmailReset);
+            Button ButtonForgotPw = (Button) mView.findViewById(R.id.ButtonForgotPw);
+
+            mBuilder.setView(mView);
+            // Pops the dialog on the screen
+            final AlertDialog dialog = mBuilder.create();
+            dialog.show();
+
+            ButtonForgotPw.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String tempEmail = EmailReset.getText().toString();
+                    if(!tempEmail.isEmpty()){
+                        dialog.dismiss();
+                        forgotPw(tempEmail);
+                    }
+                    else{
+                        Toast.makeText(SignIn.this, "Enter an Email!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
         if(view == textViewSignUp){
             startActivity(new Intent(getApplicationContext(), SignUp.class));
