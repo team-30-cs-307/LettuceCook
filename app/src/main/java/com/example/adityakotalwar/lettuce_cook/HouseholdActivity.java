@@ -23,7 +23,6 @@ public class HouseholdActivity extends AppCompatActivity {
     private Button createHouseholdButton;
     private EditText householdText;
     private FirebaseFirestore db;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +51,13 @@ public class HouseholdActivity extends AppCompatActivity {
 
         final Household household = new Household();
         household.setHouseholdName(householdName);
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        household.addMember("checker");
+        System.out.println("household name set");
+        FirebaseAuth.AuthStateListener mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+                System.out.println("curr user");
 
                 if (user != null) {
                     System.out.println("hello");
