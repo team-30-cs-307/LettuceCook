@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         friendsButton = findViewById(R.id.buttonFriends);
         groceryButton = findViewById(R.id.buttonGrocery);
 
+
         buttonLogout = findViewById(R.id.buttonLogout);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
