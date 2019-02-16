@@ -1,6 +1,9 @@
 package com.example.adityakotalwar.lettuce_cook;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ListView listView;
     private Button goToRecipes;
     private Button buttonLogout;
+    private  Button friendsButton;
+    private Button groceryButton;
+
 
     ArrayList<String> stock = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
@@ -37,12 +43,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(new Intent(getApplicationContext(),   SignUp.class));
         }
 
-        addItemB = (Button) findViewById(R.id.button_add_item);
-        addItemT = (EditText) findViewById(R.id.edit_text_add_item);
-        listView = (ListView) findViewById(R.id.my_list_view2);
-        goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
+        addItemB = findViewById(R.id.button_add_item);
+        addItemT = findViewById(R.id.edit_text_add_item);
+        listView = findViewById(R.id.my_list_view2);
+        goToRecipes = findViewById(R.id.go_to_recipes_button);
+        friendsButton = findViewById(R.id.buttonFriends);
+        groceryButton = findViewById(R.id.buttonGrocery);
 
-        buttonLogout = (Button) findViewById(R.id.buttonLogout);
+        buttonLogout = findViewById(R.id.buttonLogout);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
         listView.setAdapter(arrayAdapter);
@@ -58,7 +66,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
+        friendsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,Friends.class);
+                startActivity(intent);
+            }
+        });
 
+        groceryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this,Grocery.class);
+                startActivity(intent);
+            }
+        });
 
     }
 

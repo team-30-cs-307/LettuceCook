@@ -57,11 +57,11 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         db = FirebaseFirestore.getInstance();
 
-        UserName = (EditText) findViewById(R.id.UserName);
-        Email = (EditText) findViewById(R.id.Email);
-        Password = (EditText) findViewById(R.id.Password);
-        ButtonSignup = (Button) findViewById(R.id.ButtonSignup);
-        textViewSignIn = (TextView)findViewById(R.id.textViewSignIn);
+        UserName = findViewById(R.id.UserName);
+        Email = findViewById(R.id.Email);
+        Password = findViewById(R.id.Password);
+        ButtonSignup = findViewById(R.id.ButtonSignup);
+        textViewSignIn = findViewById(R.id.textViewSignIn);
 
         ButtonSignup.setOnClickListener(this);
         textViewSignIn.setOnClickListener(this);
