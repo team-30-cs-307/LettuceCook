@@ -33,7 +33,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     private EditText Email;
     private EditText Password;
 
-   // private String userName;
+   private String userName;
+
 
     //buttons
     private Button ButtonSignup;
@@ -76,7 +77,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     private void registerUser(){
 
-        final String userName = UserName.getText().toString().trim();
+        userName = UserName.getText().toString().trim();
         final String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
 
@@ -109,10 +110,11 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             // Gets the userId of the person loggen in.
                             UserCollection user = new UserCollection(email, userName, id);
                             // store the user details in a userCollection class
-                            dbUser.add(user)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            dbUser.document(userName)
+                                .set(user)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
+                                        public void onSuccess(Void aVoid) {
 
                                         }
                                     })

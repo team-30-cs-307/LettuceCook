@@ -20,6 +20,9 @@ public class UserCollection {
     public  String getEmail(){
         return email;
     }
+    public void setHousehold(String household){
+        this.household = household;
+    }
     public String getHousehold(){
         return household;
     }
