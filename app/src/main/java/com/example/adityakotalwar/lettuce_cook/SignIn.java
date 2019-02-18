@@ -56,12 +56,12 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
-            Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+        if(email.isEmpty()){
+            Email.setError("Enter Email");
             return;
         }
         if(TextUtils.isEmpty(pw)){
-            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
+            Password.setError("Enter Password");
             return;
         }
 

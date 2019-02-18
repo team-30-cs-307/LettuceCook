@@ -1,13 +1,18 @@
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,6 +37,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     private EditText UserName;
     private EditText Email;
     private EditText Password;
+    private EditText ConfirmPassword;
 
     //buttons
     private Button ButtonSignup;
@@ -59,7 +65,34 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
         UserName = (EditText) findViewById(R.id.UserName);
         Email = (EditText) findViewById(R.id.Email);
+
         Password = (EditText) findViewById(R.id.Password);
+        ConfirmPassword = (EditText) findViewById(R.id.ConfirmPassword);
+
+        // Dynamically checks whether confirm password equals password, prompts the user
+        ConfirmPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String pw = Password.getText().toString();
+                String cpw = ConfirmPassword.getText().toString();
+                if(pw.length() > 0 && editable.length() > 0){
+                    if(!cpw.equals(pw)){
+                        ConfirmPassword.setError("Does not match Password Entered!");
+                    }
+                }
+            }
+        });
+
         ButtonSignup = (Button) findViewById(R.id.ButtonSignup);
         textViewSignIn = (TextView)findViewById(R.id.textViewSignIn);
 
@@ -74,19 +107,26 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
         final String userName = UserName.getText().toString().trim();
         final String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
+        String cpw = ConfirmPassword.getText().toString().trim();
 
-        if(TextUtils.isEmpty(email)){
-            Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
+        if(email.isEmpty() | userName.isEmpty() | pw.isEmpty() | cpw.isEmpty() | !cpw.equals(pw)){
+            if(email.isEmpty()){
+                Email.setError("Email field annot be Empty");
+            }
+            if(pw.isEmpty()){
+                Password.setError("Password field cannot be Empty");
+            }
+            if(userName.isEmpty()){
+                UserName.setError("Username field cannot be Empty");
+            }
+            if(!cpw.equals(pw) | cpw.isEmpty()){
+                Password.setText("");
+                ConfirmPassword.setText("");
+                ConfirmPassword.setError("The password entered does not match!");
+            }
             return;
         }
-        if(TextUtils.isEmpty(pw)){
-            Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(TextUtils.isEmpty(userName)){
-            Toast.makeText(this, "Please enter Username", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        //Checks whether any of the fields is empty
 
         progressDialog.setMessage("Registering");
         progressDialog.show();
@@ -139,7 +179,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
             registerUser();
         }
         if(view == textViewSignIn){
-            startActivity(new Intent(this, SignIn.class));
+            startActivity(new Intent(this, SignIn.class), ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         }
     }
 }

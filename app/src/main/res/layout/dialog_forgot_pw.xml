@@ -25,6 +25,7 @@
             android:layout_width="100dp"
             android:layout_height="63dp"
             android:layout_gravity="center"
+            android:background="@drawable/button_dark_green"
             android:text="Send Reset Link"></Button>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
