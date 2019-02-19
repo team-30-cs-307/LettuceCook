@@ -22,6 +22,7 @@ public class Recipes extends AppCompatActivity {
     private Button stockButton;
     private Button recipesButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -33,6 +33,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     private EditText Email;
     private EditText Password;
 
+   // private String userName;
+
     //buttons
     private Button ButtonSignup;
     private TextView textViewSignIn;
@@ -46,6 +48,9 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     // databaseReference Object
     private DatabaseReference databaseReference;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +125,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             // stores the user information if a failure pops a toast
                             finish();
                             // finishes the current activity
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                             //redirects to MainActivity
                         }
                         else{

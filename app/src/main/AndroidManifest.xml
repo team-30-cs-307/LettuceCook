@@ -19,9 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Recipes" />
-        <activity android:name=".Friends" />
-        <activity android:name=".Grocery" />
-        <activity android:name=".RecipeInformation"></activity>
+        <activity android:name=".HouseholdActivity"></activity>
     </application>
 
 </manifest>
