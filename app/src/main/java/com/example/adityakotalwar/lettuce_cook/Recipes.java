@@ -14,6 +14,7 @@ public class Recipes extends AppCompatActivity {
     ArrayList<String> recipes = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
