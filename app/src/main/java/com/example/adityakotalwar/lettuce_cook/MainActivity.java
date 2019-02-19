@@ -1,5 +1,6 @@
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         firebaseAuth = FirebaseAuth.getInstance();
         if(firebaseAuth.getCurrentUser() == null){
             finish();
-            startActivity(new Intent(getApplicationContext(),   SignUp.class));
+            startActivity(new Intent(getApplicationContext(), SignUp.class), ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         }
 
         addItemB = findViewById(R.id.button_add_item);
