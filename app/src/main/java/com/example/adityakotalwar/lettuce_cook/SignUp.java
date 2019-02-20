@@ -37,7 +37,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     private EditText UserName;
     private EditText Email;
     private EditText Password;
-    private EditText ConfirmPassword;
+    public EditText ConfirmPassword;
 
    // private String userName;
 
