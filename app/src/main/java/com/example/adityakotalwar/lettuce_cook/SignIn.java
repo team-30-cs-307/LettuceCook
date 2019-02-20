@@ -1,5 +1,6 @@
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -56,12 +57,13 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
         String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
 
-        if(email.isEmpty()){
-            Email.setError("Enter Email");
-            return;
-        }
-        if(TextUtils.isEmpty(pw)){
-            Password.setError("Enter Password");
+        if(email.isEmpty() || pw.isEmpty()) {
+            if (email.isEmpty()) {
+                Email.setError("Enter Email");
+            }
+            if (TextUtils.isEmpty(pw)) {
+                Password.setError("Enter Password");
+            }
             return;
         }
 
@@ -81,19 +83,18 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 });
     }
 
-    private void forgotPw(String EmailReset){
+    private void forgotPw(final String EmailReset, final AlertDialog dialog, final EditText email){
         firebaseauth.sendPasswordResetEmail(EmailReset).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if(task.isSuccessful()){
+                        dialog.dismiss();
                         Toast.makeText(SignIn.this, "Please check your email account", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), SignIn.class));
                     }
                     else{
-                        String message = task.getException().getMessage();
-                        Toast.makeText(SignIn.this, "Error: "+message, Toast.LENGTH_SHORT).show();
+                        email.setError("The email address is not registered!");
+                        email.setText("");
                     }
-
                 }
             });
     }
@@ -120,17 +121,17 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                 public void onClick(View view) {
                     String tempEmail = EmailReset.getText().toString();
                     if(!tempEmail.isEmpty()){
-                        dialog.dismiss();
-                        forgotPw(tempEmail);
+//                        dialog.dismiss();
+                        forgotPw(tempEmail, dialog, EmailReset);
                     }
                     else{
-                        Toast.makeText(SignIn.this, "Enter an Email!", Toast.LENGTH_SHORT).show();
+                        EmailReset.setError("Enter an email!");
                     }
                 }
             });
         }
         if(view == textViewSignUp){
-            startActivity(new Intent(getApplicationContext(), SignUp.class));
+            startActivity(new Intent(getApplicationContext(), SignUp.class), ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         }
 
     }

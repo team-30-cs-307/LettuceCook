@@ -20,15 +20,16 @@
 
         <!--Put form controls here-->
         <ImageView
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:background="@drawable/lettuce_cook_name_logo"
+            android:background="@drawable/lettuce_cook_logo"
+            android:layout_marginBottom="50dp"
             android:scaleType="fitStart" />
         <EditText
             android:id="@+id/Email"
             android:layout_width="fill_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:hint="Email"
@@ -38,7 +39,6 @@
             android:id="@+id/Password"
             android:layout_width="fill_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:hint="Password"
@@ -48,8 +48,9 @@
             android:id="@+id/ButtonSignIn"
             android:layout_width="100dp"
             android:layout_height="50dp"
+            android:layout_gravity="center"
             android:background="@drawable/button_dark_green"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/colorPrimary"
             android:text="Signin"></Button>
 
         <TextView
