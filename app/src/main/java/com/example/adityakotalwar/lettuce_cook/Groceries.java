@@ -3,8 +3,16 @@ package com.example.adityakotalwar.lettuce_cook;
 import android.widget.ArrayAdapter;
 
 public class Groceries {
-    private String Household, name, userid, Groceries;
+    private String Household, name, userid, Groceries, Description;
     public Groceries(){
+
+
+    }
+    public Groceries(String Household, String userid, String Groceries, String Description){
+        this.Groceries = Groceries;
+        this.Household = Household;
+        this.userid = userid;
+        this.Description = Description;
 
 
     }
@@ -12,7 +20,6 @@ public class Groceries {
         this.Groceries = Groceries;
         this.Household = Household;
         this.userid = userid;
-
 
     }
 
@@ -30,5 +37,8 @@ public class Groceries {
 
     public String getGroceries() {
         return Groceries;
+    }
+    public String getDescription(){
+        return Description;
     }
 }
