@@ -16,11 +16,17 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
     private Button addItemB;
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button goToRecipes;
     private Button buttonLogout;
     private Button update;
+    private Button getButton;
     private FirebaseFirestore db;
 
 
@@ -54,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
 
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
+        getButton = (Button) findViewById(R.id.getButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
         listView.setAdapter(arrayAdapter);
@@ -77,6 +85,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 groceries(arrayAdapter, id, "Hardcoded ID");
             }
         });
+        getButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                db.collection("Grocery").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        for(DocumentSnapshot ds : queryDocumentSnapshots ){
+                            if(ds.getId().equals("groceries")){
+                                String itemEntered;
+                                itemEntered = ds.getString("groceries");
+                                String [] arrOfgroceries = itemEntered.split(",");
+                                for (int i = 0; i <arrOfgroceries.length ; i++) {
+                                    arrayAdapter.add(arrOfgroceries[i]);
+                                }
+                                break;
+
+                            }
+
+
+                        }
+
+                    }
+                });
+            }
+        });
 
 
 
@@ -95,7 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Groceries groceries = new Groceries("Hardcoded", userid, Grocerylist);
-        db.collection("Grocery")
+        db.collection("Grocery").document("groceries").set(groceries);
+        /*db.collection("Grocery")
                 .add(groceries)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -109,8 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_LONG).show();
                     }
-                });
-
+                });*/
     }
 
     @Override

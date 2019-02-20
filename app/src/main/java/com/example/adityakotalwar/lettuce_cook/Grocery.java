@@ -39,7 +39,7 @@ public class Grocery extends AppCompatActivity {
         friendsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Grocery.this,Grocery.class);
+                Intent intent = new Intent(Grocery.this,Friends.class);
                 startActivity(intent);
             }
         });
