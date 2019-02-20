@@ -9,7 +9,7 @@
     <ListView
         android:id="@+id/my_list_view2"
         android:layout_width="374dp"
-        android:layout_height="410dp"
+        android:layout_height="355dp"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/edit_text_add_item"
         tools:layout_editor_absoluteX="0dp"
@@ -24,6 +24,16 @@
         android:ems="10"
         android:hint="Enter item"
         android:inputType="textPersonName" />
+
+    <Button
+        android:id="@+id/update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/my_list_view2"
+        android:layout_marginStart="85dp"
+        android:layout_weight="1"
+        android:text="Update" />
 
     <Button
         android:id="@+id/button_add_item"
@@ -51,12 +61,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Grocery" />
-        <Button
-            android:id="@+id/update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Update" />
 
 
         <Button
@@ -92,5 +96,14 @@
             android:layout_weight="1"
             android:text="Friends" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/getButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/my_list_view2"
+        android:layout_marginEnd="89dp"
+        android:text="Button" />
 
 </android.widget.RelativeLayout>
