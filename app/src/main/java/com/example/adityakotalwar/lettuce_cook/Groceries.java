@@ -20,7 +20,6 @@ public class Groceries {
         this.Groceries = Groceries;
         this.Household = Household;
         this.userid = userid;
-
     }
 
     public String getHousehold() {
