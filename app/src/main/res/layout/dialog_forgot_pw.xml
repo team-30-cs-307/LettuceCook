@@ -10,6 +10,10 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
+        android:background="@drawable/linear_layout_box"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingTop="20dp"
         tools:ignore="MissingConstraints">
 
         <EditText
@@ -23,8 +27,10 @@
         <Button
             android:id="@+id/ButtonForgotPw"
             android:layout_width="100dp"
-            android:layout_height="63dp"
+            android:layout_height="50dp"
             android:layout_gravity="center"
+            android:background="@drawable/button_dark_green"
+            android:textColor="#FFFFFF"
             android:text="Send Reset Link"></Button>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
