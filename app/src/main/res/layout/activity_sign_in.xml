@@ -1,39 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SignIn">
+    android:background="@drawable/wallpaper_1"
+    tools:context=".SignIn"
+    android:gravity="center">
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="350dp"
+        android:layout_height="500dp"
         android:orientation="vertical"
+        android:background="@drawable/linear_layout_box"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingTop="20dp"
         tools:ignore="MissingConstraints">
 
         <!--Put form controls here-->
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/lettuce_cook_name_logo"
+            android:scaleType="fitStart" />
         <EditText
             android:id="@+id/Email"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
             android:hint="Email"
             android:inputType="textEmailAddress"></EditText>
 
         <EditText
             android:id="@+id/Password"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
             android:hint="Password"
             android:inputType="textPassword"></EditText>
 
         <Button
             android:id="@+id/ButtonSignIn"
             android:layout_width="100dp"
-            android:layout_height="63dp"
-            android:layout_gravity="center"
+            android:layout_height="50dp"
+            android:background="@drawable/button_dark_green"
+            android:textColor="#FFFFFF"
             android:text="Signin"></Button>
 
         <TextView
@@ -53,4 +69,4 @@
             android:textAlignment="center" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</android.widget.RelativeLayout>
