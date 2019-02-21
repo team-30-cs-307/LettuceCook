@@ -39,7 +39,8 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     private EditText Password;
     public EditText ConfirmPassword;
 
-   // private String userName;
+   private String userName;
+
 
     //buttons
     private Button ButtonSignup;
@@ -109,7 +110,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     private void registerUser(){
 
-        final String userName = UserName.getText().toString().trim();
+        userName = UserName.getText().toString().trim();
         final String email = Email.getText().toString().trim();
         String pw = Password.getText().toString().trim();
         String cpw = ConfirmPassword.getText().toString().trim();
@@ -147,12 +148,13 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             CollectionReference dbUser = db.collection("Users");
                             String id = firebaseauth.getCurrentUser().getUid();
                             // Gets the userId of the person loggen in.
-                            UserCollection user = new UserCollection(email, userName, id);
+                            UserCollection user = new UserCollection(userName, email, id, "", "");
                             // store the user details in a userCollection class
-                            dbUser.add(user)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            dbUser.document(id)
+                                .set(user)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
+                                        public void onSuccess(Void aVoid) {
 
                                         }
                                     })
@@ -180,6 +182,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+
         if(view == ButtonSignup){
             registerUser();
         }

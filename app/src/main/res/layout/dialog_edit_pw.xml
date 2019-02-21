@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignIn">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:background="@drawable/linear_layout_box"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingTop="20dp"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/PwCurrent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:hint="Enter your current password"
+            android:inputType="textPassword"></EditText>
+        <EditText
+            android:id="@+id/PwReset"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:hint="Enter new password"
+            android:inputType="textPassword"></EditText>
+
+        <EditText
+            android:id="@+id/ConfirmPwReset"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="50dp"
+            android:hint="Confirm New Password"
+            android:inputType="textPassword"></EditText>
+
+        <Button
+            android:id="@+id/ButtonConfirm"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/button_dark_green"
+            android:textColor="#FFFFFF"
+            android:text="Reset"></Button>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

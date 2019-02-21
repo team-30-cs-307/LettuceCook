@@ -45,4 +45,25 @@
             android:layout_weight="1"
             android:text="Friends" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/listUsers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="59dp"
+        android:text="TextView"
+        tools:text="gyguguguguygugyugy" />
+
+    <Button
+        android:id="@+id/showUsers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/listUsers"
+        android:layout_below="@+id/listUsers"
+        android:layout_marginTop="65dp"
+        android:text="Show users" />
+
 </android.widget.RelativeLayout>

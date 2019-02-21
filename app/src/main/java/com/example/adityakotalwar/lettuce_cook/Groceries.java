@@ -18,7 +18,6 @@ public class Groceries {
     public Groceries(String userid, String status){
         this.status = status;
         this.userid = userid;
-
     }
 
 
