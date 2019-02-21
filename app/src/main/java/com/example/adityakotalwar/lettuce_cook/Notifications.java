@@ -25,7 +25,7 @@ public class Notifications {
 
         try{
             String temp = "/topics/"+Household;
-            object.put("to",temp);
+            object.put("to",temp) ;
             JSONObject notificationObj = new JSONObject();
             notificationObj.put("title",Title);
             notificationObj.put("body", Message);
@@ -53,7 +53,6 @@ public class Notifications {
                     return header;
                 }
             };
-
             requestQueue.add(request);
 
         } catch (JSONException e){

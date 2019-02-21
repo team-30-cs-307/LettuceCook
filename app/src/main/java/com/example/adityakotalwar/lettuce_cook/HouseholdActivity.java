@@ -1,7 +1,10 @@
+
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,6 +49,8 @@ public class HouseholdActivity extends AppCompatActivity {
     private Button joinButton;
     private Button showInvitesButton;
     private TextView invitesText;
+    private Button showUsersButton;
+    private TextView listOfUsers;
 
     private String householdName;
 
@@ -63,35 +68,56 @@ public class HouseholdActivity extends AppCompatActivity {
         joinButton = findViewById(R.id.joinHouseholdButton);
         showInvitesButton = findViewById(R.id.showInvites);
         invitesText = findViewById(R.id.invites);
-
-        db = FirebaseFirestore.getInstance();
+        showUsersButton = findViewById(R.id.showUsers);
+        listOfUsers = findViewById(R.id.listUsers);
 
         createHouseholdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 householdName = householdText.getText().toString();
+
+                if(householdName.isEmpty()){
+                    Toast.makeText(HouseholdActivity.this, "Enter a household name!", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         for(DocumentSnapshot ds : queryDocumentSnapshots ){
                             if(ds.getId().equals(householdName)){
-                                householdText.setError("Enter a unique household name!");
+                                Toast.makeText(HouseholdActivity.this, "Enter a unique household name!", Toast.LENGTH_LONG).show();
                                 return;
                             }
                         }
                         createHousehold();
-                        finish();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 });
-                          }
+            }
         });
-
+        db = FirebaseFirestore.getInstance();
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                join();
+                AlertDialog.Builder logout_confir = new AlertDialog.Builder(HouseholdActivity.this);
+                logout_confir.setMessage("Are you sure you want to join this household")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                join();
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = logout_confir.create();
+                alertDialog.show();
             }
         });
 
@@ -101,6 +127,15 @@ public class HouseholdActivity extends AppCompatActivity {
                 showInvites();
             }
         });
+
+        showUsersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTheUsers();
+            }
+        });
+
+
 
 
         //invite();
@@ -112,9 +147,7 @@ public class HouseholdActivity extends AppCompatActivity {
                 if(!member.isEmpty()) {
                     addMember(member);
                 }else{
-                    addMemberText.setError("Please Enter a username");
-//                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
-                    return;
+                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -124,22 +157,7 @@ public class HouseholdActivity extends AppCompatActivity {
 
         householdName = householdText.getText().toString();
 
-//        db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                for(DocumentSnapshot ds : queryDocumentSnapshots ){
-//                    if(ds.getId().equals(householdName)){
-//                        Toast.makeText(HouseholdActivity.this, "Enter a unique household name!", Toast.LENGTH_LONG).show();
-//                        return;
-//                    }
-//                }
-////                 if(!userPresent){
-////
-////                /}
-//            }
-//        });
-
-//        db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         CollectionReference dbHousehold = db.collection("Household");
         // Gets the userId of the person loggen in.
 
@@ -149,6 +167,7 @@ public class HouseholdActivity extends AppCompatActivity {
 //        }
         final ArrayList<String> member = new ArrayList<>();
         member.add(user.getUid());
+        System.out.println(member.get(0));
         // store the user details in a userCollection class
         dbHousehold.document(householdName)
                 .set(household)
@@ -157,6 +176,9 @@ public class HouseholdActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         db.collection("Users").document(user.getUid()).update("household", householdName);
                         db.collection("Household").document(householdName).update("members", member);
+
+                        RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
+                        FirebaseMessaging.getInstance().subscribeToTopic(householdName);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -182,17 +204,17 @@ public class HouseholdActivity extends AppCompatActivity {
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 boolean userPresent = false;
                 for(DocumentSnapshot ds : queryDocumentSnapshots ){
-                   userPresent = false;
+                    userPresent = false;
                     if(ds.getString("username").equals(member)){
                         //household.addMember(ds.getId());
                         db.collection("Users").document(ds.getId()).update("invited", householdName);
-                       // db.collection("Users").document(ds.getId()).update("invited", "");
+                        // db.collection("Users").document(ds.getId()).update("invited", "");
                         Toast.makeText(HouseholdActivity.this, "User invited!", Toast.LENGTH_LONG).show();
                         userPresent = true;
                         return;
                     }
                 }
-               // if(!userPresent){
+                // if(!userPresent){
 
                 ///}
             }
@@ -229,8 +251,10 @@ public class HouseholdActivity extends AppCompatActivity {
             public void onSuccess(final DocumentSnapshot documentSnapshot) {
                 final String hName = documentSnapshot.getString("invited");
                 if(!hName.equals("")){
+
                     db.collection("Users").document(user.getUid()).update("household", hName);
                     db.collection("Users").document(user.getUid()).update("invited", "");
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     final DocumentReference dr2 = db.collection("Household").document(hName);
                     dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
@@ -244,34 +268,27 @@ public class HouseholdActivity extends AppCompatActivity {
                             listMembers.add(user.getUid());
                             db.collection("Household").document(hName).update("members", listMembers);
 
+                            /*Sends Notification*/
                             RequestQueue requestQueue;
                             requestQueue = Volley.newRequestQueue(HouseholdActivity.this);
 
-                            FirebaseMessaging.getInstance().subscribeToTopic(hName)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            String msg = "Successful";
-                                            if (!task.isSuccessful()) {
-                                                msg = "Failed";
-                                            }
-                                            Toast.makeText( HouseholdActivity.this, msg, Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-
                             Notifications n = new Notifications();
                             try {
-                                n.sendNotification("Hello","Hello",hName, requestQueue);
+                                n.sendNotification(hName+"has new member!",user.getEmail()+ " has joined the household", hName, requestQueue);
                             } catch (InstantiationException e) {
                                 e.printStackTrace();
                             } catch (IllegalAccessException e) {
                                 e.printStackTrace();
                             }
+
+                            /*Subscribes the user to the household*/
+                            RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
+                            FirebaseMessaging.getInstance().subscribeToTopic(householdName);
                         }
                     });
-                   // household.addMember(user.getUid());
+                    // household.addMember(user.getUid());
                     db.collection("Users").document(user.getUid()).update("invited", "");
-                 //   db.collection("Household").document(hName).update("members", household.getMembers());
+                    //   db.collection("Household").document(hName).update("members", household.getMembers());
                 }
             }
         });
@@ -316,5 +333,43 @@ public class HouseholdActivity extends AppCompatActivity {
         });
     }
 
+    public void showTheUsers(){
+        // final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // store the user details in a userCollection class
+        System.out.println(user.getUid());
+        final DocumentReference dr = db.collection("Users").document(user.getUid());
+        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+                final String hName = documentSnapshot.getString("invited");
+//                final DocumentReference dr2 = db.collection("Household").document(hName);
+//                dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                //  @Override
+                //   public void onSuccess(DocumentSnapshot documentSnapshot2) {
+                db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        for(DocumentSnapshot ds : queryDocumentSnapshots ){
+                            if(ds.getString("household").equals(hName)){
+                                listOfUsers.append("Users in household: \n" +ds.getString("username") + "\n");
+                            }
+                        }
+                    }
+                    //  });
+
+                    //}
+                });
+                // household.addMember(user.getUid());
+                db.collection("Users").document(user.getUid()).update("invited", "");
+                //   db.collection("Household").document(hName).update("members", household.getMembers());
+
+            }
+        });
+
+    }
+
 
 }
+
+    
