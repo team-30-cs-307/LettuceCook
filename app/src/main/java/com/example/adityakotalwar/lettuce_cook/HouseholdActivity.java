@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -114,33 +115,49 @@ public class HouseholdActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         final List<String> list = new ArrayList<>();
 
-
         db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 boolean userPresent = false;
                 for(DocumentSnapshot ds : queryDocumentSnapshots ){
                    userPresent = false;
-                    System.out.println("entering");
                     if(ds.getString("username").equals(member)){
-                       // ArrayList<String> listMembers = ds.get
                         household.addMember(ds.getId());
                         db.collection("Household").document(householdName).update("members", household.getMembers());
-                        System.out.println(ds.getId());
-                        System.out.println("household name : " + householdName);
                         db.collection("Users").document(ds.getId()).update("household", householdName);
                         userPresent = true;
-                        break;
+                        return;
                     }
                 }
-                if(!userPresent){
+               // if(!userPresent){
                     Toast.makeText(HouseholdActivity.this, "Enter a valid username!", Toast.LENGTH_LONG).show();
+                ///}
+            }
+        });
+        //Extracting participants ArrayList from each document
+    }
+
+    public void checkUserExists(final String id){
+
+        db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            boolean exists = false;
+            ArrayList<String> listMembers = new ArrayList<>();
+
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                    if (ds.getId().equals(householdName)) { //finds the household to check with all the member names in the house
+                        for (Object item : ds.getData().values()) {
+                            listMembers.add(item.toString());
+                        }
+                        if (listMembers.contains(id)) {
+                            Toast.makeText(HouseholdActivity.this, "This user is already in the household", Toast.LENGTH_LONG).show();
+                            exists = true;
+                        }
+                    }
                 }
             }
         });
-
-
-
     }
 
 
