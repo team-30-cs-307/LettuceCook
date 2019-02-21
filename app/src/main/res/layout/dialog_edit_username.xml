@@ -21,26 +21,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:hint="Enter your current password"
+            android:hint="Enter Password"
             android:inputType="textPassword"></EditText>
         <EditText
-            android:id="@+id/PwReset"
+            android:id="@+id/NewUserName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:hint="Enter new password"
-            android:inputType="textPassword"></EditText>
-
-        <EditText
-            android:id="@+id/ConfirmPwReset"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:hint="Confirm New Password"
-            android:inputType="textPassword"></EditText>
+            android:hint="Enter User Name"
+            android:inputType="text"></EditText>
 
         <Button
-            android:id="@+id/ButtonChangeConfirm"
+            android:id="@+id/ButtonUserNameChangeConfirm"
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:layout_gravity="center"

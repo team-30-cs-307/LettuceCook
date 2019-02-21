@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/my_list_view2"
-        android:layout_marginStart="85dp"
+        android:layout_marginStart="133dp"
         android:layout_weight="1"
         android:text="Update" />
 
@@ -106,22 +106,34 @@
             android:text="Friends" />
     </LinearLayout>
 
+
     <Button
-        android:id="@+id/getButton"
+        android:id="@+id/editPwButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/my_list_view2"
-        android:layout_marginEnd="89dp"
-        android:text="Button" />
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/editPwButton"
+
+        android:text="Edit Pw" />
+
+    <Button
+        android:id="@+id/editUserNameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editUserNameButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="93dp"
+        android:text="Edit Username" />
 
     <Button
         android:id="@+id/leaveHouseholdButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/getButton"
-        android:layout_alignBottom="@+id/getButton"
+        android:layout_alignBaseline="@+id/editUserNameButton"
+        android:layout_alignBottom="@+id/editUserNameButton"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="39dp"
+        android:layout_marginBottom="-399dp"
         android:text="LeaveHousehold" />
 
 </android.widget.RelativeLayout>

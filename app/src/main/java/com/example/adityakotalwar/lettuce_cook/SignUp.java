@@ -18,6 +18,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +36,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.protobuf.Method;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
@@ -56,9 +71,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
     // databaseReference Object
     private DatabaseReference databaseReference;
 
-
-
-
+    // For notifications
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +94,6 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -146,7 +158,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                         // If user creation was successful we enter the if
                         if(task.isSuccessful()){
                             CollectionReference dbUser = db.collection("Users");
-                            String id = firebaseauth.getCurrentUser().getUid();
+                            final String id = firebaseauth.getCurrentUser().getUid();
                             // Gets the userId of the person loggen in.
                             UserCollection user = new UserCollection(userName, email, id, "", "");
                             // store the user details in a userCollection class
@@ -169,6 +181,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             // finishes the current activity
                             startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                             //redirects to MainActivity
+
                         }
                         else{
                             Toast.makeText(SignUp.this, "Not Registered!", Toast.LENGTH_SHORT).show();
@@ -177,14 +190,41 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                 });
         // Does this entire authification and check whether email already exists
 
-
     }
+
+
 
     @Override
     public void onClick(View view) {
 
         if(view == ButtonSignup){
             registerUser();
+
+//            DocumentReference docrefUser;
+//            final String id = firebaseauth.getCurrentUser().getUid();
+//            final String[] user = {""};
+//            final String[] household = {""};
+//
+// docrefUser = db.collection("Users").document(id);
+//            docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                @Override
+//                public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                    user[0] = documentSnapshot.toObject(UserCollection.class).getUsername();
+//                    household[0] = documentSnapshot.toObject(UserCollection.class).getHousehold();
+//                }
+//            });
+//            String msg = "Say hi to "+user[0];
+//            RequestQueue requestQueue;
+//            requestQueue = Volley.newRequestQueue(SignUp.this);
+//
+//            Notifications n = new Notifications();
+//            try {
+//                n.sendNotification("new User Signed Up",msg, household[0], requestQueue);
+//            } catch (InstantiationException e) {
+//                e.printStackTrace();
+//            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+//            }
         }
         if(view == textViewSignIn){
             startActivity(new Intent(this, SignIn.class), ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
