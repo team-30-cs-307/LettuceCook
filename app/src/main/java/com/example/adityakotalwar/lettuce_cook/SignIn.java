@@ -77,7 +77,7 @@ public class SignIn extends AppCompatActivity implements View.OnClickListener{
                         progressDialog.dismiss();
                         if(task.isSuccessful()){
                             finish();
-                            startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         }
                     }
                 });

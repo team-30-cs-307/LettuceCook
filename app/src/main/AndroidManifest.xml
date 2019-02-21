@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Recipes" />
-        <activity android:name=".HouseholdActivity"></activity>
+        <activity android:name=".HouseholdActivity" />
+        <activity android:name=".EditCredentials"></activity>
     </application>
 
 </manifest>

@@ -232,6 +232,7 @@ public class HouseholdActivity extends AppCompatActivity {
                             ArrayList<String> listMembers = new ArrayList<>();
                             for (Object item : documentSnapshot2.getData().values()) {
                                 listMembers.add(item.toString());
+                                System.out.println(item.toString());
                             }
                             listMembers.add(user.getUid());
                             db.collection("Household").document(hName).update("members", listMembers);
