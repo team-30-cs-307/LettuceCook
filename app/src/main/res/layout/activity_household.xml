@@ -46,4 +46,32 @@
         app:layout_constraintTop_toBottomOf="@+id/addMemberText"
         tools:layout_editor_absoluteX="148dp" />
 
+    <Button
+        android:id="@+id/joinHouseholdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginTop="81dp"
+        android:text="JOIN"
+        app:layout_constraintTop_toBottomOf="@+id/addMemberButton"
+        tools:layout_editor_absoluteX="148dp" />
+
+    <Button
+        android:id="@+id/showInvites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="45dp"
+        android:text="Show invites"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="367dp" />
+
+    <TextView
+        android:id="@+id/invites"
+        android:layout_width="141dp"
+        android:layout_height="55dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="47dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/showInvites"
+        tools:layout_editor_absoluteY="367dp" />
+
 </android.support.constraint.ConstraintLayout>

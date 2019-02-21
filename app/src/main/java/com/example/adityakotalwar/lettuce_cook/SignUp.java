@@ -148,7 +148,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             CollectionReference dbUser = db.collection("Users");
                             String id = firebaseauth.getCurrentUser().getUid();
                             // Gets the userId of the person loggen in.
-                            UserCollection user = new UserCollection(userName, email, id, "");
+                            UserCollection user = new UserCollection(userName, email, id, "", "");
                             // store the user details in a userCollection class
                             dbUser.document(id)
                                 .set(user)

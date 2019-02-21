@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button update;
     private Button getButton;
     private FirebaseFirestore db;
+    private Button leaveHouseholdButton;
 
 
     ArrayList<String> stock = new ArrayList<String>();
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
         getButton = (Button) findViewById(R.id.getButton);
+        leaveHouseholdButton = findViewById(R.id.leaveHouseholdButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
         listView.setAdapter(arrayAdapter);
@@ -70,6 +73,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addItemB.setOnClickListener(this);
         listView.setOnItemClickListener(this);
         buttonLogout.setOnClickListener(this);
+
+        leaveHouseholdButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                leaveHousehold();
+            }
+        });
 
         goToRecipes.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,6 +180,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //   FileHelper.writeData(items, this);
         Toast.makeText(this, "Delete", Toast.LENGTH_SHORT).show();
     }
+
+    public void leaveHousehold(){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // store the user details in a userCollection class
+        System.out.println(user.getUid());
+        final DocumentReference dr = db.collection("Users").document(user.getUid());
+        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+                final String hName = documentSnapshot.getString("household");
+                db.collection("Users").document(user.getUid()).update("household", "");
+
+                    final DocumentReference dr2 = db.collection("Household").document(hName);
+                    dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot2) {
+                            ArrayList<String> listMembers = new ArrayList<>();
+                            for (Object item : documentSnapshot2.getData().values()) {
+                                listMembers.add(item.toString());
+                                System.out.println(item.toString());
+                            }
+                            listMembers.remove(user.getUid());
+                            db.collection("Household").document(hName).update("members", "");
+                            db.collection("Household").document(hName).update("members", listMembers);
+                            startActivity(new Intent(getApplicationContext(), SignIn.class));
+                        }
+                    });
+                    // household.addMember(user.getUid());
+                    //db.collection("Users").document(user.getUid()).update("invited", "");
+                    //   db.collection("Household").document(hName).update("members", household.getMembers());
+                }
+
+        });
+    }
+
 }
 
     

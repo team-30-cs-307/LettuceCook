@@ -115,4 +115,13 @@
         android:layout_marginEnd="89dp"
         android:text="Button" />
 
+    <Button
+        android:id="@+id/leaveHouseholdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/getButton"
+        android:layout_alignBottom="@+id/getButton"
+        android:layout_alignParentEnd="true"
+        android:text="LeaveHousehold" />
+
 </android.widget.RelativeLayout>
