@@ -12,6 +12,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,27 +64,29 @@ public class HouseholdActivity extends AppCompatActivity {
         showInvitesButton = findViewById(R.id.showInvites);
         invitesText = findViewById(R.id.invites);
 
+        db = FirebaseFirestore.getInstance();
+
         createHouseholdButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 householdName = householdText.getText().toString();
-
                 db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         for(DocumentSnapshot ds : queryDocumentSnapshots ){
                             if(ds.getId().equals(householdName)){
-                                Toast.makeText(HouseholdActivity.this, "Enter a unique household name!", Toast.LENGTH_LONG).show();
+                                householdText.setError("Enter a unique household name!");
                                 return;
                             }
                         }
                         createHousehold();
+                        finish();
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 });
                           }
         });
-        db = FirebaseFirestore.getInstance();
+
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +112,9 @@ public class HouseholdActivity extends AppCompatActivity {
                 if(!member.isEmpty()) {
                     addMember(member);
                 }else{
-                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
+                    addMemberText.setError("Please Enter a username");
+//                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
+                    return;
                 }
             }
         });
@@ -132,7 +139,7 @@ public class HouseholdActivity extends AppCompatActivity {
 //            }
 //        });
 
-        db = FirebaseFirestore.getInstance();
+//        db = FirebaseFirestore.getInstance();
         CollectionReference dbHousehold = db.collection("Household");
         // Gets the userId of the person loggen in.
 
@@ -236,6 +243,30 @@ public class HouseholdActivity extends AppCompatActivity {
                             }
                             listMembers.add(user.getUid());
                             db.collection("Household").document(hName).update("members", listMembers);
+
+                            RequestQueue requestQueue;
+                            requestQueue = Volley.newRequestQueue(HouseholdActivity.this);
+
+                            FirebaseMessaging.getInstance().subscribeToTopic(hName)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            String msg = "Successful";
+                                            if (!task.isSuccessful()) {
+                                                msg = "Failed";
+                                            }
+                                            Toast.makeText( HouseholdActivity.this, msg, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+
+                            Notifications n = new Notifications();
+                            try {
+                                n.sendNotification("Hello","Hello",hName, requestQueue);
+                            } catch (InstantiationException e) {
+                                e.printStackTrace();
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                    // household.addMember(user.getUid());

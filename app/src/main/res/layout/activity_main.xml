@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@drawable/wallpaper"
     tools:context=".MainActivity">
 
     <ListView
@@ -12,6 +14,8 @@
         android:layout_height="355dp"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/edit_text_add_item"
+        android:layout_margin="20dp"
+        android:background="@drawable/linear_layout_box"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
@@ -22,18 +26,12 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:ems="10"
+        android:padding="10dp"
         android:hint="Enter item"
+        android:background="@drawable/form_field_edit_text"
+        android:layout_margin="20dp"
         android:inputType="textPersonName" />
 
-    <Button
-        android:id="@+id/update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/my_list_view2"
-        android:layout_marginStart="133dp"
-        android:layout_weight="1"
-        android:text="Update" />
 
     <Button
         android:id="@+id/button_add_item"
@@ -41,22 +39,77 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="21dp"
+        android:background="@drawable/button_dark_green"
+        android:textColor="@color/colorPrimary"
+        android:layout_margin="20dp"
         android:text="Add item" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="377dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="63dp"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/editPwButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Edit Pw" />
+
+        <Button
+            android:id="@+id/editUserNameButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Edit Name" />
+
+        <Button
+            android:id="@+id/leaveHouseholdButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="LeaveHouse" />
+
+        <Button
+            android:id="@+id/buttonLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Logout"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Update" />
+
+    </LinearLayout>
+
     <!--<ImageView-->
-        <!--android:id="@+id/add_button"-->
+        <!--android:iwd="@+id/add_button"-->
         <!--android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content"/>-->
     <!---->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="463dp"
+        android:layout_marginTop="820dp"
+        android:background="@color/colorPrimary"
         android:gravity="bottom"
         android:orientation="horizontal">
 
@@ -87,17 +140,6 @@
             android:text="Recipes" />
 
         <Button
-            android:id="@+id/buttonLogout"
-            android:layout_width="75dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:text="Logout"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <Button
             android:id="@+id/buttonFriends"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -107,33 +149,5 @@
     </LinearLayout>
 
 
-    <Button
-        android:id="@+id/editPwButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/editPwButton"
-
-        android:text="Edit Pw" />
-
-    <Button
-        android:id="@+id/editUserNameButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editUserNameButton"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="93dp"
-        android:text="Edit Username" />
-
-    <Button
-        android:id="@+id/leaveHouseholdButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/editUserNameButton"
-        android:layout_alignBottom="@+id/editUserNameButton"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="39dp"
-        android:layout_marginBottom="-399dp"
-        android:text="LeaveHousehold" />
 
 </android.widget.RelativeLayout>

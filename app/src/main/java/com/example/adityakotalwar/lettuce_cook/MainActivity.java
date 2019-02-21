@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonLogout;
     private Button update;
     private Button getButton;
+    String household;
 
     private Button editPwButton;
     private Button editUserNameButton;
@@ -67,8 +70,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(getApplicationContext(), SignUp.class));
+            return;
         }
+
+
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
         db = FirebaseFirestore.getInstance();
+
+//        final DocumentReference dr = db.collection("Users").document(user.getUid());
+//        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                household = documentSnapshot.get("household").toString();
+//                Toast.makeText(getApplicationContext(),household, Toast.LENGTH_LONG).show();
+//            }
+//        });
+//        if(household.equals("")){
+//            finish();
+//            startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
+//        }
+
         addItemB = (Button) findViewById(R.id.button_add_item);
         update = (Button) findViewById(R.id.update);
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
@@ -79,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonLogout = (Button) findViewById(R.id.buttonLogout);
         editPwButton = (Button) findViewById(R.id.editPwButton);
         editUserNameButton = (Button) findViewById(R.id.editUserNameButton);
-        getButton = (Button) findViewById(R.id.getButton);
         leaveHouseholdButton = findViewById(R.id.leaveHouseholdButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
@@ -115,17 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        FirebaseMessaging.getInstance().subscribeToTopic("rushank")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        String msg = "Successful";
-                        if (!task.isSuccessful()) {
-                            msg = "Failed";
-                        }
-                        Toast.makeText( MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+
         }
 
 
@@ -323,7 +333,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_edit_username, null);
 
-//                final EditText emailCurrent = (EditText) mView.findViewById(R.id.EmailCurrent);
         final EditText PwCurrent = (EditText) mView.findViewById(R.id.PwCurrent);
         final EditText NewUserName = (EditText) mView.findViewById(R.id.NewUserName);
         final Button ButtonEditUserName = (Button) mView.findViewById(R.id.ButtonUserNameChangeConfirm);
@@ -345,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
-                                    db.collection("Users").document(firebaseAuth.getCurrentUser().getUid()).update("username", email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    db.collection("Users").document(user.getUid()).update("username", NewUserName).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
@@ -353,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 Toast.makeText(MainActivity.this, "YUP", Toast.LENGTH_SHORT).show();
                                             }
                                             else{
-                                                Toast.makeText(MainActivity.this, "YUP", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(MainActivity.this, "NOPE", Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });
