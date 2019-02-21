@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
-
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,8 +153,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String itemEntered = addItemT.getText().toString();
                 addItemT.setText("");
                 arrayAdapter.add(itemEntered);
-
-
                 Toast.makeText(this, "Item Added", Toast.LENGTH_SHORT).show();
                 break;
         }
