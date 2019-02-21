@@ -8,7 +8,7 @@ public class UserCollection {
 
     }
 
-    public UserCollection(String username, String email, String userId){
+    public UserCollection(String username, String email, String userId, String household){
         this.username = username;
         this.email = email;
         this.userId = userId;

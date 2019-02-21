@@ -18,13 +18,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class HouseholdActivity extends AppCompatActivity {
 
@@ -58,7 +63,12 @@ public class HouseholdActivity extends AppCompatActivity {
         addMemberButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addMember();
+                String member = addMemberText.getText().toString().trim();
+                if(!member.isEmpty()) {
+                    addMember(member);
+                }else{
+                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -70,24 +80,20 @@ public class HouseholdActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         CollectionReference dbHousehold = db.collection("Household");
         // Gets the userId of the person loggen in.
+        DocumentReference house = dbHousehold.document(householdName);
 
-
-
-       // household.setHouseholdName(householdName);
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        System.out.println(house.getId()+" house id");
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user!=null){
             household.addMember(user.getUid());
-
         }
-        //db.document(householdName).set(household);
         // store the user details in a userCollection class
         dbHousehold.document(householdName)
                 .set(household)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-
+                        db.collection("Users").document(user.getUid()).update("household", householdName);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -103,33 +109,35 @@ public class HouseholdActivity extends AppCompatActivity {
         // finishes the current activity
     }
 
-    public void addMember(){
-        final String member = addMemberText.getText().toString().trim();
+    public void addMember(final String member){
+
         db = FirebaseFirestore.getInstance();
         final List<String> list = new ArrayList<>();
-        db.collection("Users").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            boolean userPresent = false;
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
 
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        //list.add(document.getId());
-                        if(document.getId().equals(member)){
-                            household.addMember(member);
-                            db.collection("Household").document(householdName).set(household, SetOptions.merge());
-                            userPresent = true;
-                        }
+
+        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                boolean userPresent = false;
+                for(DocumentSnapshot ds : queryDocumentSnapshots ){
+                   userPresent = false;
+                    System.out.println("entering");
+                    if(ds.getString("username").equals(member)){
+                       // ArrayList<String> listMembers = ds.get
+                        household.addMember(ds.getId());
+                        db.collection("Household").document(householdName).update("members", household.getMembers());
+                        System.out.println(ds.getId());
+                        System.out.println("household name : " + householdName);
+                        db.collection("Users").document(ds.getId()).update("household", householdName);
+                        userPresent = true;
+                        break;
                     }
-                    if(!userPresent){
-                        System.out.println("aint no user like this");
-                    }
-                } else {
-                    System.out.println("not happening");
+                }
+                if(!userPresent){
+                    Toast.makeText(HouseholdActivity.this, "Enter a valid username!", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
 
 
 

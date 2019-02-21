@@ -148,9 +148,9 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
                             CollectionReference dbUser = db.collection("Users");
                             String id = firebaseauth.getCurrentUser().getUid();
                             // Gets the userId of the person loggen in.
-                            UserCollection user = new UserCollection(email, userName, id);
+                            UserCollection user = new UserCollection(userName, email, id, "");
                             // store the user details in a userCollection class
-                            dbUser.document(userName)
+                            dbUser.document(id)
                                 .set(user)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -182,6 +182,7 @@ public class SignUp extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+
         if(view == ButtonSignup){
             registerUser();
         }
