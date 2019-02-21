@@ -3,42 +3,32 @@ package com.example.adityakotalwar.lettuce_cook;
 import android.widget.ArrayAdapter;
 
 public class Groceries {
-    private String Household, name, userid, Groceries, Description;
+    private String userid, description, status;
     public Groceries(){
 
 
     }
-    public Groceries(String Household, String userid, String Groceries, String Description){
-        this.Groceries = Groceries;
-        this.Household = Household;
+    public Groceries(String userid, String description, String status){
         this.userid = userid;
-        this.Description = Description;
+        this.description = description;
+        this.status = status;
 
 
     }
-    public Groceries(String Household, String userid, String Groceries){
-        this.Groceries = Groceries;
-        this.Household = Household;
+    public Groceries(String userid, String status){
+        this.status = status;
         this.userid = userid;
 
     }
 
-    public String getHousehold() {
-        return Household;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     public String getUserid() {
         return userid;
     }
-
-    public String getGroceries() {
-        return Groceries;
+    public String getStatus(){
+        return status;
     }
     public String getDescription(){
-        return Description;
+        return description;
     }
 }
