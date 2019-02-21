@@ -11,25 +11,25 @@ import java.util.Date;
 @IgnoreExtraProperties
 public class Household {
 
-    private String householdName;
+  //  private String householdName;
     private ArrayList<String> members = new ArrayList<>();
     //private @ServerTimestamp Date timestamp;
 
-    public Household(String householdName){
-        this.householdName = householdName;
-    }
+//    public Household(String householdName){
+//        this.householdName = householdName;
+//    }
 
     public Household(){
 
     }
 
-    public void setHouseholdName(String householdName){
-        this.householdName = householdName;
-    }
+//    public void setHouseholdName(String householdName){
+//        this.householdName = householdName;
+//    }
 
-    public String getHouseholdName(){
-        return householdName;
-    }
+   // public String getHouseholdName(){
+    //    return householdName;
+    //}
 
     public void addMember(String member){
         members.add(member);
