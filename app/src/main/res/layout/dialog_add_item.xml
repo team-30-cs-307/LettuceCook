@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="200dp"
+    android:background="@drawable/linear_layout_box"
+    android:layout_gravity="center"
+    tools:context=".SignIn">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextViewzz
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Item"
+            android:padding="10dp"
+            android:background="@color/colorGrey"
+            android:textSize="15dp"
+            android:layout_marginBottom="10dp"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            tools:ignore="MissingConstraints">
+
+            <!--Overrides the padding of the container-->
+
+            <EditText
+                android:id="@+id/ItemName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:hint="Enter Item Name"></EditText>
+
+            <EditText
+                android:id="@+id/ItemDescription"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:hint="Enter Item Name"></EditText>
+
+            <Button
+                android:id="@+id/ButtonAddItem"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="right"
+                android:background="@drawable/button_dark_green"
+                android:textColor="#FFFFFF"
+                android:text="ADD"
+                android:layout_weight="1"
+                ></Button>
+            <Button
+                android:id="@+id/ButtonCancelItem"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="right"
+                android:background="@drawable/button_dark_green"
+                android:textColor="#FFFFFF"
+                android:layout_weight="1"
+                android:text="CANCEL"></Button>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
