@@ -261,8 +261,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onSuccess(DocumentSnapshot documentSnapshot) {
 
                 //user.getUsername();
-
-
                 Household = documentSnapshot.getString("household");
                 //Household = "hi";
                 //System.out.println("\n\n\n\n\n\n\n\n" + Household+ "\n\n\n\n\n\n");
@@ -308,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Groceries groceries = new Groceries(userid, description, status);
         db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
+        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added!", item + " added to Stock!" );
+        notiCollection.sendInAppNotification(notiCollection);
     }
 
     public void repopulate(final ArrayAdapter ArrayAdapter, String HouseholdName){

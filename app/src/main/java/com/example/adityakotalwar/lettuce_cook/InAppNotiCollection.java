@@ -50,6 +50,7 @@ public class InAppNotiCollection {
                 }
             });
 
+
 //            dbNoti.document().set(inAppNotificationCollection).addOnSuccessListener(new OnSuccessListener<Void>() {
 //                @Override
 //                public void onSuccess(Void aVoid) {
