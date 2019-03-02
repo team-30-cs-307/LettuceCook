@@ -187,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+
     }
 
     public void deleteGrocery(String Household /*Name of the household the user is in*/, String item /*Item to be deleted*/){
@@ -329,11 +330,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(task.isSuccessful()){
                     //List<String> list = new ArrayList<>();
                     for(QueryDocumentSnapshot document : task.getResult()){
-                        arrayAdapter.add(document.getId());
+                        ArrayAdapter.add(document.getId());
                     }
                 }
             }
         });
+
+    }
+    public void realtime(final String householdName){
+        db.collection("Household").document(householdName).collection("Grocery Items").whereEqualTo("status", "stock")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        //System.out.println("going in here");
+                        arrayAdapter.clear();
+                        //repopulate(arrayAdapter, householdName);
+                        for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
+                           arrayAdapter.add(doc.getId());
+                        }
+
+
+
+
+                    }
+                });
 
     }
 
@@ -341,20 +361,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+
+            //If the button add item is pressed, do this
+
             case R.id.button_add_item:
                 String itemEntered = addItemT.getText().toString();
                 String descEntered = addDescription.getText().toString();
 
                 flag = 0;
-
+                    realtime(GetCurrentHouseholdName());
 //                addItemT.setText("");
 //                arrayAdapter.add(itemEntered);
 
                 if (!(GroceryItemContains(itemEntered, GetCurrentHouseholdName()))) {
 
                     addItemToGroceryCollection(itemEntered, descEntered, "stock", GetCurrentHouseholdName());
-                    arrayAdapter.clear();
-                    repopulate(arrayAdapter, GetCurrentHouseholdName());
+
+                    //arrayAdapter.clear();
+                    //realtime(GetCurrentHouseholdName());
+                    //arrayAdapter.clear();
+                    //repopulate(arrayAdapter, GetCurrentHouseholdName());
                     addItemT.setText("");
                     addDescription.setText("");
 
