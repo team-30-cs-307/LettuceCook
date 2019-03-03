@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:background="@drawable/form_field_edit_text" android:padding="5dp">
+
+    <TextView
+        android:id="@id/noti_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:textColor="@color/colorAccent"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@id/noti_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/noti_title"
+        android:textSize="14dp"/>
+
+    <TextView
+        android:id="@+id/sender_username"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/noti_body"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorGrey"
+        android:textSize="12dp"/>
+
+</RelativeLayout>
+
