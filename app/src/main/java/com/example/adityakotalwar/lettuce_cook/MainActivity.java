@@ -59,18 +59,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText addItemT;
     private ListView listView;
     private Button goToRecipes;
-    private Button buttonLogout;
-    private Button update;
     private String Household;
     private int flag = 0;
-    private String description;
     private EditText addDescription;
 
     private Button buttonFriends;
-
-    private Button editPwButton;
-    private Button editUserNameButton;
-    private Button leaveHouseholdButton;
 
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
@@ -100,20 +93,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
+                Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
+
                 switch(id)
                 {
-                    case R.id.account:
+                    case R.id.home:
                         Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
-                    case R.id.settings:
-                        Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
-                    case R.id.mycart:
-                        Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
-                    default:
                         return true;
+                    case R.id.edit_name:
+                        editUserName();
+                        return true;
+                    case R.id.edit_pw:
+                        editPw();
+                        return true;
+                    case R.id.leave_house:
+                        AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
+                        logout_confir.setMessage("Are you sure you want to leave the household")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        leaveHousehold();
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog = logout_confir.create();
+                        alertDialog.show();
+                        return true;
+                    case R.id.logout:
+                        AlertDialog.Builder logout_confir1 = new AlertDialog.Builder(MainActivity.this);
+                        logout_confir1.setMessage("Are you sure you want to logout")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        firebaseAuth.signOut();
+                                        finish();
+                                        startActivity(new Intent(getApplicationContext(), SignIn.class));
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog1 = logout_confir1.create();
+                        alertDialog1.show();
+                        return true;
+                    default:
+                         return true;
                 }
             }
         });
-
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -137,18 +175,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         addItemB = (Button) findViewById(R.id.button_add_item);
-        update = (Button) findViewById(R.id.update);
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
 
         goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
-
-        buttonLogout = (Button) findViewById(R.id.buttonLogout);
-        editPwButton = (Button) findViewById(R.id.editPwButton);
-        editUserNameButton = (Button) findViewById(R.id.editUserNameButton);
-        leaveHouseholdButton = findViewById(R.id.leaveHouseholdButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
@@ -166,59 +198,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         addItemB.setOnClickListener(this);
         listView.setOnItemClickListener(this);
-        buttonLogout.setOnClickListener(this);
-        editPwButton.setOnClickListener(this);
-        editUserNameButton.setOnClickListener(this);
-
         buttonFriends.setOnClickListener(this);
 
         listView.setAdapter(arrayAdapter);
-
-
-        leaveHouseholdButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
-                logout_confir.setMessage("Are you sure you want to leave the household")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                leaveHousehold();
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                AlertDialog alertDialog = logout_confir.create();
-                alertDialog.show();
-
-            }
-        });
-
-//        goToRecipes.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, Recipes.class);
-//                startActivity(intent);
-//            }
-//        });
-
-
-//
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String id = firebaseAuth.getCurrentUser().getUid();
-                //groceries(arrayAdapter, id, "Hardcoded ID");
-                arrayAdapter.clear();
-                repopulate(arrayAdapter, GetCurrentHouseholdName());
-            }
-        });
 
         final DocumentReference docrefUser;
         final String id = firebaseAuth.getCurrentUser().getUid();
@@ -381,10 +363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
                            arrayAdapter.add(doc.getId());
                         }
-
-
-
-
                     }
                 });
 
@@ -402,15 +380,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String descEntered = addDescription.getText().toString();
 
                 flag = 0;
-                    realtime(GetCurrentHouseholdName());
+                realtime(GetCurrentHouseholdName());
 //                addItemT.setText("");
 //                arrayAdapter.add(itemEntered);
 
                 if (!(GroceryItemContains(itemEntered, GetCurrentHouseholdName()))) {
 
                     addItemToGroceryCollection(itemEntered, descEntered, "stock", GetCurrentHouseholdName());
-                    arrayAdapter.clear();
-                    repopulate(arrayAdapter, GetCurrentHouseholdName());
+                    //arrayAdapter.clear();
+                    //repopulate(arrayAdapter, GetCurrentHouseholdName());
 
                     //arrayAdapter.clear();
                     //realtime(GetCurrentHouseholdName());
@@ -426,41 +404,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
-        }
-        if (v == buttonLogout) {
-            buttonLogout.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
-                            logout_confir.setMessage("Are you sure you want to logout")
-                                    .setCancelable(false)
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            firebaseAuth.signOut();
-                                            finish();
-                                            startActivity(new Intent(getApplicationContext(), SignIn.class));
-                                        }
-                                    })
-                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.cancel();
-                                        }
-                                    });
-                            AlertDialog alertDialog = logout_confir.create();
-                            alertDialog.show();
-
-                        }
-                    }
-            );
-        }
-        if(v == editPwButton){
-            editPw();
-        }
-        if(v == editUserNameButton){
-            editUserName();
         }
         if(v == goToRecipes){
             finish();
@@ -670,6 +613,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -159,7 +159,6 @@ public class Friends extends AppCompatActivity {
                         notification_body.clear();
                         notification_title.clear();
                         sender.clear();
-                        System.out.println("Household " + household);
                         populateNoti(listView, db, household, notification_title, notification_body, sender);
                     }
                 });
@@ -189,12 +188,6 @@ public class Friends extends AppCompatActivity {
                             CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
                             listView.setAdapter(customAdapter);
 
-                              //                            String[] noti_body = new String[1]; noti_body[0] = documentSnapshot.get("noti_body").toString();
-//                            String[] sender_username = new String[1]; sender_username[0] = documentSnapshot.get("sender_username").toString();
-
-//                            FriendsNotiCustomListView customListView = new FriendsNotiCustomListView(, noti_title, noti_body, sender_username);
-
-//                            arrayAdapter.add(documentSnapshot.get("noti_body").toString());
                         }
                     });
                 }
@@ -205,11 +198,6 @@ public class Friends extends AppCompatActivity {
 
 
     }
-
-//    public String[] notiSplitter(String noti_list){
-//        String[] notifications = noti_list.split("|");
-//        return notifications;
-//    }
 
     public void sendNoti(){
         InAppNotiCollection noti = new InAppNotiCollection("totalwar1","aditya","alisha","have my babies");
