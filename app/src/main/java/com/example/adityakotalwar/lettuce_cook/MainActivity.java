@@ -38,6 +38,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,10 +78,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> stock = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
 
+    private DrawerLayout dl;
+    private ActionBarDrawerToggle t;
+    private NavigationView nv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dl = (DrawerLayout)findViewById(R.id.activity_drawer);
+        t = new ActionBarDrawerToggle(this, dl,R.string.Open, R.string.Close);
+
+        dl.addDrawerListener(t);
+        t.syncState();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        nv = (NavigationView)findViewById(R.id.nv);
+        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.account:
+                        Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                    case R.id.settings:
+                        Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();
+                    case R.id.mycart:
+                        Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
+                    default:
+                        return true;
+                }
+            }
+        });
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -92,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
+
 
         addItemB = (Button) findViewById(R.id.button_add_item);
         update = (Button) findViewById(R.id.update);
@@ -166,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
 
 
+//
         update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -187,6 +231,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+
+
+
     }
 
     public void deleteGrocery(String Household /*Name of the household the user is in*/, String item /*Item to be deleted*/){
@@ -312,17 +359,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void repopulate(final ArrayAdapter ArrayAdapter, String HouseholdName){
 
-        /*db.collection("Household").document(HouseholdName).collection("Grocery Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-
-                    ArrayAdapter.add(ds.getId());
-
-                }
-
-            }
-        });*/
         db.collection("Household").document(HouseholdName).collection("Grocery Items").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -355,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     addItemToGroceryCollection(itemEntered, descEntered, "stock", GetCurrentHouseholdName());
                     arrayAdapter.clear();
                     repopulate(arrayAdapter, GetCurrentHouseholdName());
+
                     addItemT.setText("");
                     addDescription.setText("");
 
@@ -609,6 +646,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (t.onOptionsItemSelected(item))
+            return true;
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
 
 

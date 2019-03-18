@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,6 +53,9 @@ public class Friends extends AppCompatActivity {
 
         showNotiButton = findViewById(R.id.showNotiButton);
 
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         recipesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,12 +88,16 @@ public class Friends extends AppCompatActivity {
         showNotiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showNoti("totalwar1");
+                db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        showNoti(documentSnapshot.getString("household"));
+                    }
+                });
+                //showNoti();
 //                sendNoti();
             }
         });
-
-
     }
 
     public void showTheUsers(){
@@ -151,20 +159,16 @@ public class Friends extends AppCompatActivity {
                         notification_body.clear();
                         notification_title.clear();
                         sender.clear();
+                        System.out.println("Household " + household);
                         populateNoti(listView, db, household, notification_title, notification_body, sender);
                     }
                 });
 
     }
 
-    public void populateNoti(final ListView listView, final FirebaseFirestore db, String household,
+    public void populateNoti(final ListView listView, final FirebaseFirestore db, final String household,
                              final ArrayList<String> notification_title, final ArrayList<String> notification_body, final ArrayList<String> sender){
 
-
-
-//        notification_title.add("RJNCDKJDNCJNLCECNCNEJ");
-//        notification_body.add("kjenvuj");
-//        sender.add("ckjncj");
 
         db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
