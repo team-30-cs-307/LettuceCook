@@ -9,8 +9,13 @@
         android:roundIcon="@drawable/lettuce_cook_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignUp" android:theme="@style/AppThemeNoActionBar" />
-        <activity android:name=".SignIn" android:theme="@style/AppThemeNoActionBar" />
+        <activity android:name=".navDrawer"></activity>
+        <activity
+            android:name=".SignUp"
+            android:theme="@style/AppThemeNoActionBar" />
+        <activity
+            android:name=".SignIn"
+            android:theme="@style/AppThemeNoActionBar" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,7 +25,9 @@
         </activity>
         <activity android:name=".Recipes" />
         <activity android:name=".Friends" />
-        <activity android:name=".HouseholdActivity" android:theme="@style/AppThemeNoActionBar"/>
+        <activity
+            android:name=".HouseholdActivity"
+            android:theme="@style/AppThemeNoActionBar" />
     </application>
 
 </manifest>
