@@ -188,7 +188,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         addItemB = (Button) findViewById(R.id.button_add_item);
-        update = (Button) findViewById(R.id.update);
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
@@ -196,10 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
 
-        buttonLogout = (Button) findViewById(R.id.buttonLogout);
-        editPwButton = (Button) findViewById(R.id.editPwButton);
-        editUserNameButton = (Button) findViewById(R.id.editUserNameButton);
-        leaveHouseholdButton = findViewById(R.id.leaveHouseholdButton);
+
         addMemberButton = findViewById(R.id.addMemberButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
@@ -218,39 +214,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         addItemB.setOnClickListener(this);
         listView.setOnItemClickListener(this);
-        buttonLogout.setOnClickListener(this);
-        editPwButton.setOnClickListener(this);
-        editUserNameButton.setOnClickListener(this);
+//        buttonLogout.setOnClickListener(this);
+//        editPwButton.setOnClickListener(this);
+  //      editUserNameButton.setOnClickListener(this);
 
         buttonFriends.setOnClickListener(this);
 
         listView.setAdapter(arrayAdapter);
 
-
-        leaveHouseholdButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
-                logout_confir.setMessage("Are you sure you want to leave the household")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                leaveHousehold();
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                AlertDialog alertDialog = logout_confir.create();
-                alertDialog.show();
-
-            }
-        });
+//
+//        leaveHouseholdButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
+//                logout_confir.setMessage("Are you sure you want to leave the household")
+//                        .setCancelable(false)
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                leaveHousehold();
+//                                finish();
+//                            }
+//                        })
+//                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.cancel();
+//                            }
+//                        });
+//                AlertDialog alertDialog = logout_confir.create();
+//                alertDialog.show();
+//
+//            }
+//        });//commented this but is important
 
 //        goToRecipes.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -261,15 +257,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
 
 
-        update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String id = firebaseAuth.getCurrentUser().getUid();
-                //groceries(arrayAdapter, id, "Hardcoded ID");
-                arrayAdapter.clear();
-                repopulate(arrayAdapter, GetCurrentHouseholdName());
-            }
-        });
+//        update.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String id = firebaseAuth.getCurrentUser().getUid();
+//                //groceries(arrayAdapter, id, "Hardcoded ID");
+//                arrayAdapter.clear();
+//                repopulate(arrayAdapter, GetCurrentHouseholdName());
+//            }
+//        });
 
         final DocumentReference docrefUser;
         final String id = firebaseAuth.getCurrentUser().getUid();

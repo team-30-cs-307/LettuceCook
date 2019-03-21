@@ -1,6 +1,5 @@
 package com.example.adityakotalwar.lettuce_cook;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,7 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
@@ -326,7 +323,7 @@ public class Friends extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             convertView = getLayoutInflater().inflate(R.layout.dialog_noti_view_listview_layout, null);
-            TextView noti_title = convertView.findViewById(R.id.noti_title);
+            TextView noti_title = convertView.findViewById(R.id.invite_name);
             TextView noti_body = convertView.findViewById(R.id.noti_body);
             TextView sender_username = convertView.findViewById(R.id.sender_username);
 

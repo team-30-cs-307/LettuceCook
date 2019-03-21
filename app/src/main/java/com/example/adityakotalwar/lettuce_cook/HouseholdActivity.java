@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -274,19 +276,19 @@ public class HouseholdActivity extends AppCompatActivity {
 
     }
 
-    public void showInvites(){
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final DocumentReference dr = db.collection("Users").document(user.getUid());
-        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                final String hName = documentSnapshot.getString("invited");
-                if(!hName.equals("")){
-                    invitesText.setText("You are invited to " +hName+" household!");
-                }
-            }
-        });
-    }
+//    public void showInvites(){
+//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        final DocumentReference dr = db.collection("Users").document(user.getUid());
+//        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+//                final String hName = documentSnapshot.getString("invited");
+//                if(!hName.equals("")){
+//                    invitesText.setText("You are invited to " +hName+" household!");
+//                }
+//            }
+//        });
+//    }
 
 
     public void checkUserExists(final String id){
@@ -346,6 +348,107 @@ public class HouseholdActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void showInvites(){
+
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        android.app.AlertDialog.Builder mBuilder = new android.app.AlertDialog.Builder(HouseholdActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.list_view_join_decline, null);
+        mBuilder.setView(mView);
+        final ListView listView = mView.findViewById(R.id.invite_view);
+        final android.app.AlertDialog dialog = mBuilder.create();
+        dialog.show();
+
+        final ArrayList<String> invites = new ArrayList<>();
+
+        db.collection("Household").document(user.getUid()).
+                addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        invites.clear();
+                        populateInvites(listView, db, invites);
+                    }
+                });
+
+    }
+
+
+    public void populateInvites(final ListView listView, final FirebaseFirestore db,
+                             final ArrayList<String> invites){
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+//        notification_title.add("RJNCDKJDNCJNLCECNCNEJ");
+//        notification_body.add("kjenvuj");
+//        sender.add("ckjncj");
+
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                String[] inviteForHousehold = documentSnapshot.get("invites").toString().split(" ");
+                final int size = inviteForHousehold.length;
+                for(int i=0; i<size; i++){
+
+                            invites.add(documentSnapshot.get("invites").toString());
+
+                            HouseholdActivity.CustomAdapter customAdapter = new HouseholdActivity.CustomAdapter(invites);
+                            listView.setAdapter(customAdapter);
+                }
+
+            }
+        });
+
+
+
+    }
+
+
+
+    /** This is where the dynamic join decline shit starts
+     * there is a new class created that will help dynamically help created
+     * class starts here
+     * yaaaaas queen
+     */
+
+    class CustomAdapter extends BaseAdapter {
+
+        ArrayList<String> invites;
+
+        public CustomAdapter(ArrayList<String> invites) {
+
+            this.invites = invites;
+
+        }
+        @Override
+        public int getCount() {
+            return this.invites.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 1;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = getLayoutInflater().inflate(R.layout.dialog_join_decline, null);
+            TextView inviteName = convertView.findViewById(R.id.invite_name);
+            Button joinButton = convertView.findViewById(R.id.join_button);
+            Button declineButton = convertView.findViewById(R.id.decline_button);
+
+            inviteName.setText(invites.get(position));
+
+            return convertView;
+        }
     }
 
 
