@@ -6,12 +6,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,9 +33,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.annotation.Nullable;
+
+import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.NULL;
 
 public class Friends extends AppCompatActivity {
     private Button groceryButton;
@@ -39,6 +49,9 @@ public class Friends extends AppCompatActivity {
     private Button recipesButton;
     private Button showUsersButton;
     private TextView listOfUsers;
+    ListView listFriends;
+    SearchView searchView;
+    ArrayAdapter<String> adapter;
 
     private Button showNotiButton;
     private String friendToBeAdded;
@@ -56,6 +69,50 @@ public class Friends extends AppCompatActivity {
         recipesButton = findViewById(R.id.buttonRecipes);
         showUsersButton = findViewById(R.id.showUsers);
         listOfUsers = findViewById(R.id.listUsers);
+        listFriends = findViewById(R.id.listviewFriends);
+        final ArrayList<String> arrayFriends = new ArrayList<>();
+        final ArrayList<String> arrayHouseholds = new ArrayList<>();
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+
+        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                    if (!arrayFriends.contains(ds.getString("username"))) {
+                        arrayFriends.add(ds.getString("username"));
+                        arrayHouseholds.add(ds.getString("household"));
+                    }
+                }
+            }
+        });
+        //  arrayFriends.addAll(Arrays.asList(getResources().getStringArray(R.array.array_friends)));
+
+        adapter = new ArrayAdapter<>(
+                Friends.this,
+                android.R.layout.simple_list_item_1,
+                arrayHouseholds);
+        listFriends.setAdapter(adapter);
+
+        listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
+                Notifications n = new Notifications();
+                try {
+                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+//                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), " ", "Friend Reuqest Sent!", adapter.getItem(i) );
+//                notiCollection.sendInAppNotification(notiCollection);
+                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+              // Toast.makeText(Friends.this, "Hello " + arrayHouseholds.get(arrayFriends.indexOf(adapter.getItem(i))), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        showNotiButton = findViewById(R.id.showNotiButton);
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         friendRequestsButton = findViewById(R.id.friendRequest);
 
         showNotiButton = findViewById(R.id.showNotiButton);
@@ -127,15 +184,34 @@ public class Friends extends AppCompatActivity {
                     }
                 });
 
-                builder.show();
             }
         });
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_search, menu);
+        MenuItem item = menu.findItem(R.id.menuSearch);
+        searchView = (SearchView)item.getActionView();
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                adapter.getFilter().filter(s);
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     public void showTheUsers(){
-
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         // store the user details in a userCollection class
         System.out.println(user.getUid());
@@ -237,14 +313,9 @@ public class Friends extends AppCompatActivity {
 
     }
 
-    public void populateNoti(final ListView listView, final FirebaseFirestore db, String household,
+    public void populateNoti(final ListView listView, final FirebaseFirestore db, final String household,
                              final ArrayList<String> notification_title, final ArrayList<String> notification_body, final ArrayList<String> sender){
 
-
-
-//        notification_title.add("RJNCDKJDNCJNLCECNCNEJ");
-//        notification_body.add("kjenvuj");
-//        sender.add("ckjncj");
 
         db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -265,12 +336,6 @@ public class Friends extends AppCompatActivity {
                             CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
                             listView.setAdapter(customAdapter);
 
-                              //                            String[] noti_body = new String[1]; noti_body[0] = documentSnapshot.get("noti_body").toString();
-//                            String[] sender_username = new String[1]; sender_username[0] = documentSnapshot.get("sender_username").toString();
-
-//                            FriendsNotiCustomListView customListView = new FriendsNotiCustomListView(, noti_title, noti_body, sender_username);
-
-//                            arrayAdapter.add(documentSnapshot.get("noti_body").toString());
                         }
                     });
                 }
@@ -281,11 +346,6 @@ public class Friends extends AppCompatActivity {
 
 
     }
-
-//    public String[] notiSplitter(String noti_list){
-//        String[] notifications = noti_list.split("|");
-//        return notifications;
-//    }
 
     public void sendNoti(){
         InAppNotiCollection noti = new InAppNotiCollection("totalwar1","aditya","alisha","have my babies");

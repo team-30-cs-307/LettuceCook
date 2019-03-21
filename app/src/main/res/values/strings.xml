@@ -12,5 +12,16 @@
     <string name="Open">LettuceCook-master</string>
     <string name="Close">LettuceCook-master</string>
 
+    <string-array name="array_friends">
+        <item>Aditya</item>
+        <item>Rushank</item>
+        <item>Priyansh</item>
+        <item>Alisha</item>
+        <item>Aahan</item>
+        <item>Raditya</item>
+        <item>Pappu</item>
+
+
+    </string-array>
 
 </resources>
