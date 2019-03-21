@@ -40,6 +40,16 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> stock = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
 
+    private DrawerLayout dl;
+    private ActionBarDrawerToggle t;
+    private NavigationView nv;
+
     String userToBeAdded;
 
 
@@ -79,6 +93,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dl = (DrawerLayout)findViewById(R.id.activity_drawer);
+        t = new ActionBarDrawerToggle(this, dl,R.string.Open, R.string.Close);
+
+        dl.addDrawerListener(t);
+        t.syncState();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        nv = (NavigationView)findViewById(R.id.nv);
+        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
+
+                switch(id)
+                {
+                    case R.id.home:
+                        Toast.makeText(MainActivity.this, "My Account",Toast.LENGTH_SHORT).show();
+                        return true;
+                    case R.id.edit_name:
+                        editUserName();
+                        return true;
+                    case R.id.edit_pw:
+                        editPw();
+                        return true;
+                    case R.id.leave_house:
+                        AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
+                        logout_confir.setMessage("Are you sure you want to leave the household")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        leaveHousehold();
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog = logout_confir.create();
+                        alertDialog.show();
+                        return true;
+                    case R.id.logout:
+                        AlertDialog.Builder logout_confir1 = new AlertDialog.Builder(MainActivity.this);
+                        logout_confir1.setMessage("Are you sure you want to logout")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        firebaseAuth.signOut();
+                                        finish();
+                                        startActivity(new Intent(getApplicationContext(), SignIn.class));
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog1 = logout_confir1.create();
+                        alertDialog1.show();
+                        return true;
+                    default:
+                         return true;
+                }
+            }
+        });
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -93,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(documentSnapshot.getString("household").equals("")){
+                if(documentSnapshot.get("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
@@ -379,6 +466,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
     }
+    public void realtime(final String householdName){
+        db.collection("Household").document(householdName).collection("Grocery Items").whereEqualTo("status", "stock")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        //System.out.println("going in here");
+                        arrayAdapter.clear();
+                        //repopulate(arrayAdapter, householdName);
+                        for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
+                           arrayAdapter.add(doc.getId());
+                        }
+                    }
+                });
+
+    }
 
 
     @Override
@@ -389,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String descEntered = addDescription.getText().toString();
 
                 flag = 0;
-
+                realtime(GetCurrentHouseholdName());
 //                addItemT.setText("");
 //                arrayAdapter.add(itemEntered);
 
@@ -477,16 +579,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot2) {
-//                        ArrayList<String> listMembers = new ArrayList<>();
-//                        for (Object item : documentSnapshot2.getData().values()) {
-//                            listMembers.add(item.toString());
-//                            System.out.println(item.toString());
-//                        }
-//                        listMembers.remove(user.getUid());
-                        String listMembers = documentSnapshot2.getString("members");
-                        String listNewMembers = remove(listMembers.split(","), user.getUid());
+                        ArrayList<String> listMembers = new ArrayList<>();
+                        for (Object item : documentSnapshot2.getData().values()) {
+                            listMembers.add(item.toString());
+                            System.out.println(item.toString());
+                        }
+                        listMembers.remove(user.getUid());
                         db.collection("Household").document(hName).update("members", "");
-                        db.collection("Household").document(hName).update("members", listNewMembers);
+                        db.collection("Household").document(hName).update("members", listMembers);
 
                         /*Notification chunk */
 
@@ -720,6 +820,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Extracting participants ArrayList from each document
     }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (t.onOptionsItemSelected(item))
+            return true;
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
 
 
