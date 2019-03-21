@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -44,8 +45,6 @@ public class HouseholdActivity extends AppCompatActivity {
     private Button createHouseholdButton;
     private EditText householdText;
     private FirebaseFirestore db;
-    private EditText addMemberText;
-    private Button addMemberButton;
     private Button joinButton;
     private Button showInvitesButton;
     private TextView invitesText;
@@ -53,18 +52,17 @@ public class HouseholdActivity extends AppCompatActivity {
     private TextView listOfUsers;
 
     private String householdName;
+    //final Household household = new Household();
 
-    final Household household = new Household();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_household);
 
+
         createHouseholdButton = (Button) findViewById(R.id.HouseholdButton);
         householdText = (EditText) findViewById(R.id.householdText);
 
-        addMemberText = (EditText) findViewById(R.id.addMemberText);
-        addMemberButton = findViewById(R.id.addMemberButton);
         joinButton = findViewById(R.id.joinHouseholdButton);
         showInvitesButton = findViewById(R.id.showInvites);
         invitesText = findViewById(R.id.invites);
@@ -137,48 +135,52 @@ public class HouseholdActivity extends AppCompatActivity {
 
         //invite();
 
-        addMemberButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String member = addMemberText.getText().toString().trim();
-                if(!member.isEmpty()) {
-                    addMember(member);
-                }else{
-                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+//        addMemberButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                String member = addMemberText.getText().toString().trim();
+//                if(!member.isEmpty()) {
+//                    addMember(member);
+//                }else{
+//                    Toast.makeText(HouseholdActivity.this, "Please enter a username", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
     }
 
     public void createHousehold(){
 
         householdName = householdText.getText().toString();
 
-        CollectionReference dbHousehold = db.collection("Household");
+
+        //CollectionReference dbHousehold = db.collection("Household");
         // Gets the userId of the person loggen in.
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        final ArrayList<String> member = new ArrayList<>();
-        member.add(user.getUid());
-        final String notification_id = "";
+      //  final ArrayList<String> member = new ArrayList<>();
+        //member.add(user.getUid());
 
+        final String notification_id = "";
+        Household household = new Household(user.getUid(), "");
+//       household.setMember(user.getUid());
+//       household.setInvited("");
 //        System.out.println(member.get(0));
         // store the user details in a userCollection class
-        dbHousehold.document(householdName)
+        db.collection("Household").document(householdName)
                 .set(household)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         db.collection("Users").document(user.getUid()).update("household", householdName);
-                        db.collection("Household").document(householdName).update("members", member);
+                        db.collection("Household").document(householdName).update("members", user.getUid());
 
                         db.collection("Household").document(householdName).update("noti_list", notification_id);
 //                        RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
 
                         FirebaseMessaging.getInstance().subscribeToTopic(householdName);
 
-                        finish();
+                        //finish(); //just commented this out yaas queen
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 })
@@ -195,45 +197,6 @@ public class HouseholdActivity extends AppCompatActivity {
         // finishes the current activity
     }
 
-    public void addMember(final String member){
-        householdName = householdText.getText().toString();
-        db = FirebaseFirestore.getInstance();
-        final List<String> list = new ArrayList<>();
-
-        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                boolean userPresent = false;
-                for(DocumentSnapshot ds : queryDocumentSnapshots ){
-                    userPresent = false;
-                    if(ds.getString("username").equals(member)){
-                        //household.addMember(ds.getId());
-                        db.collection("Users").document(ds.getId()).update("invited", householdName);
-                        // db.collection("Users").document(ds.getId()).update("invited", "");
-                        Toast.makeText(HouseholdActivity.this, "User invited!", Toast.LENGTH_LONG).show();
-                        userPresent = true;
-
-                        /*Sends notification if a household invites a particular user*/
-                        RequestQueue requestQueue = Volley.newRequestQueue(HouseholdActivity.this);
-                        Notifications n = new Notifications();
-                        try {
-                            n.sendNotification("Invitation",householdName+"has invited you to their houseold!", ds.getId(), requestQueue);
-                        } catch (InstantiationException e1) {
-                            e1.printStackTrace();
-                        } catch (IllegalAccessException e1) {
-                            e1.printStackTrace();
-                        }
-
-                        return;
-                    }
-                }
-                // if(!userPresent){
-
-                ///}
-            }
-        });
-        //Extracting participants ArrayList from each document
-    }
 
     public void invite(){
 
@@ -273,12 +236,10 @@ public class HouseholdActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot2) {
                             //String hName = documentSnapshot2.getString("invited");
-                            ArrayList<String> listMembers = new ArrayList<>();
-                            for (Object item : documentSnapshot2.getData().values()) {
-                                listMembers.add(item.toString());
-                                System.out.println(item.toString());
-                            }
-                            listMembers.add(user.getUid());
+                            String listMembers = documentSnapshot2.getString("members");
+                            System.out.println("entered here " + listMembers);
+                            listMembers += "," + user.getUid();
+                            System.out.println("after appending " + listMembers);
                             db.collection("Household").document(hName).update("members", listMembers);
 
                             /*Sends Notification*/
@@ -301,6 +262,15 @@ public class HouseholdActivity extends AppCompatActivity {
                 }
             }
         });
+
+    }
+    public void decline(){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // store the user details in a userCollection class
+        System.out.println(user.getUid());
+        db.collection("Users").document(user.getUid()).update("invited", "");
+        Toast.makeText(HouseholdActivity.this, "Invitation declined!", Toast.LENGTH_LONG).show();
+
 
     }
 

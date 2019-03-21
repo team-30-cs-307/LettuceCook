@@ -2,12 +2,14 @@
 package com.example.adityakotalwar.lettuce_cook;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -40,6 +42,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -61,12 +64,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button editPwButton;
     private Button editUserNameButton;
     private Button leaveHouseholdButton;
+    private Button addMemberButton;
 
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
 
     ArrayList<String> stock = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
+
+    String userToBeAdded;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(documentSnapshot.get("household").equals("")){
+                if(documentSnapshot.getString("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
@@ -106,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editPwButton = (Button) findViewById(R.id.editPwButton);
         editUserNameButton = (Button) findViewById(R.id.editUserNameButton);
         leaveHouseholdButton = findViewById(R.id.leaveHouseholdButton);
+        addMemberButton = findViewById(R.id.addMemberButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
@@ -184,6 +192,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 //user.getUsername();
                 Household = documentSnapshot.getString("household");
+
+            }
+        });
+        final Context obj = this;
+
+        addMemberButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(obj);
+                builder.setTitle("Enter username of member to be invited");
+
+// Set up the input
+                final EditText input = new EditText(obj);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+               // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                builder.setView(input);
+
+// Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        userToBeAdded = input.getText().toString();
+                        System.out.println("getting username " +userToBeAdded);
+                        addMember(userToBeAdded);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
 
             }
         });
@@ -434,14 +477,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot2) {
-                        ArrayList<String> listMembers = new ArrayList<>();
-                        for (Object item : documentSnapshot2.getData().values()) {
-                            listMembers.add(item.toString());
-                            System.out.println(item.toString());
-                        }
-                        listMembers.remove(user.getUid());
+//                        ArrayList<String> listMembers = new ArrayList<>();
+//                        for (Object item : documentSnapshot2.getData().values()) {
+//                            listMembers.add(item.toString());
+//                            System.out.println(item.toString());
+//                        }
+//                        listMembers.remove(user.getUid());
+                        String listMembers = documentSnapshot2.getString("members");
+                        String listNewMembers = remove(listMembers.split(","), user.getUid());
                         db.collection("Household").document(hName).update("members", "");
-                        db.collection("Household").document(hName).update("members", listMembers);
+                        db.collection("Household").document(hName).update("members", listNewMembers);
 
                         /*Notification chunk */
 
@@ -469,6 +514,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         });
     }
+
+    private String remove(String [] mems, String user){
+        for(String a : mems)
+            System.out.println(a);
+        String newMems = "";
+        for(int i=0; i< mems.length; i++){
+                if(!mems[i].equalsIgnoreCase(user)){
+                    if(i==0){
+                            newMems = mems[i];
+                    }
+                    else {
+                        newMems += "|" + mems[i];
+                    }
+                }
+        }
+        return newMems;
+    }
+
 
     private void editPw(){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
@@ -608,6 +671,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+    }
+
+    public void addMember(final String member){
+
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                final String householdName = documentSnapshot.getString("household");
+                db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        boolean userPresent = false;
+                        for(DocumentSnapshot ds : queryDocumentSnapshots ){
+                            userPresent = false;
+                            System.out.println("GETTING HERE " +ds.getString("username")+ " " +member);
+                            if(ds.getString("username").equals(member)){
+                                System.out.println("GETTING HERE 222222222");
+                                db.collection("Users").document(ds.getId()).update("invited", householdName);
+                                // db.collection("Users").document(ds.getId()).update("invited", "");
+                                Toast.makeText(getApplicationContext(), "User invited!", Toast.LENGTH_LONG).show();
+                                userPresent = true;
+
+                        /*Sends notification if a household invites a particular user*/
+                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                Notifications n = new Notifications();
+                                try {
+                                    n.sendNotification("Invitation",householdName+"has invited you to their houseold!", ds.getId(), requestQueue);
+                                } catch (InstantiationException e1) {
+                                    e1.printStackTrace();
+                                } catch (IllegalAccessException e1) {
+                                    e1.printStackTrace();
+                                }
+
+                                return;
+                            }
+                        }
+                        // if(!userPresent){
+
+                        ///}
+                    }
+                });
+            }
+        });
+
+
+        //Extracting participants ArrayList from each document
     }
 }
 

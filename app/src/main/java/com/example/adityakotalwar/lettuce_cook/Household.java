@@ -11,14 +11,17 @@ import java.util.Date;
 @IgnoreExtraProperties
 public class Household {
 
-  //  private String householdName;
-    private ArrayList<String> members = new ArrayList<>();
+    private String householdName;
+   // private ArrayList<String> members = new ArrayList<>();
     String notification_ids = "";
+    private String members;
+    private String friendRequests;
     //private @ServerTimestamp Date timestamp;
 
-//    public Household(String householdName){
-//        this.householdName = householdName;
-//    }
+    public Household(String members, String friendRequests){
+        this.members = members;
+        this.friendRequests = friendRequests;
+    }
 
     public Household(){
 
@@ -32,11 +35,16 @@ public class Household {
     //    return householdName;
     //}
 
-    public void addMember(String member){
-        members.add(member);
+    public void setMember(String member){
+        this.members = member;
     }
 
-    public ArrayList getMembers(){
+    public void setInvited(String friendRequests){
+        this.friendRequests = friendRequests;
+    }
+
+
+    public String getMembers(){
         return members;
     }
 

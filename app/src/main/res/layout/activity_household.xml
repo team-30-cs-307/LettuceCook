@@ -14,18 +14,47 @@
 
     <EditText android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.48" app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="24dp" android:layout_marginStart="84dp" android:layout_marginEnd="99dp" android:id="@+id/householdText" app:layout_constraintTop_toTopOf="parent" android:inputType="textPersonName" android:hint="Enter household name" android:ems="10"/>
 
-    <EditText android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/householdText" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="32dp" android:layout_marginStart="84dp" android:layout_marginEnd="99dp" android:id="@+id/addMemberText" android:inputType="textPersonName" android:hint="Add username" android:ems="10"/>
+    <Button
+        android:id="@+id/joinHouseholdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_marginBottom="76dp"
+        android:layout_marginEnd="162dp"
+        android:layout_marginStart="148dp"
+        android:layout_marginTop="130dp"
+        android:text="JOIN"
+        app:layout_constraintBottom_toTopOf="@+id/HouseholdButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button android:layout_height="48dp" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/addMemberText" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:text="Add user" android:layout_marginTop="32dp" android:layout_marginStart="148dp" android:layout_marginEnd="160dp" android:id="@+id/addMemberButton"/>
+    <Button
+        android:id="@+id/showInvites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="56dp"
+        android:layout_marginEnd="54dp"
+        android:layout_marginStart="52dp"
+        android:text="Show invites"
+        app:layout_constraintBottom_toTopOf="@+id/joinHouseholdButton"
+        app:layout_constraintEnd_toStartOf="@+id/invites"
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <Button android:layout_height="45dp" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/addMemberButton" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:text="JOIN" android:layout_marginTop="148dp" android:layout_marginStart="148dp" android:layout_marginEnd="162dp" android:layout_marginBottom="76dp" android:id="@+id/joinHouseholdButton" app:layout_constraintBottom_toTopOf="@+id/HouseholdButton"/>
-
-    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/addMemberButton" app:layout_constraintStart_toStartOf="parent" android:text="Show invites" android:layout_marginTop="44dp" android:layout_marginStart="52dp" android:layout_marginEnd="54dp" android:layout_marginBottom="56dp" android:id="@+id/showInvites" app:layout_constraintBottom_toTopOf="@+id/joinHouseholdButton" app:layout_constraintEnd_toStartOf="@+id/invites"/>
-
-    <TextView android:layout_height="55dp" android:layout_width="141dp" app:layout_constraintTop_toBottomOf="@+id/addMemberText" app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="116dp" android:layout_marginStart="53dp" android:layout_marginEnd="31dp" android:layout_marginBottom="177dp" android:id="@+id/invites" app:layout_constraintBottom_toTopOf="@+id/HouseholdButton" app:layout_constraintStart_toEndOf="@+id/showInvites"/>
+    <TextView
+        android:id="@+id/invites"
+        android:layout_width="141dp"
+        android:layout_height="55dp"
+        android:layout_marginBottom="177dp"
+        android:layout_marginEnd="31dp"
+        android:layout_marginStart="53dp"
+        app:layout_constraintBottom_toTopOf="@+id/HouseholdButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/showInvites" />
 
     <Button android:layout_height="wrap_content" android:layout_width="wrap_content" app:layout_constraintTop_toBottomOf="@+id/showInvites" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" android:text="showUsers" android:layout_marginTop="116dp" android:layout_marginStart="47dp" android:layout_marginEnd="263dp" android:layout_marginBottom="29dp" android:id="@+id/showUsers" app:layout_constraintBottom_toTopOf="@+id/HouseholdButton"/>
 
     <TextView android:layout_height="105dp" android:layout_width="119dp" app:layout_constraintTop_toBottomOf="@+id/invites" app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="71dp" android:layout_marginStart="18dp" android:layout_marginEnd="25dp" android:layout_marginBottom="7dp" android:id="@+id/listUsers" app:layout_constraintBottom_toTopOf="@+id/HouseholdButton" app:layout_constraintStart_toEndOf="@+id/joinHouseholdButton"/>
+
 
 </android.support.constraint.ConstraintLayout>

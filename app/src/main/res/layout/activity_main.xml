@@ -118,6 +118,14 @@
     </LinearLayout>
 
     <include layout="@layout/tabbar"/>
+
+    <Button
+        android:id="@+id/addMemberButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/button_add_item"
+        android:layout_alignTop="@+id/edit_text_add_description"
+        android:text="Add Member" />
     <!--<ImageView-->
         <!--android:iwd="@+id/add_button"-->
         <!--android:layout_width="wrap_content"-->

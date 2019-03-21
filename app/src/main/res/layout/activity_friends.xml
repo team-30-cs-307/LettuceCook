@@ -78,4 +78,14 @@
             android:text="Friends" />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/friendRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/showUsers"
+        android:layout_below="@+id/showNotiButton"
+        android:layout_marginStart="71dp"
+        android:layout_marginTop="72dp"
+        android:text="SEND FRIEND REQUEST" />
+
 </android.widget.RelativeLayout>
