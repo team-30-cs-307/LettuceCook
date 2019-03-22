@@ -25,6 +25,7 @@
         </activity>
         <activity android:name=".Recipes" />
         <activity android:name=".Friends" />
+        <activity android:name=".SuggestedRecipe"/>
         <activity
             android:name=".HouseholdActivity"
             android:theme="@style/AppThemeNoActionBar" />

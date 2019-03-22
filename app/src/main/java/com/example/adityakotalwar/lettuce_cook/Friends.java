@@ -106,7 +106,6 @@ public class Friends extends AppCompatActivity {
 //                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), " ", "Friend Reuqest Sent!", adapter.getItem(i) );
 //                notiCollection.sendInAppNotification(notiCollection);
                 Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
-              // Toast.makeText(Friends.this, "Hello " + arrayHouseholds.get(arrayFriends.indexOf(adapter.getItem(i))), Toast.LENGTH_LONG).show();
             }
         });
 
