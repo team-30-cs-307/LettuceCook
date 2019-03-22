@@ -15,6 +15,30 @@
       },
       "oauth_client": [
         {
+          "client_id": "1089854627684-3dj8ltc8jrsvdglvbf567sggf52fjmkp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adityakotalwar.lettuce_cook",
+            "certificate_hash": "07174f4c0a3a6031c0c9499c956527fe5bae6b53"
+          }
+        },
+        {
+          "client_id": "1089854627684-sah3ffans6o20sjlj6bcbopc7it5cd1e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adityakotalwar.lettuce_cook",
+            "certificate_hash": "605fba32d1270a0524cbd4505ded7b2249c4bede"
+          }
+        },
+        {
+          "client_id": "1089854627684-g0f0n8et0dq85iqno6o7uodjd048i6pe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adityakotalwar.lettuce_cook",
+            "certificate_hash": "6da88ac76ad1ab6d309c1f89d383a2b3b9800779"
+          }
+        },
+        {
           "client_id": "1089854627684-4llf64kgtnj78id2v8bj0t3ln4n7dvsk.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +53,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1089854627684-rk2goti3d3u9vgjf43gs7bst8qnigoi7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2

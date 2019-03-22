@@ -26,6 +26,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText addDescription;
 
     private Button buttonFriends;
+    private Button buttonGroceries;
 
     private Button editPwButton;
     private Button editUserNameButton;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(this);
 
         dl = (DrawerLayout)findViewById(R.id.activity_drawer);
         t = new ActionBarDrawerToggle(this, dl,R.string.Open, R.string.Close);
@@ -167,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -194,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
+        buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
 
 
         addMemberButton = findViewById(R.id.addMemberButton);
@@ -219,6 +225,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
   //      editUserNameButton.setOnClickListener(this);
 
         buttonFriends.setOnClickListener(this);
+        //buttonGroceries.setOnClickListener(this);
+        buttonGroceries.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                Intent myIntent = new Intent(MainActivity.this, Grocery.class);
+
+                startActivity(myIntent);
+            }
+        });
 
         listView.setAdapter(arrayAdapter);
 
@@ -506,6 +522,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
+
+
+
         }
         if (v == buttonLogout) {
             buttonLogout.setOnClickListener(
@@ -549,7 +568,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == buttonFriends){
             finish();
             startActivity(new Intent(getApplicationContext(), Friends.class));
-        }
+       }
+//        if(v == buttonGroceries){
+//            finish();
+//            startActivity(new Intent(getApplicationContext(), Grocery.class));
+//
+//        }
     }
 
     @Override

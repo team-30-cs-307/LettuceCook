@@ -24,6 +24,7 @@
 
         <!--<include layout="@layout/activity_nav_drawer"/>-->
 
+
         <ListView
             android:id="@+id/my_list_view2"
             android:layout_width="357dp"
@@ -37,6 +38,11 @@
             android:longClickable="true"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />
+
+
+
+
+
 
         <EditText
             android:id="@+id/edit_text_add_item"
