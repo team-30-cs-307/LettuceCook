@@ -7,13 +7,15 @@
     tools:context=".Friends">
 
 
+
     <TextView
         android:id="@+id/listUsers"
         android:layout_width="wrap_content"
-        android:layout_height="85dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignTop="@+id/showUsers"
-        android:layout_marginEnd="13dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/showUsers"
+        android:layout_alignBottom="@+id/showUsers"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="30dp"
         android:text="TextView"
         tools:text="gyguguguguygugyugy" />
 
@@ -21,19 +23,17 @@
         android:id="@+id/showUsers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="145dp"
-        android:layout_marginStart="13dp"
-        android:text="Show users in household" />
+        android:layout_above="@+id/friendRequest"
+        android:layout_marginBottom="23dp"
+        android:layout_toEndOf="@+id/showNotiButton"
+        android:text="Show users" />
 
     <Button
         android:id="@+id/showNotiButton"
-        android:layout_width="106dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/showUsers"
-        android:layout_below="@+id/showUsers"
-        android:layout_marginTop="-132dp"
+        android:layout_alignStart="@+id/listUsers"
+        android:layout_alignTop="@+id/friendRequest"
         android:text="Show Notification" />
 
     <LinearLayout
@@ -43,7 +43,6 @@
         android:layout_marginTop="463dp"
         android:gravity="bottom"
         android:orientation="horizontal">
-
 
         <Button
             android:id="@+id/buttonGrocery"
@@ -90,10 +89,28 @@
         android:id="@+id/friendRequest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/listUsers"
-        android:layout_marginEnd="70dp"
-        android:text="Send Friend Request" />
+        android:layout_marginBottom="52dp"
+        android:layout_marginEnd="13dp"
+        android:text="SEND FRIEND REQUEST" />
 
+    <Button
+        android:id="@+id/showRequests"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="Show friend requests and invitations" />
+
+    <ListView
+        android:id="@+id/requests_and_invites"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/showUsers"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="70dp"
+        android:layout_marginTop="52dp" />
 
 </android.widget.RelativeLayout>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<android.widget.RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context="com.example.adityakotalwar.lettuce_cook.HouseholdActivity"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@drawable/wallpaper"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditText
+        android:id="@+id/householdText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/invites"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="24dp"
+        android:ems="10"
+        android:hint="Enter household name"
+        android:inputType="textPersonName"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="446dp" />
+
+    <Button
+        android:id="@+id/joinHouseholdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_alignTop="@+id/showUsers"
+        android:layout_toEndOf="@+id/listUsers"
+        android:text="JOIN" />
+
+    <Button
+        android:id="@+id/showInvites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/invites"
+        android:layout_toEndOf="@+id/showUsers"
+        android:text="Show invites" />
+
+    <TextView
+        android:id="@+id/invites"
+        android:layout_width="141dp"
+        android:layout_height="55dp"
+        android:layout_alignEnd="@+id/showInvites"
+        android:layout_centerVertical="true" />
+
+    <Button
+        android:id="@+id/showUsers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/listUsers"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:text="showUsers"
+        tools:layout_editor_absoluteX="30dp"
+        tools:layout_editor_absoluteY="503dp" />
+
+    <TextView
+        android:id="@+id/listUsers"
+        android:layout_width="119dp"
+        android:layout_height="105dp"
+        android:layout_above="@+id/showUsers"
+        android:layout_alignEnd="@+id/householdText"
+        android:layout_marginBottom="29dp"
+        app:layout_constraintBottom_toTopOf="@+id/HouseholdButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/joinHouseholdButton"
+        app:layout_constraintTop_toBottomOf="@+id/invites" />
+
+    <Button
+        android:id="@+id/householdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/listUsers"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/listUsers"
+        android:text="CREATE HOUSEHOLD" />
+
+    <ListView
+        android:id="@+id/invite_view2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/householdButton"
+        android:layout_alignParentStart="true" />
+
+
+</android.widget.RelativeLayout>

@@ -1,6 +1,7 @@
 
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -8,12 +9,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +46,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public class HouseholdActivity extends AppCompatActivity {
+public class HouseholdActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Button createHouseholdButton;
     private EditText householdText;
@@ -53,16 +57,22 @@ public class HouseholdActivity extends AppCompatActivity {
     private Button showUsersButton;
     private TextView listOfUsers;
 
+    private ListView inviting_view;
+    private CustomAdapter inviteListAdapter;
+
     private String householdName;
+
+
+    private ArrayList<String> invites = new ArrayList<>();
     //final Household household = new Household();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_household);
+        setContentView(R.layout.activity_household2);
 
 
-        createHouseholdButton = (Button) findViewById(R.id.HouseholdButton);
+        createHouseholdButton = (Button) findViewById(R.id.householdButton);
         householdText = (EditText) findViewById(R.id.householdText);
 
         joinButton = findViewById(R.id.joinHouseholdButton);
@@ -70,7 +80,12 @@ public class HouseholdActivity extends AppCompatActivity {
         invitesText = findViewById(R.id.invites);
         showUsersButton = findViewById(R.id.showUsers);
         listOfUsers = findViewById(R.id.listUsers);
-
+        inviting_view = findViewById(R.id.invite_view2);
+//        ArrayList<String> inv = getInvites();
+//        inviteListAdapter = new CustomAdapter(this,inv);
+//
+//       inviting_view.setAdapter(inviteListAdapter);
+      //  showInvites();
         db = FirebaseFirestore.getInstance();
 
         createHouseholdButton.setOnClickListener(new View.OnClickListener() {
@@ -97,29 +112,29 @@ public class HouseholdActivity extends AppCompatActivity {
             }
         });
 
-        joinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder logout_confir = new AlertDialog.Builder(HouseholdActivity.this);
-                logout_confir.setMessage("Are you sure you want to join this household")
-                        .setCancelable(false)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                join();
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                AlertDialog alertDialog = logout_confir.create();
-                alertDialog.show();
-            }
-        });
+//        joinButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AlertDialog.Builder logout_confir = new AlertDialog.Builder(HouseholdActivity.this);
+//                logout_confir.setMessage("Are you sure you want to join this household")
+//                        .setCancelable(false)
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                join();
+//                                finish();
+//                            }
+//                        })
+//                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.cancel();
+//                            }
+//                        });
+//                AlertDialog alertDialog = logout_confir.create();
+//                alertDialog.show();
+//            }
+//        });
 
         showInvitesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +165,30 @@ public class HouseholdActivity extends AppCompatActivity {
 //        });
     }
 
+    @Override
+    public void onClick(View view) {
+    //    if (view.getId() == R.id.ButtonSignup || view.getId() == R.id.leave_house){
+            showInvites();
+      //  }
+    }
+
+    public ArrayList<String> getInvites(){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                String[] inviteForHousehold = documentSnapshot.getString("invited").toString().split(" ");
+                final int size = inviteForHousehold.length;
+                for(int i=0; i<size; i++){
+
+                    invites.add(inviteForHousehold[i]);
+                }
+            }
+        });
+        return invites;
+    }
+
     public void createHousehold(){
 
         householdName = householdText.getText().toString();
@@ -164,7 +203,7 @@ public class HouseholdActivity extends AppCompatActivity {
         //member.add(user.getUid());
 
         final String notification_id = "";
-        Household household = new Household(user.getUid(), "");
+        Household household = new Household(user.getUid(), "", "");
 //       household.setMember(user.getUid());
 //       household.setInvited("");
 //        System.out.println(member.get(0));
@@ -240,9 +279,10 @@ public class HouseholdActivity extends AppCompatActivity {
                             //String hName = documentSnapshot2.getString("invited");
                             String listMembers = documentSnapshot2.getString("members");
                             System.out.println("entered here " + listMembers);
-                            listMembers += "," + user.getUid();
+                            listMembers += " " + user.getUid();
                             System.out.println("after appending " + listMembers);
                             db.collection("Household").document(hName).update("members", listMembers);
+                            householdName = hName;
 
                             /*Sends Notification*/
                             RequestQueue requestQueue = Volley.newRequestQueue(HouseholdActivity.this);
@@ -276,27 +316,11 @@ public class HouseholdActivity extends AppCompatActivity {
 
     }
 
-//    public void showInvites(){
-//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        final DocumentReference dr = db.collection("Users").document(user.getUid());
-//        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-//                final String hName = documentSnapshot.getString("invited");
-//                if(!hName.equals("")){
-//                    invitesText.setText("You are invited to " +hName+" household!");
-//                }
-//            }
-//        });
-//    }
-
-
     public void checkUserExists(final String id){
 
         db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
             boolean exists = false;
             ArrayList<String> listMembers = new ArrayList<>();
-
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 for (DocumentSnapshot ds : queryDocumentSnapshots) {
@@ -352,59 +376,13 @@ public class HouseholdActivity extends AppCompatActivity {
 
     public void showInvites(){
 
-        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        ArrayList<String> inv = getInvites();
+        inviteListAdapter = new CustomAdapter(this,inv);
 
-        android.app.AlertDialog.Builder mBuilder = new android.app.AlertDialog.Builder(HouseholdActivity.this);
-        View mView = getLayoutInflater().inflate(R.layout.list_view_join_decline, null);
-        mBuilder.setView(mView);
-        final ListView listView = mView.findViewById(R.id.invite_view);
-        final android.app.AlertDialog dialog = mBuilder.create();
-        dialog.show();
-
-        final ArrayList<String> invites = new ArrayList<>();
-
-        db.collection("Household").document(user.getUid()).
-                addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        invites.clear();
-                        populateInvites(listView, db, invites);
-                    }
-                });
+        inviting_view.setAdapter(inviteListAdapter);
 
     }
 
-
-    public void populateInvites(final ListView listView, final FirebaseFirestore db,
-                             final ArrayList<String> invites){
-
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-//        notification_title.add("RJNCDKJDNCJNLCECNCNEJ");
-//        notification_body.add("kjenvuj");
-//        sender.add("ckjncj");
-
-        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                String[] inviteForHousehold = documentSnapshot.get("invites").toString().split(" ");
-                final int size = inviteForHousehold.length;
-                for(int i=0; i<size; i++){
-
-                            invites.add(documentSnapshot.get("invites").toString());
-
-                            HouseholdActivity.CustomAdapter customAdapter = new HouseholdActivity.CustomAdapter(invites);
-                            listView.setAdapter(customAdapter);
-                }
-
-            }
-        });
-
-
-
-    }
 
 
 
@@ -417,10 +395,12 @@ public class HouseholdActivity extends AppCompatActivity {
     class CustomAdapter extends BaseAdapter {
 
         ArrayList<String> invites;
+        Context context;
 
-        public CustomAdapter(ArrayList<String> invites) {
+        public CustomAdapter(Context context, ArrayList<String> invites) {
 
             this.invites = invites;
+            this.context = context;
 
         }
         @Override
@@ -440,12 +420,30 @@ public class HouseholdActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            //if(convertView == null){
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = getLayoutInflater().inflate(R.layout.dialog_join_decline, null);
+            //convertView = getLayoutInflater().inflate(R.layout.dialog_join_decline, null);
             TextView inviteName = convertView.findViewById(R.id.invite_name);
             Button joinButton = convertView.findViewById(R.id.join_button);
             Button declineButton = convertView.findViewById(R.id.decline_button);
-
             inviteName.setText(invites.get(position));
+            joinButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    join();
+                }
+            });
+            declineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    decline();
+                }
+            });
+
+
 
             return convertView;
         }

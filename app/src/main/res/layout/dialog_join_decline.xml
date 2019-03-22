@@ -2,24 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="wrap_content" android:background="@drawable/form_field_edit_text" android:padding="5dp">
 
-    <Button
-        android:id="@+id/decline_button"
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="15dp"
-        android:text="Button" />
+        android:layout_alignParentRight="true">
 
-    <Button
-        android:id="@+id/join_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/decline_button"
-        android:layout_alignBottom="@+id/decline_button"
-        android:layout_centerHorizontal="true"
-        android:text="Button" />
+        <Button
+            android:id="@+id/join_button"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+
+            android:layout_alignBaseline="@+id/decline_button"
+            android:layout_alignBottom="@+id/decline_button"
+            android:layout_marginEnd="15dp"
+            android:layout_toStartOf="@+id/decline_button"
+            android:background="@drawable/button_dark_green"
+            android:text="ACCEPT"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/decline_button"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/invite_name"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/button_dark_green"
+            android:text="DECLINE"
+            android:textColor="@color/colorPrimary"
+            android:textSize="12dp" />
+    </android.support.v7.widget.LinearLayoutCompat>
+
 
     <TextView
         android:id="@+id/invite_name"
@@ -27,7 +41,7 @@
         android:layout_height="wrap_content"
         android:textAllCaps="true"
         android:textColor="@color/colorAccent"
-        android:textSize="20dp" />
+        android:textSize="12dp" />
 
     <TextView
         android:id="@+id/sender_username"

@@ -73,6 +73,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                     }
 
                 }
+                System.out.println(selected+"SHSHSHSHS");
                 Toast.makeText(SuggestedRecipe.this, selected, Toast.LENGTH_LONG).show();
             }
         });

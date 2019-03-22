@@ -1,0 +1,5 @@
+JvmtiExport can_access_local_variables 0
+JvmtiExport can_hotswap_or_post_breakpoint 0
+JvmtiExport can_post_on_exceptions 0
+# 109 ciObject found
+ciMethod org/gradle/api/internal/artifacts/ivyservice/modulecache/ModuleMetadataSerializer$Reader <init> (Lorg/gradle/internal/serialize/Decoder;Lorg/gradle/api/internal/artifacts/ImmutableModuleIdentifierFactory;Lorg/gradle/api/internal/artifacts/ivyservice/resolveengine/result/AttributeContainerSerializer;Lorg/gradle/api/internal/artifacts/ModuleComponentSelectorSerializer;Lorg/gradle/api/internal/artifacts/repositories/metadata/MavenMutableModuleMetadataFactory;Lorg/gradle/api/internal/artifacts/repositories/metadata/IvyMutableModuleMetadataFactory;Lorg/gradle/api/internal/artifacts/ivyservice/modulecache/ModuleMetadataSerializer$1;)V 4097 1 5632 0 -1

@@ -16,11 +16,13 @@ public class Household {
     String notification_ids = "";
     private String members;
     private String friendRequests;
+    private String friends;
     //private @ServerTimestamp Date timestamp;
 
-    public Household(String members, String friendRequests){
+    public Household(String members, String friendRequests, String friends){
         this.members = members;
         this.friendRequests = friendRequests;
+        this.friends = friends;
     }
 
     public Household(){

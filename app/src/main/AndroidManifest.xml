@@ -9,8 +9,6 @@
         android:roundIcon="@drawable/lettuce_cook_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NewGroceryActivity"></activity>
-        <activity android:name=".navDrawer" />
         <activity
             android:name=".SignUp"
             android:theme="@style/AppThemeNoActionBar" />

@@ -170,8 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
-
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -219,10 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         addItemB.setOnClickListener(this);
-        listView.setOnItemClickListener(this);
-//        buttonLogout.setOnClickListener(this);
-//        editPwButton.setOnClickListener(this);
-  //      editUserNameButton.setOnClickListener(this);
+      //  listView.setOnItemClickListener(this);
 
         buttonFriends.setOnClickListener(this);
         //buttonGroceries.setOnClickListener(this);
@@ -238,37 +233,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setAdapter(arrayAdapter);
 
-//
-//        leaveHouseholdButton.setOnClickListener(new View.OnClickListener() {
+//        final DocumentReference docrefUser;
+//        final String id = firebaseAuth.getCurrentUser().getUid();
+//        docrefUser = db.collection("Users").document(id);
+//        docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
 //            @Override
-//            public void onClick(View view) {
-//                AlertDialog.Builder logout_confir = new AlertDialog.Builder(MainActivity.this);
-//                logout_confir.setMessage("Are you sure you want to leave the household")
-//                        .setCancelable(false)
-//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                leaveHousehold();
-//                                finish();
-//                            }
-//                        })
-//                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                dialogInterface.cancel();
-//                            }
-//                        });
-//                AlertDialog alertDialog = logout_confir.create();
-//                alertDialog.show();
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                //user.getUsername();
+//                Household = documentSnapshot.getString("household");
 //
-//            }
-//        });//commented this but is important
-
-//        goToRecipes.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, Recipes.class);
-//                startActivity(intent);
 //            }
 //        });
 
@@ -599,15 +572,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot2) {
-                        ArrayList<String> listMembers = new ArrayList<>();
-                        for (Object item : documentSnapshot2.getData().values()) {
-                            listMembers.add(item.toString());
-                            System.out.println(item.toString());
-                        }
-                        listMembers.remove(user.getUid());
-                        db.collection("Household").document(hName).update("members", "");
-                        db.collection("Household").document(hName).update("members", listMembers);
 
+                        String[] listMembers = documentSnapshot2.getString("members").split(" ");
+                        String newMembers = remove(listMembers, user.getUid());
+                        db.collection("Household").document(hName).update("members", newMembers);
                         /*Notification chunk */
 
                         RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
@@ -640,14 +608,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             System.out.println(a);
         String newMems = "";
         for(int i=0; i< mems.length; i++){
-                if(!mems[i].equalsIgnoreCase(user)){
-                    if(i==0){
-                            newMems = mems[i];
-                    }
-                    else {
-                        newMems += "|" + mems[i];
-                    }
+            if(!mems[i].equalsIgnoreCase(user)){
+                if(newMems.length()==0){
+                    newMems = mems[i];
                 }
+                else {
+                    newMems += " " + mems[i];
+                }
+            }
         }
         return newMems;
     }
@@ -810,8 +778,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             System.out.println("GETTING HERE " +ds.getString("username")+ " " +member);
                             if(ds.getString("username").equals(member)){
                                 System.out.println("GETTING HERE 222222222");
-                                db.collection("Users").document(ds.getId()).update("invited", householdName);
-                                // db.collection("Users").document(ds.getId()).update("invited", "");
+                                String invites = ds.getString("invited");
+                                invites = householdName;
+                               // System.out.println(invites);
+                                db.collection("Users").document(ds.getId()).update("invited", invites);
+                              //   db.collection("Users").document(ds.getId()).update("invited", "");
                                 Toast.makeText(getApplicationContext(), "User invited!", Toast.LENGTH_LONG).show();
                                 userPresent = true;
 
@@ -819,14 +790,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                 Notifications n = new Notifications();
                                 try {
-                                    n.sendNotification("Invitation",householdName+"has invited you to their houseold!", ds.getId(), requestQueue);
+                                    n.sendNotification("Invitation",householdName+" has invited you to their household!", ds.getId(), requestQueue);
                                 } catch (InstantiationException e1) {
                                     e1.printStackTrace();
                                 } catch (IllegalAccessException e1) {
                                     e1.printStackTrace();
                                 }
-
-                                return;
+                                break;
+                               // return;
                             }
                         }
                         // if(!userPresent){
