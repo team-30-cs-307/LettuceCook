@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
 
 import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.NULL;
 
-public class Friends extends AppCompatActivity implements View.OnLongClickListener {
+public class Friends extends AppCompatActivity {
     private Button groceryButton;
     private Button friendsButton;
     private Button friendRequestsButton;
@@ -56,6 +56,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
     private Button showUsersButton;
     private TextView listOfUsers;
     ListView listFriends;
+    ListView listView;
     SearchView searchView;
     ArrayAdapter<String> adapter;
 
@@ -64,6 +65,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
     private ListView requests_invites;
     private Button showRequestsButton;
     private RequestAdapter requestListAdapter;
+    ArrayList<String> notification_title;
     private ArrayList<String> requests = new ArrayList<>();
 
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
@@ -106,6 +108,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
         listFriends.setAdapter(adapter);
 
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
@@ -115,8 +118,8 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-//                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), " ", "Friend Reuqest Sent!", adapter.getItem(i) );
-//                notiCollection.sendInAppNotification(notiCollection);
+                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Friend Request Sent!", adapter.getItem(i) );
+                notiCollection.sendInAppNotification(notiCollection);
                 Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
             }
         });
@@ -255,7 +258,57 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                 builder.show();
             }
         });
+
+
+
+//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//                if(notification_title.get(i).contains("dinner")){
+//                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+//                    inv.setMessage("Do you accept their invitation")
+//                            .setCancelable(false)
+//                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//                                    Notifications n = new Notifications();
+//                                    try {
+//                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
+//                                    } catch (InstantiationException e1) {
+//                                        e1.printStackTrace();
+//                                    } catch (IllegalAccessException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+//                                    finish();
+//                                }
+//                            })
+//                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//                                    Notifications n = new Notifications();
+//                                    try {
+//                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
+//                                    } catch (InstantiationException e1) {
+//                                        e1.printStackTrace();
+//                                    } catch (IllegalAccessException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+//                                    dialogInterface.cancel();
+//                                }
+//                            });
+//                    AlertDialog alertDialog = inv.create();
+//                    alertDialog.show();
+//                // }
+//
+//            }
+//                return true;
+//        }
+//        });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -496,11 +549,11 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
         mBuilder.setView(mView);
-        final ListView listView = mView.findViewById(R.id.noti_view);
+        listView = mView.findViewById(R.id.noti_view);
         final AlertDialog dialog = mBuilder.create();
         dialog.show();
 
-        final ArrayList<String> notification_title = new ArrayList<>();
+        notification_title = new ArrayList<>();
         final ArrayList<String> notification_body = new ArrayList<>();
         final ArrayList<String> sender = new ArrayList<>();
 
@@ -514,11 +567,11 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                         populateNoti(listView, db, household, notification_title, notification_body, sender);
                     }
                 });
-        listView.setOnLongClickListener(new View.OnLongClickListener() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onLongClick(View view) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-               //if(notification_title..equals("to their household")){
+                if(notification_title.get(i).contains("dinner")){
                     AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                     inv.setMessage("Do you accept their invitation")
                             .setCancelable(false)
@@ -554,12 +607,62 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                             });
                     AlertDialog alertDialog = inv.create();
                     alertDialog.show();
-               // }
-                return false;
+                    // }
+
+                }
+                return true;
             }
         });
+//        listView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//               //if(notification_title..equals("to their household")){
+//                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+//                    inv.setMessage("Do you accept their invitation")
+//                            .setCancelable(false)
+//                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//                                    Notifications n = new Notifications();
+//                                    try {
+//                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
+//                                    } catch (InstantiationException e1) {
+//                                        e1.printStackTrace();
+//                                    } catch (IllegalAccessException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+//                                    finish();
+//                                }
+//                            })
+//                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//                                    Notifications n = new Notifications();
+//                                    try {
+//                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
+//                                    } catch (InstantiationException e1) {
+//                                        e1.printStackTrace();
+//                                    } catch (IllegalAccessException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+//                                    dialogInterface.cancel();
+//                                }
+//                            });
+//                    AlertDialog alertDialog = inv.create();
+//                    alertDialog.show();
+//               // }
+//                return false;
+//            }
+//        });
 
     }
+
+
+
+
 
     public void populateNoti(final ListView listView, final FirebaseFirestore db, final String household,
                              final ArrayList<String> notification_title, final ArrayList<String> notification_body, final ArrayList<String> sender){
@@ -611,10 +714,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
         noti.sendInAppNotification(noti);
     }
 
-    @Override
-    public boolean onLongClick(View view) {
-        return false;
-    }
+
 
     class CustomAdapter extends BaseAdapter{
 
@@ -706,7 +806,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                 declineButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        System.out.println("lols ho gaya");
+                       // System.out.println("lols ho gaya");
                         decline(invites.get(position));
                     }
                 });
