@@ -55,6 +55,7 @@ public class Friends extends AppCompatActivity {
     private Button recipesButton;
     private Button showUsersButton;
     private TextView listOfUsers;
+
     ListView listFriends;
     ListView listView;
     SearchView searchView;
@@ -84,6 +85,7 @@ public class Friends extends AppCompatActivity {
         showUsersButton = findViewById(R.id.showUsers);
         listOfUsers = findViewById(R.id.listUsers);
         listFriends = findViewById(R.id.listviewFriends);
+
         final ArrayList<String> arrayFriends = new ArrayList<>();
         final ArrayList<String> arrayHouseholds = new ArrayList<>();
         //final FirebaseFirestore db =  FirebaseFirestore.getInstance();

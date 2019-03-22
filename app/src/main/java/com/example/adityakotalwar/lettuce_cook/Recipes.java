@@ -1,6 +1,7 @@
 package com.example.adityakotalwar.lettuce_cook;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -19,8 +21,23 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -56,6 +73,35 @@ public class Recipes extends AppCompatActivity {
 
         recipes.add("SAVED RECIPE 1");
         recipes.add("SAVED RECIPE 2");
+
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+//        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                String house = documentSnapshot.getString("household");
+//                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//
+//                        String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
+//                        final int size = tempRecipes.length;
+//                        for(int i=0; i<size; i++){
+//
+//                            db.collection("SavedRecipe").document(tempRecipes[i]).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                                @Override
+//                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                                    recipes.add(documentSnapshot.getString("recipe_title"));
+//                                }
+//                            });
+//                        }
+//
+//                    }
+//                });
+//            }
+//        });
 
 
 
@@ -93,12 +139,17 @@ public class Recipes extends AppCompatActivity {
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Recipes.this,Grocery.class);
-                startActivity(intent);
+//                HashMap<String[], ArrayList<String[]>> t = recipeDetails("479101");
+//                Intent intent = new Intent(Grocery.this,MainActivity.class);
+//                startActivity(intent);
             }
         });
 
     }
 
+
+
 }
+
+
 

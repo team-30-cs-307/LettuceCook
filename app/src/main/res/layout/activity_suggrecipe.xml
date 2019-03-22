@@ -10,17 +10,6 @@
 
     >
 
-    <Button
-
-        android:id="@+id/getChoiceButton"
-
-        android:layout_width="fill_parent"
-
-        android:layout_height="wrap_content"
-
-        android:text="Choose Ingredients"
-
-        />
 
     <ListView
 
@@ -31,6 +20,12 @@
         android:layout_height="198dp"
 
         />
+
+    <Button
+        android:id="@+id/get_recipe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="get recipe" />
 
     <TextView
         android:id="@+id/textView2"

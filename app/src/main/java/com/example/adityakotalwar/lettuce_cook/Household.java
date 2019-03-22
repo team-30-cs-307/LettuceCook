@@ -16,10 +16,12 @@ public class Household {
     String notification_ids = "";
     private String members;
     private String friendRequests;
+    private String noti_list = "";
+    private String recipe_list = "";
     private String friends;
     //private @ServerTimestamp Date timestamp;
 
-    public Household(String members, String friendRequests, String friends){
+    public Household(String members, String friendRequests){
         this.members = members;
         this.friendRequests = friendRequests;
         this.friends = friends;

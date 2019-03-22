@@ -33,22 +33,28 @@ public class InAppNotiCollection {
             final CollectionReference dbNoti = db.collection("Notification");
             final DocumentReference house = db.collection("Household").document(inAppNotificationCollection.householdName);
 
+
             //Saves the Notification in NotificationCollection
-
-            dbNoti.add(inAppNotificationCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            db.collection("Users").document(sender_userName).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                 @Override
-                public void onSuccess(final DocumentReference documentReference) {
-
-                    house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    inAppNotificationCollection.sender_userName = documentSnapshot.getString("username");
+                    dbNoti.add(inAppNotificationCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            notifications = documentSnapshot.get("noti_list").toString();
-                            notifications += documentReference.getId() + " ";
-                            house.update("noti_list", notifications);
+                        public void onSuccess(final DocumentReference documentReference) {
+                            house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    notifications = documentSnapshot.get("noti_list").toString();
+                                    notifications += documentReference.getId() + " ";
+                                    house.update("noti_list", notifications);
+                                }
+                            });
                         }
                     });
                 }
             });
+
 
 
 //            dbNoti.document().set(inAppNotificationCollection).addOnSuccessListener(new OnSuccessListener<Void>() {

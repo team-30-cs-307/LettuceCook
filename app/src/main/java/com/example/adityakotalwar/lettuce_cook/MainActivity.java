@@ -535,9 +535,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
-
-
-
         }
         if (v == buttonLogout) {
             buttonLogout.setOnClickListener(
@@ -581,12 +578,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == buttonFriends){
             finish();
             startActivity(new Intent(getApplicationContext(), Friends.class));
-       }
-//        if(v == buttonGroceries){
-//            finish();
-//            startActivity(new Intent(getApplicationContext(), Grocery.class));
-//
-//        }
+        }
     }
 
     @Override

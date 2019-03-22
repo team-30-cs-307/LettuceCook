@@ -154,7 +154,7 @@ public class HouseholdActivity extends AppCompatActivity implements View.OnClick
 
 //        addMemberButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onClick(View view) {
+//            public void onClick (View view) {
 //                String member = addMemberText.getText().toString().trim();
 //                if(!member.isEmpty()) {
 //                    addMember(member);
