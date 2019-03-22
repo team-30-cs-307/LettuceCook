@@ -503,6 +503,7 @@ public class Friends extends AppCompatActivity {
 
             }
         });
+        requests.remove(newFriend);
     }
 
     public void decline(final String removeFriend){

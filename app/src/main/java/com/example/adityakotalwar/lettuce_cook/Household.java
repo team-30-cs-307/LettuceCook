@@ -21,7 +21,7 @@ public class Household {
     private String friends;
     //private @ServerTimestamp Date timestamp;
 
-    public Household(String members, String friendRequests){
+    public Household(String members, String friendRequests, String friends){
         this.members = members;
         this.friendRequests = friendRequests;
         this.friends = friends;
