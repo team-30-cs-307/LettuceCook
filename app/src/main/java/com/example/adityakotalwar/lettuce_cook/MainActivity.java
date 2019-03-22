@@ -204,13 +204,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
+//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
+//                deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(i));
+//                arrayAdapter.clear();
+//                repopulate(arrayAdapter, GetCurrentHouseholdName());
+//
+//                return false;
+//            }
+//        });
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
                 //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
-                deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(i));
-                arrayAdapter.clear();
-                repopulate(arrayAdapter, GetCurrentHouseholdName());
+                AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("What should happen to this item");
+                builder.setMessage("Message content of Title");
+                builder.setCancelable(false);
+
+                builder.setPositiveButton("Remove from stock", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int j) {
+                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position));
+                        //               Toast.makeText(MainActivity.this,"REMOVE FROM STOCK", Toast.LENGTH_LONG).show();
+//                        arrayAdapter.clear();
+//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
+                    }
+                });
+
+                builder.setNegativeButton("Remove from stock + Add to grocery", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int j) {
+                        Toast.makeText(MainActivity.this,"GROCERY LIST", Toast.LENGTH_LONG).show();
+
+//                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(j));
+//                        arrayAdapter.clear();
+//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
+                        String item = arrayAdapter.getItem(position);
+                        db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
+
+
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
 
                 return false;
             }

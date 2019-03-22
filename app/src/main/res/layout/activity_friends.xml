@@ -32,8 +32,9 @@
         android:id="@+id/showNotiButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/listUsers"
-        android:layout_alignTop="@+id/friendRequest"
+        android:layout_alignBaseline="@+id/showRequests"
+        android:layout_alignBottom="@+id/showRequests"
+        android:layout_toEndOf="@+id/showRequests"
         android:text="Show Notification" />
 
     <LinearLayout
@@ -82,8 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="290dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="15dp" />
+        android:layout_alignTop="@+id/showNotiButton" />
 
     <Button
         android:id="@+id/friendRequest"
@@ -99,18 +99,17 @@
         android:id="@+id/showRequests"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/showUsers"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="Show friend requests and invitations" />
+        android:layout_marginBottom="18dp"
+        android:text="FRIEND REQUESTS" />
 
     <ListView
         android:id="@+id/requests_and_invites"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/showUsers"
+        android:layout_above="@+id/showNotiButton"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="70dp"
-        android:layout_marginTop="52dp" />
+        android:layout_marginBottom="69dp" />
 
 </android.widget.RelativeLayout>

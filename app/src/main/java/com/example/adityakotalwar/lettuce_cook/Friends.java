@@ -84,13 +84,13 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
         listFriends = findViewById(R.id.listviewFriends);
         final ArrayList<String> arrayFriends = new ArrayList<>();
         final ArrayList<String> arrayHouseholds = new ArrayList<>();
-        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        //final FirebaseFirestore db =  FirebaseFirestore.getInstance();
 
         db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 for (DocumentSnapshot ds : queryDocumentSnapshots) {
-                    if (!arrayFriends.contains(ds.getString("username"))) {
+                    if (ds.getString("household")!=null && !arrayHouseholds.contains(ds.getString("household"))) {
                         arrayFriends.add(ds.getString("username"));
                         arrayHouseholds.add(ds.getString("household"));
                     }
@@ -366,26 +366,26 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
         dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                householdName = documentSnapshot.getString("household");
-                db.collection("Household").document(householdName).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                String householdName = documentSnapshot.getString("household");
+                // System.out.println(householdName + "here");
+                db.collection("Household").document(householdName).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        System.out.println(documentSnapshot.getString("friendRequests") + "here");
                         String[] inviteForHousehold = documentSnapshot.getString("friendRequests").toString().split(" ");
                         ArrayList<String> requests = new ArrayList<>();
                         final int size = inviteForHousehold.length;
-                        for(int i=0; i<size; i++){
+                        for (int i = 0; i < size; i++) {
                             requests.add(inviteForHousehold[i]);
 
                         }
-                        for(String j : requests){
-                            if(!j.equals(" ") && !j.equals("")){
+                        for (String j : requests) {
+                            if (!j.equals(" ") && !j.equals("")) {
                                 requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
 
                                 requests_invites.setAdapter(requestListAdapter);
                             }
                         }
-
-
                     }
                 });
             }
@@ -417,6 +417,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                         String newFriendRequests = removeFriendRequest(currFriendRequests, newFriend);
                         db.collection("Household").document(hName).update("friends", currFriend);
                         db.collection("Household").document(hName).update("friendRequests", newFriendRequests);
+
                         otherHouse.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -433,7 +434,7 @@ public class Friends extends AppCompatActivity implements View.OnLongClickListen
                                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                 Notifications n = new Notifications();
                                 try {
-                                    n.sendNotification("Friend Request Accepted!", householdName + "has accepted your friend request!", friend, requestQueue);
+                                    n.sendNotification("Friend Request Accepted!", householdName + "has accepted your friend request!", hName, requestQueue);
                                 } catch (InstantiationException e1) {
                                     e1.printStackTrace();
                                 } catch (IllegalAccessException e1) {
