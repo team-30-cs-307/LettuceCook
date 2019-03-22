@@ -1,6 +1,9 @@
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -69,6 +72,7 @@ public class Grocery extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_grocery);
+        //setContentView(R.layout.activity_suggrecipe);
 
 
         Buttondelete = findViewById(R.id.DeleteGrocery);
@@ -87,6 +91,8 @@ public class Grocery extends AppCompatActivity {
         GroceryList.setAdapter(GroceryArray);
         MoveToStockList.setAdapter(StockArray);
 
+        GroceryList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -94,7 +100,7 @@ public class Grocery extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
 
 
-
+        additem.setOnClickListener(Listen);
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(getApplicationContext(), SignUp.class));
@@ -103,58 +109,144 @@ public class Grocery extends AppCompatActivity {
         db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                //additem.performClick();
                 if(documentSnapshot.get("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
             }
         });
-        additem.setOnClickListener(Listen);
+
 
 
 
         coordinatorLayout =  findViewById(R.id.activity_drawer);
+//        additem.performClick();
+
+
+
+
+
+
+//        GroceryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+////                SnackFlag = 0;
+////                //final String household = GetCurrentHouseholdName();
+////                final String item = GroceryArray.getItem(position);
+////                final Groceries DeletedGrocery = getGroceryAt(GetCurrentHouseholdName(), item);
+////                //deleteGrocery(GetCurrentHouseholdName(), item);
+////                GroceryArray.remove(item);
+////                final Snackbar snackbar = Snackbar.make(coordinatorLayout, "Item deleted", Snackbar.LENGTH_LONG)
+////                        .setAction("UNDO", new View.OnClickListener() {
+////                            @Override
+////                            public void onClick(View v) {
+////                                SnackFlag = 1;
+////                                //addItemToGroceryCollection(item, DeletedGrocery.getDescription(), DeletedGrocery.getStatus(), GetCurrentHouseholdName());
+////                                Snackbar snackbar1 = Snackbar.make(coordinatorLayout, "Item restored", Snackbar.LENGTH_SHORT);
+////                                snackbar1.show();
+////
+////                                GroceryArray.add(item);
+////
+////
+////
+////
+////                            }
+////                        });
+////
+////
+////
+////                  snackbar.show();
+////                snackbar.addCallback(new Snackbar.Callback() {
+////                    @Override
+////                    public void onDismissed(Snackbar snackbar, int event) {
+////                        //see Snackbar.Callback docs for event details
+////                        if(SnackFlag == 0){
+////
+////                            deleteGrocery(GetCurrentHouseholdName(), item);
+////                        }
+////
+////                    }
+////                });
+//////                if(SnackFlag == 0){
+//////                    deleteGrocery(GetCurrentHouseholdName(), item);
+//////
+//////                }
+//////                else{
+//////                    GroceryArray.add(item);
+//////
+//////                }
+////
+////
+////
+////                //deleteGrocery(GetCurrentHouseholdName(), GroceryArray.getItem(position));
+////
+////
+////
+////                return false;
+//            }
+//        });
+
+
         GroceryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                SnackFlag = 0;
-                //final String household = GetCurrentHouseholdName();
-                final String item = GroceryArray.getItem(position);
-                final Groceries DeletedGrocery = getGroceryAt(GetCurrentHouseholdName(), item);
-                //deleteGrocery(GetCurrentHouseholdName(), item);
-                GroceryArray.remove(item);
-                final Snackbar snackbar = Snackbar.make(coordinatorLayout, "Item deleted", Snackbar.LENGTH_LONG)
-                        .setAction("UNDO", new View.OnClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                AlertDialog.Builder logout_confir = new AlertDialog.Builder(Grocery.this);
+                logout_confir.setMessage("Do you want to add this grocery to stock or delete the item?")
+                        .setCancelable(false)
+
+                        .setPositiveButton("Add to stock", new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                SnackFlag = 1;
-                                //addItemToGroceryCollection(item, DeletedGrocery.getDescription(), DeletedGrocery.getStatus(), GetCurrentHouseholdName());
-                                Snackbar snackbar1 = Snackbar.make(coordinatorLayout, "Item restored", Snackbar.LENGTH_SHORT);
-                                snackbar1.show();
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                String item = GroceryArray.getItem(position);
+                                deleteGrocery(GetCurrentHouseholdName(), item);
+                                StockArray.add(item);
+                            }
+                        })
+                        .setNeutralButton("Go back", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        })
+                .setNegativeButton("Delete from everywhere", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SnackFlag = 0;
+                        //final String household = GetCurrentHouseholdName();
+                        final String item = GroceryArray.getItem(position);
+                        final Groceries DeletedGrocery = getGroceryAt(GetCurrentHouseholdName(), item);
+                        //deleteGrocery(GetCurrentHouseholdName(), item);
+                        GroceryArray.remove(item);
+                        final Snackbar snackbar = Snackbar.make(coordinatorLayout, item + " deleted", Snackbar.LENGTH_LONG)
+                                .setAction("UNDO", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        SnackFlag = 1;
+                                        //addItemToGroceryCollection(item, DeletedGrocery.getDescription(), DeletedGrocery.getStatus(), GetCurrentHouseholdName());
+                                        Snackbar snackbar1 = Snackbar.make(coordinatorLayout, "Item restored", Snackbar.LENGTH_SHORT);
+                                        snackbar1.show();
 
-                                GroceryArray.add(item);
+                                        GroceryArray.add(item);
 
 
+                                    }
+                                });
 
+
+                        snackbar.show();
+                        snackbar.addCallback(new Snackbar.Callback() {
+                            @Override
+                            public void onDismissed(Snackbar snackbar, int event) {
+                                //see Snackbar.Callback docs for event details
+                                if (SnackFlag == 0) {
+
+                                    deleteGrocery(GetCurrentHouseholdName(), item);
+                                }
 
                             }
                         });
-
-
-
-                  snackbar.show();
-                snackbar.addCallback(new Snackbar.Callback() {
-                    @Override
-                    public void onDismissed(Snackbar snackbar, int event) {
-                        //see Snackbar.Callback docs for event details
-                        if(SnackFlag == 0){
-
-                            deleteGrocery(GetCurrentHouseholdName(), item);
-                        }
-
-                    }
-                });
 //                if(SnackFlag == 0){
 //                    deleteGrocery(GetCurrentHouseholdName(), item);
 //
@@ -165,19 +257,52 @@ public class Grocery extends AppCompatActivity {
 //                }
 
 
-
-                //deleteGrocery(GetCurrentHouseholdName(), GroceryArray.getItem(position));
-
+                        //deleteGrocery(GetCurrentHouseholdName(), GroceryArray.getItem(position));
 
 
+                    }
+                });
+                AlertDialog alertDialog = logout_confir.create();
+                alertDialog.show();
                 return false;
+
             }
         });
 
+        MoveToStockList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = StockArray.getItem(position);
+                StockArray.remove(item);
+                addItemToGroceryCollection(item, "", "grocery", GetCurrentHouseholdName());
+            }
+        });
 
+        Buttonupdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for(int i = 0; i< StockArray.getCount(); i++){
 
+                    addItemToGroceryCollection(StockArray.getItem(i), "", "stock", GetCurrentHouseholdName());
+
+                }
+                StockArray.clear();
+
+            }
+        });
+
+        //additem.performClick();
+    }
+
+    public void moveToStock(String item, String household){
+
+        db.collection("Household").document(household).collection("Grocery Items").document(item)
+                .update(
+                        "status", "stock"
+                );
 
     }
+
 
     public Groceries getGroceryAt(String household, String item){
 
@@ -192,6 +317,18 @@ public class Grocery extends AppCompatActivity {
 
     }
 
+    public boolean ArrayadapterContains(String item, ArrayAdapter arrayAdapter){
+
+        for(int i = 0; i < arrayAdapter.getCount(); i++){
+            if(arrayAdapter.getItem(i).equals(item)){
+                return true;
+
+            }
+
+        }
+        return false;
+    }
+
 
     private View.OnClickListener Listen = new View.OnClickListener() {
         @Override
@@ -199,13 +336,14 @@ public class Grocery extends AppCompatActivity {
             switch (view.getId()) {
                 case R.id.button_add_item:
                     flag = 0;
+                    realtime(GetCurrentHouseholdName());
                     String ItemEntered = AdditemText.getText().toString();
                     if (ItemEntered.equals("")) {
                         Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
                         break;
 
                     }
-                    realtime(GetCurrentHouseholdName());
+
                     //Toast.makeText(getApplicationContext(), GetCurrentHouseholdName(), Toast.LENGTH_SHORT).show();
                     //GetCurrentHouseholdName();
                     String Description = AddDescText.getText().toString();

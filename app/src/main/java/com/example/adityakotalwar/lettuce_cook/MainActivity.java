@@ -170,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -203,18 +205,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addMemberButton = findViewById(R.id.addMemberButton);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
-
-//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
-//                deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(i));
-//                arrayAdapter.clear();
-//                repopulate(arrayAdapter, GetCurrentHouseholdName());
-//
-//                return false;
-//            }
-//        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -257,6 +247,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         addItemB.setOnClickListener(this);
+        //listView.setOnItemClickListener(this);
+//        buttonLogout.setOnClickListener(this);
+//        editPwButton.setOnClickListener(this);
+  //      editUserNameButton.setOnClickListener(this);
       //  listView.setOnItemClickListener(this);
 
         buttonFriends.setOnClickListener(this);
@@ -344,12 +338,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    public void deleteGrocery(String Household /*Name of the household the user is in*/, String item /*Item to be deleted*/){
+    public void deleteGrocery(final String Household /*Name of the household the user is in*/, final String  item /*Item to be deleted*/){
         db.collection("Household").document(Household).collection("Grocery Items").document(item)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(), "Grocery Item Deleted!", item + " added to Stock!" );
+                        notiCollection.sendInAppNotification(notiCollection);
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -517,6 +513,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 flag = 0;
                 realtime(GetCurrentHouseholdName());
+                if(itemEntered.equals("")){
+                    Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
+                    break;
+                }
 //                addItemT.setText("");
 //                arrayAdapter.add(itemEntered);
 
@@ -524,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     addItemToGroceryCollection(itemEntered, descEntered, "stock", GetCurrentHouseholdName());
                     arrayAdapter.clear();
-                    repopulate(arrayAdapter, GetCurrentHouseholdName());
+                    //repopulate(arrayAdapter, GetCurrentHouseholdName());
                     addItemT.setText("");
                     addDescription.setText("");
 
@@ -535,6 +535,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
+
+
+
         }
         if (v == buttonLogout) {
             buttonLogout.setOnClickListener(
