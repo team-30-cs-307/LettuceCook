@@ -201,8 +201,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
         buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
 
-
         addMemberButton = findViewById(R.id.addMemberButton);
+
+        goToRecipes.setOnClickListener(this);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 

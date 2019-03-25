@@ -117,76 +117,29 @@ public class Grocery extends AppCompatActivity {
             }
         });
 
-
-
+        ButtonStock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
+        });
+        Buttonfriends.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), Friends.class));
+            }
+        });
+        ButtonRecipes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), Recipes.class));
+            }
+        });
 
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 //        additem.performClick();
 
 
-
-
-
-
-//        GroceryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-////                SnackFlag = 0;
-////                //final String household = GetCurrentHouseholdName();
-////                final String item = GroceryArray.getItem(position);
-////                final Groceries DeletedGrocery = getGroceryAt(GetCurrentHouseholdName(), item);
-////                //deleteGrocery(GetCurrentHouseholdName(), item);
-////                GroceryArray.remove(item);
-////                final Snackbar snackbar = Snackbar.make(coordinatorLayout, "Item deleted", Snackbar.LENGTH_LONG)
-////                        .setAction("UNDO", new View.OnClickListener() {
-////                            @Override
-////                            public void onClick(View v) {
-////                                SnackFlag = 1;
-////                                //addItemToGroceryCollection(item, DeletedGrocery.getDescription(), DeletedGrocery.getStatus(), GetCurrentHouseholdName());
-////                                Snackbar snackbar1 = Snackbar.make(coordinatorLayout, "Item restored", Snackbar.LENGTH_SHORT);
-////                                snackbar1.show();
-////
-////                                GroceryArray.add(item);
-////
-////
-////
-////
-////                            }
-////                        });
-////
-////
-////
-////                  snackbar.show();
-////                snackbar.addCallback(new Snackbar.Callback() {
-////                    @Override
-////                    public void onDismissed(Snackbar snackbar, int event) {
-////                        //see Snackbar.Callback docs for event details
-////                        if(SnackFlag == 0){
-////
-////                            deleteGrocery(GetCurrentHouseholdName(), item);
-////                        }
-////
-////                    }
-////                });
-//////                if(SnackFlag == 0){
-//////                    deleteGrocery(GetCurrentHouseholdName(), item);
-//////
-//////                }
-//////                else{
-//////                    GroceryArray.add(item);
-//////
-//////                }
-////
-////
-////
-////                //deleteGrocery(GetCurrentHouseholdName(), GroceryArray.getItem(position));
-////
-////
-////
-////                return false;
-//            }
-//        });
 
 
         GroceryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

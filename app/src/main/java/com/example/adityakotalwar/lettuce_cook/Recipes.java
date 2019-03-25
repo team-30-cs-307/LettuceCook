@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,6 +30,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import org.json.JSONArray;
@@ -53,6 +56,13 @@ public class Recipes extends AppCompatActivity {
     private Button stockButton;
     private Button recipesButton;
     private Button chooseIngreButton;
+    String title;
+    String ingredients;
+    String procedure;
+    ArrayList<String> recipe2 = new ArrayList<>();
+    ArrayList<String> recipeIngr = new ArrayList<>();
+    ArrayList<String> recipeProc = new ArrayList<>();
+
 
 
     @Override
@@ -64,44 +74,118 @@ public class Recipes extends AppCompatActivity {
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
         chooseIngreButton = findViewById(R.id.buttonChooseIngredients);
-
-
         recipeView = findViewById(R.id.my_list_view2);
-        // in this class content from api needs to be collected and displayed on the
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, recipes);
-        recipeView.setAdapter(arrayAdapter);
+//        final  ArrayList<String> recipe2 = new ArrayList<>();
 
-        recipes.add("SAVED RECIPE 1");
-        recipes.add("SAVED RECIPE 2");
+
+
+
+//        recipes.add("SAVED RECIPE 1");
+//        recipes.add("SAVED RECIPE 2");
 
         final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
-//        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                String house = documentSnapshot.getString("household");
-//                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String house = documentSnapshot.getString("household");
+//                recipeView = findViewById(R.id.my_list_view2);
+//                final ArrayList<String> recipe2 = new ArrayList<>();
+//                // in this class content from api needs to be collected and displayed on the
+//                arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipe2);
+//                recipeView.setAdapter(arrayAdapter);
+                System.out.println(house);
+                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                        recipeView = findViewById(R.id.my_list_view2);
+//                        //recipe2 = new ArrayList<>();
+//                        // in this class content from api needs to be collected and displayed on the
+//                        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipe2);
+//                        recipeView.setAdapter(arrayAdapter);
 //
-//                        String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
-//                        final int size = tempRecipes.length;
+                        if(documentSnapshot.get("recipe_list").toString()!=null) {
+                            String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
+                            final int size = tempRecipes.length;
+                            final ArrayList<String> temprec = new ArrayList<>();
+                            for (int i = 0; i < size; i++) {
+                                temprec.add(tempRecipes[i]);
+                            }
 //                        for(int i=0; i<size; i++){
-//
 //                            db.collection("SavedRecipe").document(tempRecipes[i]).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
 //                                @Override
 //                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                                    recipes.add(documentSnapshot.getString("recipe_title"));
+//                                    System.out.println("SAVED123123123:"+ documentSnapshot.getString("recipe_title"));
+//                                    recipe2.add(documentSnapshot.getString("recipe_title"));
 //                                }
 //                            });
 //                        }
-//
-//                    }
-//                });
-//            }
-//        });
+                            db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                    recipe2 = new ArrayList<>();
+                                    recipeIngr = new ArrayList<>();
+                                    recipeProc = new ArrayList<>();
+                                    // in this class content from api needs to be collected and displayed on the
+                                    arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipe2);
+                                    recipeView.setAdapter(arrayAdapter);
+
+                                    //    String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
+                                    for (QueryDocumentSnapshot ds : queryDocumentSnapshots) {
+                                        if (temprec.contains(ds.getId())) {
+                                            recipe2.add(ds.getString("recipe_title"));
+                                            recipeIngr.add(ds.getString("recipe_ingrediets"));
+                                            recipeProc.add(ds.getString("recipe_procedure"));
+                                            title = ds.getString("recipe_title");
+                                            ingredients = ds.getString("recipe_ingredients");
+                                            procedure = ds.getString("recipe_procedure");
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        recipeView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                Toast.makeText(Recipes.this, "This user is already in the household", Toast.LENGTH_LONG).show();
+//                                showSavedRecipe(arrayAdapter.getItem(position))
+//                                startActivity(new Intent(getApplicationContext(), RecipeInformation.class));
+                                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
+                                View mView = getLayoutInflater().inflate(R.layout.dialog_show_recipe, null);
+
+//                final EditText emailCurrent = (EditText) mView.findViewById(R.id.EmailCurrent);
+                                final TextView recipe_title = mView.findViewById(R.id.recipe_title);
+                                final TextView recipe_ingredients = mView.findViewById(R.id.recipe_ingredients);
+                                final TextView recipe_procedure = mView.findViewById(R.id.recipe_procedure);
+                                final Button button_back = mView.findViewById(R.id.button_back);
+
+                                recipe_title.setText(recipe2.get(position));
+                                recipe_ingredients.setText(recipeIngr.get(position));
+                                recipe_procedure.setText(recipeProc.get(position));
+
+                                mBuilder.setView(mView);
+                                // Pops the dialog on the screen
+                                final AlertDialog dialog = mBuilder.create();
+                                dialog.show();
+
+                                button_back.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
 
 
 
@@ -115,17 +199,11 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
-        recipeView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(Recipes.this,RecipeInformation.class);
-                startActivity(intent);
-            }
-        });
+
         friendsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Recipes.this,Recipes.class);
+                Intent intent = new Intent(Recipes.this, Friends.class);
                 startActivity(intent);
             }
         });

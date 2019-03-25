@@ -1,6 +1,7 @@
 package com.example.adityakotalwar.lettuce_cook;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -58,6 +59,7 @@ public class SuggestedRecipe extends AppCompatActivity {
     ArrayList<String> recipes = new ArrayList<String>();
     ArrayList<String> list = new ArrayList<>();
     private Button getRecipesButton;
+    ArrayList<String> saved = new ArrayList<>();
 
 
 //    String[] listContent =
@@ -247,34 +249,51 @@ public class SuggestedRecipe extends AppCompatActivity {
                                         @Override
                                         public void onClick(View v) {
 
-                                            //Saves the Notification in NotificationCollection
-
-                                            final FirebaseFirestore db = FirebaseFirestore.getInstance();
-                                            final CollectionReference saveRecipe = db.collection("SavedRecipe");
-
-                                            db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                    String household = documentSnapshot.getString("household");
-                                                    final DocumentReference house = db.collection("Household").document(household);
-//                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_title.toString(), recipe_ingredients.toString(),recipe_procedure.toString());
-                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_name, recipe_ingredients.getText().toString(),recipe_procedure.getText().toString());
-
-                                                    saveRecipe.add(saveRecipesCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                            AlertDialog.Builder logout_confir = new AlertDialog.Builder(SuggestedRecipe.this);
+                                            logout_confir.setMessage("Are you sure you want to save the Recipe?")
+                                                    .setCancelable(false)
+                                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                                         @Override
-                                                        public void onSuccess(final DocumentReference documentReference) {
-                                                            house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            final FirebaseFirestore db = FirebaseFirestore.getInstance();
+                                                            final CollectionReference saveRecipe = db.collection("SavedRecipe");
+
+                                                            db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                                 @Override
                                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                                    String recipe = documentSnapshot.get("recipe_list").toString();
-                                                                    recipe += documentReference.getId() + " ";
-                                                                    house.update("recipe_list", recipe);
+                                                                    String household = documentSnapshot.getString("household");
+                                                                    final DocumentReference house = db.collection("Household").document(household);
+//                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_title.toString(), recipe_ingredients.toString(),recipe_procedure.toString());
+                                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_name, recipe_ingredients.getText().toString(),recipe_procedure.getText().toString());
+
+                                                                    saveRecipe.add(saveRecipesCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                                                        @Override
+                                                                        public void onSuccess(final DocumentReference documentReference) {
+                                                                            house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                                                @Override
+                                                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                                                    String recipe = documentSnapshot.get("recipe_list").toString();
+                                                                                    recipe += documentReference.getId() + " ";
+                                                                                    house.update("recipe_list", recipe);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
                                                                 }
-                                                            });
+                                                            });finish();
+                                                        }
+                                                    })
+                                                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            dialogInterface.cancel();
                                                         }
                                                     });
-                                                }
-                                            });
+                                            AlertDialog alertDialog = logout_confir.create();
+                                            alertDialog.show();
+                                            //Saves the Notification in NotificationCollection
+
+
 
 
                                         }
@@ -331,7 +350,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                     public void onResponse(JSONArray response) {
                         ArrayList<String[]> recipeIds = new ArrayList<>();
                         for (int i=0; i< response.length(); i++){
                             try {

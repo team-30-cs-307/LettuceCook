@@ -120,7 +120,7 @@ public class Friends extends AppCompatActivity {
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Friend Request Sent!", adapter.getItem(i) );
+                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over" );
                 notiCollection.sendInAppNotification(notiCollection);
                 Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
             }

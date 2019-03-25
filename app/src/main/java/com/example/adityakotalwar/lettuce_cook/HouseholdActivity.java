@@ -203,7 +203,7 @@ public class HouseholdActivity extends AppCompatActivity implements View.OnClick
         //member.add(user.getUid());
 
         final String notification_id = "";
-        Household household = new Household(user.getUid(), "", "");
+        Household household = new Household(user.getUid(), "","");
 //       household.setMember(user.getUid());
 //       household.setInvited("");
 //        System.out.println(member.get(0));
