@@ -116,11 +116,11 @@ public class Friends extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
                 Notifications n = new Notifications();
                 try {
-                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
+                    n.sendNotification("dinner invitation", adapter.getItem(i)+ "has invited you for dinner", adapter.getItem(i), requestQueue);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over" );
+                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "dinner invitation", adapter.getItem(i)+" has invited you !" );
                 notiCollection.sendInAppNotification(notiCollection);
                 Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
             }
