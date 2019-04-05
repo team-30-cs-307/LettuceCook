@@ -26,14 +26,16 @@
         android:layout_marginBottom="23dp"
         android:text="Show users" />
 
-    <Button
+    <ImageButton
         android:id="@+id/showNotiButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="39dp"
+        android:layout_height="47dp"
         android:layout_alignBaseline="@+id/showRequests"
         android:layout_alignBottom="@+id/showRequests"
-        android:layout_toEndOf="@+id/showRequests"
-        android:text="Show Notification" />
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="14dp"
+        android:layout_marginBottom="-20dp"
+        android:background="@drawable/notification" />
 
     <LinearLayout
         android:layout_width="match_parent"

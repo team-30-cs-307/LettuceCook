@@ -7,6 +7,8 @@
         android:title="Reset Username"/>
     <item android:id="@+id/edit_pw"
         android:title="Reset Password"/>
+    <item android:id="@+id/add_member"
+        android:title="Add Member"/>
     <item android:id="@+id/leave_house"
         android:title="Leave Household"/>
     <item android:id="@+id/logout"
