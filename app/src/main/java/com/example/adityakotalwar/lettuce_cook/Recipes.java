@@ -1,8 +1,10 @@
 package com.example.adityakotalwar.lettuce_cook;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
@@ -63,7 +65,7 @@ public class Recipes extends AppCompatActivity {
     ArrayList<String> recipeIngr = new ArrayList<>();
     ArrayList<String> recipeProc = new ArrayList<>();
 
-
+    private DrawerLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,18 @@ public class Recipes extends AppCompatActivity {
         recipeView = findViewById(R.id.my_list_view2);
 //        final  ArrayList<String> recipe2 = new ArrayList<>();
 
+        coordinatorLayout =  findViewById(R.id.activity_drawer);
 
+        coordinatorLayout.setOnTouchListener(new OnSwipeTouchListener(Recipes.this) {
+            public void onSwipeRight() {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+            public void onSwipeLeft() {
+                startActivity(new Intent(getApplicationContext(), Friends.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            }
+        });
 
 
 //        recipes.add("SAVED RECIPE 1");
@@ -91,38 +104,19 @@ public class Recipes extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 String house = documentSnapshot.getString("household");
-//                recipeView = findViewById(R.id.my_list_view2);
-//                final ArrayList<String> recipe2 = new ArrayList<>();
-//                // in this class content from api needs to be collected and displayed on the
-//                arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipe2);
-//                recipeView.setAdapter(arrayAdapter);
                 System.out.println(house);
                 db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        recipeView = findViewById(R.id.my_list_view2);
-//                        //recipe2 = new ArrayList<>();
-//                        // in this class content from api needs to be collected and displayed on the
-//                        arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipe2);
-//                        recipeView.setAdapter(arrayAdapter);
-//
-                        if(documentSnapshot.get("recipe_list").toString()!=null) {
+
+                        if(documentSnapshot.getString("recipe_list") !=null) {
                             String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
                             final int size = tempRecipes.length;
                             final ArrayList<String> temprec = new ArrayList<>();
                             for (int i = 0; i < size; i++) {
                                 temprec.add(tempRecipes[i]);
                             }
-//                        for(int i=0; i<size; i++){
-//                            db.collection("SavedRecipe").document(tempRecipes[i]).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                                @Override
-//                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                                    System.out.println("SAVED123123123:"+ documentSnapshot.getString("recipe_title"));
-//                                    recipe2.add(documentSnapshot.getString("recipe_title"));
-//                                }
-//                            });
-//                        }
-                            db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
@@ -187,8 +181,6 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
-
-
         chooseIngreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,27 +191,26 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
-
+        recipesButton.setTextColor(Color.parseColor("#5D993D"));
         friendsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Recipes.this, Friends.class);
-                startActivity(intent);
+                startActivity(new Intent(Recipes.this, Friends.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Recipes.this,MainActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(Recipes.this,MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                HashMap<String[], ArrayList<String[]>> t = recipeDetails("479101");
-//                Intent intent = new Intent(Grocery.this,MainActivity.class);
-//                startActivity(intent);
+                startActivity(new Intent(Recipes.this,Grocery.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
 

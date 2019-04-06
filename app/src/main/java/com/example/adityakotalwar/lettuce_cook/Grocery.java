@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -50,10 +51,12 @@ import javax.annotation.Nullable;
 public class Grocery extends MainActivity {
     private Button Buttondelete;
     private Button Buttonupdate;
-    private Button Buttongrocery;
+
+    private Button ButtonGrocery;
     private Button ButtonStock;
     private Button ButtonRecipes;
-    private Button Buttonfriends;
+    private Button ButtonFriends;
+
     private ListView GroceryList;
     private ListView MoveToStockList;
     private EditText AdditemText;
@@ -82,10 +85,13 @@ public class Grocery extends MainActivity {
 
         Buttondelete = findViewById(R.id.DeleteGrocery);
         Buttonupdate = findViewById(R.id.updateToStock);
-        Buttongrocery = findViewById(R.id.buttonGrocery);
+
+        ButtonGrocery = findViewById(R.id.buttonGrocery);
         ButtonStock = findViewById(R.id.buttonStock);
-        ButtonRecipes = findViewById(R.id.go_to_recipes_button);
-        Buttonfriends = findViewById(R.id.buttonFriends);
+        ButtonRecipes = findViewById(R.id.buttonRecipes);
+        ButtonFriends = findViewById(R.id.buttonFriends);
+        ButtonGrocery.setTextColor(Color.parseColor("#5D993D"));
+
         GroceryList = findViewById(R.id.GroceryListView);
         MoveToStockList = findViewById(R.id.MoveToStockListView);
         AdditemText = findViewById(R.id.edit_text_add_item);
@@ -103,7 +109,6 @@ public class Grocery extends MainActivity {
         final FirebaseUser user = firebaseAuth.getCurrentUser();
         GetCurrentHouseholdName();
         FirebaseApp.initializeApp(this);
-
 
         additem.setOnClickListener(Listen);
         if (firebaseAuth.getCurrentUser() == null) {
@@ -129,7 +134,7 @@ public class Grocery extends MainActivity {
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
-        Buttonfriends.setOnClickListener(new View.OnClickListener() {
+        ButtonFriends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Friends.class));
@@ -143,7 +148,6 @@ public class Grocery extends MainActivity {
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
-
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 //        additem.performClick();
 
@@ -154,7 +158,6 @@ public class Grocery extends MainActivity {
             }
         });
 
-        coordinatorLayout = (DrawerLayout)findViewById(R.id.activity_drawer);
         t = new ActionBarDrawerToggle(this, coordinatorLayout,R.string.Open, R.string.Close);
 
         coordinatorLayout.addDrawerListener(t);
@@ -321,15 +324,6 @@ public class Grocery extends MainActivity {
         //additem.performClick();
     }
 
-    public void moveToStock(String item, String household){
-
-        db.collection("Household").document(household).collection("Grocery Items").document(item)
-                .update(
-                        "status", "stock"
-                );
-
-    }
-
 
     public Groceries getGroceryAt(String household, String item){
 
@@ -368,7 +362,6 @@ public class Grocery extends MainActivity {
                     if (ItemEntered.equals("")) {
                         Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
                         break;
-
                     }
 
                     //Toast.makeText(getApplicationContext(), GetCurrentHouseholdName(), Toast.LENGTH_SHORT).show();
@@ -414,7 +407,6 @@ public class Grocery extends MainActivity {
 
             @Override
             public void onFailure(@NonNull Exception e) {
-
                 Household = "bye";
             }
         });

@@ -88,8 +88,6 @@
         <!--android:layout_weight="1"-->
         <!--android:text="Update" />-->
 
-
-
         <include layout="@layout/tabbar"
             android:id="@+id/tabbar"/>
 
@@ -103,6 +101,27 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         android:id="@+id/nv">
+
+        <TextView
+            android:id="@+id/UserNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="240dp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="20dp"
+            android:textSize="20dp"
+            android:fontFamily="sans-serif-medium"
+            />
+        <TextView
+            android:id="@+id/HouseholdTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="270dp"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14dp"
+            android:textFontWeight="20"
+            />
 
     </android.support.design.widget.NavigationView>
 

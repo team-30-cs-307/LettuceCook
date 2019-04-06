@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -64,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button addItemB;
     private EditText addItemT;
     private ListView listView;
-    private Button goToRecipes;
     private Button buttonLogout;
     private Button update;
     private String Household;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button buttonFriends;
     private Button buttonGroceries;
+    private Button buttonStock;
+    private Button buttonRecipes;
 
     private Button editPwButton;
     private Button editUserNameButton;
@@ -107,18 +110,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
         dl.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             public void onSwipeRight() {
                 startActivity(new Intent(getApplicationContext(), Grocery.class));
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
             public void onSwipeLeft() {
-                startActivity(new Intent(getApplicationContext(), SuggestedRecipe.class));
+                startActivity(new Intent(getApplicationContext(), Recipes.class));
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
 
+        final TextView userNameDisp = findViewById(R.id.UserNameTextView);
+        final TextView householdDisp = findViewById(R.id.HouseholdTextView);
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -132,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                userNameDisp.setText("Hello " + documentSnapshot.getString("username") + " !");
+                householdDisp.setText("House "+documentSnapshot.getString("household"));
                 if(documentSnapshot.get("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
@@ -144,11 +150,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
 
-        goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
+        buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
         buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
+        buttonStock = findViewById(R.id.buttonStock);
 
-        goToRecipes.setOnClickListener(this);
+        buttonRecipes.setOnClickListener(this);
+        buttonFriends.setOnClickListener(this);
+        buttonGroceries.setOnClickListener(this);
+        buttonStock.setTextColor(Color.parseColor("#5D993D"));
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
@@ -194,17 +204,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         addItemB.setOnClickListener(this);
 
-        buttonFriends.setOnClickListener(this);
-        //buttonGroceries.setOnClickListener(this);
-        buttonGroceries.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                Intent myIntent = new Intent(MainActivity.this, Grocery.class);
-                startActivity(myIntent);
-            }
-        });
-
         listView.setAdapter(arrayAdapter);
 
         final DocumentReference docrefUser;
@@ -225,8 +224,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
-
                 switch(id)
                 {
                     case R.id.home:
@@ -338,20 +335,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    //checks if arrayadapter contains the required string
-    public boolean contains(ArrayAdapter arrayAdapter, String string){
-
-        for (int i = 0; i < arrayAdapter.getCount(); i++) {
-
-            if (arrayAdapter.getItem(i).equals(string)) {
-                return true;
-
-            }
-
-        }
-        return false;
-
-    }
 
     //Function to check if grocery items collection contains the grocery
 
@@ -487,9 +470,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
-
-
-
         }
         if (v == buttonLogout) {
             buttonLogout.setOnClickListener(
@@ -526,13 +506,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == editUserNameButton){
             editUserName();
         }
-        if(v == goToRecipes){
+        if(v == buttonRecipes){
             finish();
             startActivity(new Intent(getApplicationContext(), Recipes.class));
+            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
         }
         if(v == buttonFriends){
             finish();
             startActivity(new Intent(getApplicationContext(), Friends.class));
+            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+        }
+        if(v == buttonGroceries) {
+            finish();
+            Intent myIntent = new Intent(MainActivity.this, Grocery.class);
+            startActivity(myIntent);
+            overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
         }
     }
 
