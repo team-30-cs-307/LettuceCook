@@ -120,10 +120,11 @@ public class Grocery extends MainActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 //additem.performClick();
-                if(documentSnapshot.get("household").equals("")){
+                if(documentSnapshot.getString("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
+                realtime(documentSnapshot.getString("household"));
             }
         });
 

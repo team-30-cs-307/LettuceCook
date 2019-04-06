@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
         final TextView userNameDisp = findViewById(R.id.UserNameTextView);
         final TextView householdDisp = findViewById(R.id.HouseholdTextView);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -136,12 +138,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                userNameDisp.setText("Hello " + documentSnapshot.getString("username") + " !");
-                householdDisp.setText("House "+documentSnapshot.getString("household"));
                 if(documentSnapshot.get("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
+                userNameDisp.setText("Hello " + documentSnapshot.getString("username") + " !");
+                householdDisp.setText("House "+documentSnapshot.getString("household"));
+                realtime(documentSnapshot.getString("household"));
             }
         });
 
@@ -414,6 +417,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Add grocery item to the database
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
+        if(item.equals("")){
+            return;
+        }
         String userid = firebaseAuth.getCurrentUser().getUid();
         Groceries groceries = new Groceries(userid, description, status);
         db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
@@ -462,11 +468,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //repopulate(arrayAdapter, GetCurrentHouseholdName());
                     addItemT.setText("");
                     addDescription.setText("");
-
-
                 } else {
                     Toast.makeText(this, "You already have this grocery", Toast.LENGTH_SHORT).show();
-
+                    break;
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;

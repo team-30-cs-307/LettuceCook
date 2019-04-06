@@ -92,10 +92,6 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
-
-//        recipes.add("SAVED RECIPE 1");
-//        recipes.add("SAVED RECIPE 2");
-
         final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
