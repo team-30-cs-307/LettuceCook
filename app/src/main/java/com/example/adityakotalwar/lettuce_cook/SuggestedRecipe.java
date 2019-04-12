@@ -51,16 +51,18 @@ import java.util.Map;
 public class SuggestedRecipe extends AppCompatActivity {
 
     ListView myList;
-    ListView suggRecipeList;
     Button getChoice;
     Button chooseIngredients;
     private String Household;
-    ArrayAdapter<String> recipe_adapter;
+
     ArrayList<String> recipes = new ArrayList<String>();
     ArrayList<String> list = new ArrayList<>();
     private Button getRecipesButton;
     ArrayList<String> saved = new ArrayList<>();
 
+    ListView suggRecipeList;
+    ArrayList<RecipeListViewItem> recipeSet = new ArrayList<>();
+    private static CustomAdapterRecipe adapterRecipe;
 
 //    String[] listContent =
 
@@ -83,15 +85,6 @@ public class SuggestedRecipe extends AppCompatActivity {
        // getChoice = (Button) findViewById(R.id.getChoiceButton);
         getRecipesButton = findViewById(R.id.get_recipe);
 
-//        list = new ArrayList<>();
-       // list = new ArrayList<>();
-
-//        suggRecipeList = findViewById(R.id.listViewSuggestedRecipes);
-//        ArrayAdapter<String> recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);
-//        suggRecipeList.setAdapter(recipe_adapter);
-//
-//        recipes.add("SUGGESTED RECIPE 1");
-//        recipes.add("SUGGESTED RECIPE 2");
 
                 db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
@@ -121,43 +114,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 });
 
 
-//        getChoice.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        String hName = documentSnapshot.getString("household");
-//                        db.collection("Household").document(hName).collection("Grocery Items").whereEqualTo("status", "stock")
-//                                .get()
-//                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                                    @Override
-//                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                        String selected = "";
-//                                      //  ArrayList<String> list = new ArrayList<>();
-//                                        list.clear();
-//                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-//                                            list.add(document.getId());
-//                                        }
-//
-//                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-//                                                SuggestedRecipe.this,
-//                                                android.R.layout.simple_list_item_multiple_choice,
-//                                                list);
-//                                        myList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//                                        myList.setAdapter(adapter);
-//
-//                                    }
-//                                });
-//                    }
-//                });
-//
-//
-//
-//            }
-//        });
+
 
         getRecipesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,7 +133,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 }
                 else{
                     try {
-                        getRecipe(selected, recipes, recipe_adapter);
+                        getRecipe(selected, recipes);
                     } catch (UnirestException e) {
                         e.printStackTrace();
                     }
@@ -190,7 +147,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         });
 
         suggRecipeList = findViewById(R.id.listViewSuggestedRecipes);
-        recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);
+//        recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);
 
         suggRecipeList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
@@ -211,13 +168,14 @@ public class SuggestedRecipe extends AppCompatActivity {
                 final AlertDialog dialog = mBuilder.create();
                 dialog.show();
 
-                final String id_recipe = recipe_adapter.getItem(position).split("\n")[0];
-                final String recipe_name = recipe_adapter.getItem(position).split("\n")[1];
-
+                String reci = recipes.get((int) id);
+                int tempo = reci.indexOf('\n');
+                final String id_recipe = reci.substring(0, tempo);
+                String tempo1 = reci.substring(tempo+1, reci.length());
+                final String recipe_name = tempo1.substring(tempo+1, tempo1.indexOf('\n'));
 
                 RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
                 String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/"+id_recipe+"/information";
-                System.out.println("URLURL: "+temp);
                 String url = Uri.parse(temp)
                         .buildUpon().build().toString();
 
@@ -226,13 +184,12 @@ public class SuggestedRecipe extends AppCompatActivity {
                             @Override
                             public void onResponse(JSONObject response) {
                                 try {
-                                    String instructions = "Procedure:\n\n" + response.getString("instructions");
+                                    String instructions = response.getString("instructions");
                                     String time = response.getString("readyInMinutes");
 
                                     String recipeIngr = "";
                                     JSONArray ingr_list = response.getJSONArray("extendedIngredients");
 
-                                    recipeIngr += "Ingredients:\n\n";
                                     for(int i = 0; i < ingr_list.length(); i++){
                                         JSONObject id =  ingr_list.getJSONObject(i);
                                         String ingredient = id.getString("name")+": "+id.getString("amount") + " " + id.getString("unit") + "\n";
@@ -334,7 +291,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         //Inflates the dialog box
     }
 
-    void getRecipe(ArrayList<String> ingredients, final ArrayList<String> recipes, final ArrayAdapter recipe_adapter) throws UnirestException {
+    void getRecipe(ArrayList<String> ingredients, final ArrayList<String> recipes) throws UnirestException {
 
         RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
         String ingr = "";
@@ -368,12 +325,16 @@ public class SuggestedRecipe extends AppCompatActivity {
 
 //                        suggRecipeList = findViewById(R.id.listViewSuggestedRecipes);
 //                        ArrayAdapter<String> recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);
-                        suggRecipeList.setAdapter(recipe_adapter);
 
                         for(int i=0; i<recipeIds.size(); i++){
+                            String ing = "Missing Ingredients: " + recipeIds.get(i)[2];
+                            recipeSet.add(new RecipeListViewItem("","", ing, recipeIds.get(i)[1], ""));
                             recipes.add(recipeIds.get(i)[0] + "\n" +recipeIds.get(i)[1] + "\nMissing Ingredients: " + recipeIds.get(i)[2]);
 //                            System.out.println(recipeIds.get(i)[1]+"biTch");
                         }
+                        adapterRecipe = new CustomAdapterRecipe(recipeSet, getApplicationContext());
+                        suggRecipeList.setAdapter(adapterRecipe);
+
 //                        printRecipes(awesome);
                     }
                 }, new Response.ErrorListener() {

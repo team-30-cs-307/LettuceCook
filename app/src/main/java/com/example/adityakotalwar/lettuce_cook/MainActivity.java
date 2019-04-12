@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,7 +65,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
-    private Button addItemB;
+    private ImageButton addItemB;
     private EditText addItemT;
     private ListView listView;
     private Button buttonLogout;
@@ -148,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        addItemB = (Button) findViewById(R.id.button_add_item);
+        addItemB = (ImageButton) findViewById(R.id.button_add_item);
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
@@ -280,35 +282,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         alertDialog1.show();
                         return true;
                     case R.id.add_member:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(obj);
-                        builder.setTitle("Enter username of member to be invited");
 
-// Set up the input
-                        final EditText input = new EditText(obj);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                        // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                        builder.setView(input);
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+                        View mView = getLayoutInflater().inflate(R.layout.dialog_add_member, null);
 
-// Set up the buttons
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        final EditText userName = (EditText) mView.findViewById(R.id.userNameText);
+                        final Button reset = (Button) mView.findViewById(R.id.buttonSubmitUsername);
+                        final ImageButton backButton = (ImageButton) mView.findViewById(R.id.buttonBack);
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialog = mBuilder.create();
+                        dialog.show();
+
+                        reset.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                userToBeAdded = input.getText().toString();
-                                System.out.println("getting username " +userToBeAdded);
-                                addMember(userToBeAdded);
+                            public void onClick(View v) {
+                                if(userName.getText().toString().isEmpty()){
+                                    userName.setError("Username is empty");
+                                    return;
+                                }
+                                addMember(userName.getText().toString());
                             }
                         });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        backButton.setOnClickListener(new View.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.cancel();
+                            public void onClick(View v) {
+                                dialog.dismiss();
                             }
                         });
-
-                        builder.show();
+                        break;
                     default:
                         return true;
                 }
+                return true;
             }
         });
     }
@@ -396,24 +402,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //adds the grocery item created in the function to the database
-    public void groceries(ArrayAdapter arrayAdapter, String userid, String Household){
-
-        String Grocerylist = "";
-        for (int i = 0; i < arrayAdapter.getCount() ; i++) {
-            /*if (i == arrayAdapter.getCount() - 1) {
-                Grocerylist += arrayAdapter.getItem(i);
-            } else {
-                Grocerylist += arrayAdapter.getItem(i) + ",";
-            }*/
-
-            if(!(arrayAdapter.getItem(i) == null || arrayAdapter.getItem(i).toString().equals(""))){
-                Groceries groceries = new Groceries(userid, "Describe", "stock");
-                db.collection("Household").document("Household").collection("Grocery Items").document(arrayAdapter.getItem(i).toString()).set(groceries);
-            }
-        }
-
-    }
 
     //Add grocery item to the database
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
@@ -609,6 +597,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final EditText PwReset = (EditText) mView.findViewById(R.id.PwReset);
         final EditText ComfirmPwReset = (EditText) mView.findViewById(R.id.ConfirmPwReset);
         final Button ButtonEditPw = (Button) mView.findViewById(R.id.ButtonChangeConfirm);
+        final ImageButton BackButton = (ImageButton) mView.findViewById(R.id.buttonBack);
 
         mBuilder.setView(mView);
         // Pops the dialog on the screen
@@ -640,7 +629,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-
+        BackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         ButtonEditPw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -754,9 +748,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         boolean userPresent = false;
                         for(DocumentSnapshot ds : queryDocumentSnapshots ){
                             userPresent = false;
-                            System.out.println("GETTING HERE " +ds.getString("username")+ " " +member);
                             if(ds.getString("username").equals(member)){
-                                System.out.println("GETTING HERE 222222222");
                                 String invites = ds.getString("invited");
                                 invites = householdName;
                                // System.out.println(invites);
