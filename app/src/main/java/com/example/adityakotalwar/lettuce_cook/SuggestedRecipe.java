@@ -2,6 +2,8 @@ package com.example.adityakotalwar.lettuce_cook;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -44,7 +46,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.SQLOutput;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,7 +72,6 @@ public class SuggestedRecipe extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
-    ArrayList<String> getGrocery = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,19 +165,20 @@ public class SuggestedRecipe extends AppCompatActivity {
                 final TextView recipe_procedure = mView.findViewById(R.id.recipe_procedure);
                 final Button button_save = mView.findViewById(R.id.button_save);
                 final Button button_back = mView.findViewById(R.id.button_back);
+                final Button button_share = mView.findViewById(R.id.button_share);
+                button_share.setVisibility(View.INVISIBLE);
 
                 mBuilder.setView(mView);
                 // Pops the dialog on the screen
                 final AlertDialog dialog = mBuilder.create();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
 
-                String reci = recipes.get((int) id);
-                int tempo = reci.indexOf('\n');
-                final String id_recipe = reci.substring(0, tempo);
-                String tempo1 = reci.substring(tempo+1, reci.length());
-                final String recipe_name = tempo1.substring(tempo+1, tempo1.indexOf('\n'));
+                final String id_recipe = recipeIds.get((int)id)[0];
+                final String recipe_name = recipeIds.get((int) id)[1];
 
                 RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+                System.out.println("Recipe ID: "+ id_recipe);
                 String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/"+id_recipe+"/information";
                 String url = Uri.parse(temp)
                         .buildUpon().build().toString();
@@ -221,7 +225,11 @@ public class SuggestedRecipe extends AppCompatActivity {
                                                                     String household = documentSnapshot.getString("household");
                                                                     final DocumentReference house = db.collection("Household").document(household);
 //                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_title.toString(), recipe_ingredients.toString(),recipe_procedure.toString());
-                                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_name, recipe_ingredients.getText().toString(),recipe_procedure.getText().toString());
+//                                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_name, recipe_ingredients.getText().toString(),recipe_procedure.getText().toString());
+                                                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+                                                                    String format = simpleDateFormat.format(new Date());
+
+                                                                    SaveRecipeCollection saveRecipesCollection = new SaveRecipeCollection(recipe_name, recipe_ingredients.getText().toString(),recipe_procedure.getText().toString(), household, format);
 
                                                                     saveRecipe.add(saveRecipesCollection).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                                                         @Override
@@ -291,6 +299,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         //Inflates the dialog box
     }
 
+    ArrayList<String[]> recipeIds = new ArrayList<>();
     void getRecipe(ArrayList<String> ingredients, final ArrayList<String> recipes) throws UnirestException {
 
         RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
@@ -308,7 +317,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 new Response.Listener<JSONArray>() {
                     @Override
                      public void onResponse(JSONArray response) {
-                        ArrayList<String[]> recipeIds = new ArrayList<>();
+                        recipeIds = new ArrayList<>();
                         for (int i=0; i< response.length(); i++){
                             try {
                                 JSONObject id  =  response.getJSONObject(i);
@@ -329,7 +338,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                         for(int i=0; i<recipeIds.size(); i++){
                             String ing = "Missing Ingredients: " + recipeIds.get(i)[2];
                             recipeSet.add(new RecipeListViewItem("","", ing, recipeIds.get(i)[1], ""));
-                            recipes.add(recipeIds.get(i)[0] + "\n" +recipeIds.get(i)[1] + "\nMissing Ingredients: " + recipeIds.get(i)[2]);
+//                            recipes.add(recipeIds.get(i)[0] + "\n" +recipeIds.get(i)[1] + "\nMissing Ingredients: " + recipeIds.get(i)[2]);
 //                            System.out.println(recipeIds.get(i)[1]+"biTch");
                         }
                         adapterRecipe = new CustomAdapterRecipe(recipeSet, getApplicationContext());

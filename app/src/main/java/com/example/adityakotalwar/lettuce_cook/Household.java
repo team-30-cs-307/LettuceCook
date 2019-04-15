@@ -18,6 +18,7 @@ public class Household {
     private String friendRequests;
     private String noti_list = "";
     private String recipe_list = "";
+    private String shared_recipe_list = "";
     private String friends;
     //private @ServerTimestamp Date timestamp;
 

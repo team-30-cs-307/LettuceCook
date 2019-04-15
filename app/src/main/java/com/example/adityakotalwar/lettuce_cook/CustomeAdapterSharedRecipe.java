@@ -9,12 +9,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implements View.OnClickListener {
+class CustomAdapterSharedRecipe extends ArrayAdapter<RecipeListViewItem> implements View.OnClickListener {
+
+    final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     private ArrayList<RecipeListViewItem> recipeSet;
     Context mContext;
@@ -27,7 +37,7 @@ public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implem
         ImageButton star_button;
     }
 
-    public CustomAdapterRecipe(ArrayList<RecipeListViewItem> recipeSet, Context context){
+    public CustomAdapterSharedRecipe(ArrayList<RecipeListViewItem> recipeSet, Context context){
         super(context, R.layout.listview_recipe_item, recipeSet);
         this.recipeSet = recipeSet;
         this.mContext = context;
@@ -37,12 +47,30 @@ public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implem
 
         int position = (Integer) v.getTag();
         Object obj = getItem(position);
-        RecipeListViewItem recipe = (RecipeListViewItem) obj;
+        final RecipeListViewItem recipe = (RecipeListViewItem) obj;
 
-//        switch(v.getId()){
-//
-//
-//        }
+        switch(v.getId()){
+            case R.id.star_button:
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String house = documentSnapshot.getString("household");
+                        final DocumentReference dr = db.collection("Household").document(house);
+                        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                String rec = documentSnapshot.getString("SavedRecipe");
+                                if(!rec.contains("recipe.id")){
+                                    rec += recipe.id + " ";
+                                    dr.update("SavedRecipe", rec);
+                                }
+
+                            }
+                        });
+                    }
+                });
+
+        }
 
     }
 

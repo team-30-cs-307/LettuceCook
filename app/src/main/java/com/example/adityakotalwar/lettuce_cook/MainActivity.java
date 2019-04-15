@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -262,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         return true;
                     case R.id.logout:
                         AlertDialog.Builder logout_confir1 = new AlertDialog.Builder(MainActivity.this);
+
                         logout_confir1.setMessage("Are you sure you want to logout")
                                 .setCancelable(false)
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -279,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     }
                                 });
                         AlertDialog alertDialog1 = logout_confir1.create();
+
                         alertDialog1.show();
                         return true;
                     case R.id.add_member:
@@ -292,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         mBuilder.setView(mView);
                         final AlertDialog dialog = mBuilder.create();
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialog.show();
 
                         reset.setOnClickListener(new View.OnClickListener() {
@@ -602,6 +606,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBuilder.setView(mView);
         // Pops the dialog on the screen
         final AlertDialog dialog = mBuilder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
         ComfirmPwReset.addTextChangedListener(new TextWatcher() {

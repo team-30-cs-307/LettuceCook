@@ -10,7 +10,8 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/layout_border"
         android:gravity="bottom"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="4">
 
         <Button
             android:id="@+id/buttonGrocery"
@@ -19,8 +20,6 @@
             android:background="@null"
             android:layout_weight="1"
             android:text="Grocery" />
-
-
         <Button
             android:id="@+id/buttonStock"
             android:layout_width="wrap_content"
@@ -34,8 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
+            android:layout_weight="1"
             android:text="Recipes" />
 
         <Button

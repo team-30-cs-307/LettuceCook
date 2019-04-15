@@ -13,16 +13,32 @@
     android:layout_height="match_parent"
     tools:context=".Recipes">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="321dp"
-        android:layout_height="30dp"
-        android:layout_alignParentStart="true"
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@drawable/layout_border"
+        android:layout_marginBottom="20dp"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="13dp"
-        android:text="Saved Recipes"
-        android:textSize="24sp" />
+        android:weightSum="2">
+        <Button
+            android:id="@+id/SavedRecipeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SAVED"
+            android:background="@null"
+            android:textColor="@color/colorAccentLight"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/SharedRecipeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="SHARED"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
 
     <include layout="@layout/tabbar"
         android:id="@+id/tabbar"/>
@@ -31,9 +47,11 @@
     <ListView
         android:id="@+id/my_list_view2"
         android:layout_width="match_parent"
-        android:layout_height="346dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textView"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/buttons"
+        android:layout_above="@+id/buttonChooseIngredients"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
 
