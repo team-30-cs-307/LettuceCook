@@ -1,10 +1,13 @@
 
 package com.example.adityakotalwar.lettuce_cook;
 
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,7 +20,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -52,6 +57,7 @@ import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +65,9 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
-    private Button addItemB;
+    private ImageButton addItemB;
     private EditText addItemT;
     private ListView listView;
-    private Button goToRecipes;
     private Button buttonLogout;
     private Button update;
     private String Household;
@@ -72,11 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button buttonFriends;
     private Button buttonGroceries;
+    private Button buttonStock;
+    private Button buttonRecipes;
 
     private Button editPwButton;
     private Button editUserNameButton;
     private Button leaveHouseholdButton;
-    private Button addMemberButton;
 
     private FirebaseFirestore db;
     private FirebaseAuth firebaseAuth;
@@ -105,13 +111,124 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+        dl.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
+            public void onSwipeRight() {
+                startActivity(new Intent(getApplicationContext(), Grocery.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+            public void onSwipeLeft() {
+                startActivity(new Intent(getApplicationContext(), Recipes.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            }
+        });
+
+
+
+        final TextView userNameDisp = findViewById(R.id.UserNameTextView);
+        final TextView householdDisp = findViewById(R.id.HouseholdTextView);
+        firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        if (firebaseAuth.getCurrentUser() == null) {
+            finish();
+            startActivity(new Intent(getApplicationContext(), SignUp.class));
+            return;
+        }
+
+        db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                if(documentSnapshot.get("household").equals("")){
+                    finish();
+                    startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
+                }
+                userNameDisp.setText("Hello " + documentSnapshot.getString("username") + " !");
+                householdDisp.setText("House "+documentSnapshot.getString("household"));
+                realtime(documentSnapshot.getString("household"));
+            }
+        });
+
+        addItemB = (ImageButton) findViewById(R.id.button_add_item);
+        addItemT = (EditText) findViewById(R.id.edit_text_add_item);
+        listView = (ListView) findViewById(R.id.my_list_view2);
+        addDescription = (EditText) findViewById(R.id.edit_text_add_description);
+
+        buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
+        buttonFriends = (Button) findViewById(R.id.buttonFriends);
+        buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
+        buttonStock = findViewById(R.id.buttonStock);
+
+        buttonRecipes.setOnClickListener(this);
+        buttonFriends.setOnClickListener(this);
+        buttonGroceries.setOnClickListener(this);
+        buttonStock.setTextColor(Color.parseColor("#5D993D"));
+
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
+                //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("What should happen to this item");
+                builder.setMessage("Message content of Title");
+                builder.setCancelable(false);
+
+                builder.setPositiveButton("Remove from stock", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int j) {
+                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position));
+                        //               Toast.makeText(MainActivity.this,"REMOVE FROM STOCK", Toast.LENGTH_LONG).show();
+//                        arrayAdapter.clear();
+//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
+                    }
+                });
+
+                builder.setNegativeButton("Remove from stock + Add to grocery", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int j) {
+                        Toast.makeText(MainActivity.this,"GROCERY LIST", Toast.LENGTH_LONG).show();
+
+//                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(j));
+//                        arrayAdapter.clear();
+//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
+                        String item = arrayAdapter.getItem(position);
+                        db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
+
+
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                return false;
+            }
+        });
+
+        addItemB.setOnClickListener(this);
+
+        listView.setAdapter(arrayAdapter);
+
+        final DocumentReference docrefUser;
+        final String id = firebaseAuth.getCurrentUser().getUid();
+        docrefUser = db.collection("Users").document(id);
+        docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                //user.getUsername();
+                Household = documentSnapshot.getString("household");
+
+            }
+        });
+        final Context obj = this;
+
         nv = (NavigationView)findViewById(R.id.nv);
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                Toast.makeText(MainActivity.this, "My Cart",Toast.LENGTH_SHORT).show();
-
                 switch(id)
                 {
                     case R.id.home:
@@ -164,180 +281,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         AlertDialog alertDialog1 = logout_confir1.create();
                         alertDialog1.show();
                         return true;
+                    case R.id.add_member:
+
+                        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+                        View mView = getLayoutInflater().inflate(R.layout.dialog_add_member, null);
+
+                        final EditText userName = (EditText) mView.findViewById(R.id.userNameText);
+                        final Button reset = (Button) mView.findViewById(R.id.buttonSubmitUsername);
+                        final ImageButton backButton = (ImageButton) mView.findViewById(R.id.buttonBack);
+
+                        mBuilder.setView(mView);
+                        final AlertDialog dialog = mBuilder.create();
+                        dialog.show();
+
+                        reset.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(userName.getText().toString().isEmpty()){
+                                    userName.setError("Username is empty");
+                                    return;
+                                }
+                                addMember(userName.getText().toString());
+                            }
+                        });
+                        backButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+                        break;
                     default:
-                         return true;
+                        return true;
                 }
-            }
-        });
-
-
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-        final FirebaseUser user = firebaseAuth.getCurrentUser();
-
-        if (firebaseAuth.getCurrentUser() == null) {
-            finish();
-            startActivity(new Intent(getApplicationContext(), SignUp.class));
-            return;
-        }
-
-        db.collection("Users").document(user.getUid()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if(documentSnapshot.get("household").equals("")){
-                    finish();
-                    startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
-                }
-            }
-        });
-
-        addItemB = (Button) findViewById(R.id.button_add_item);
-        addItemT = (EditText) findViewById(R.id.edit_text_add_item);
-        listView = (ListView) findViewById(R.id.my_list_view2);
-        addDescription = (EditText) findViewById(R.id.edit_text_add_description);
-
-        goToRecipes = (Button) findViewById(R.id.go_to_recipes_button);
-        buttonFriends = (Button) findViewById(R.id.buttonFriends);
-        buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
-
-        addMemberButton = findViewById(R.id.addMemberButton);
-
-        goToRecipes.setOnClickListener(this);
-
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
-                //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
-                AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("What should happen to this item");
-                builder.setMessage("Message content of Title");
-                builder.setCancelable(false);
-
-                builder.setPositiveButton("Remove from stock", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int j) {
-                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position));
-                        //               Toast.makeText(MainActivity.this,"REMOVE FROM STOCK", Toast.LENGTH_LONG).show();
-//                        arrayAdapter.clear();
-//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
-                    }
-                });
-
-                builder.setNegativeButton("Remove from stock + Add to grocery", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int j) {
-                        Toast.makeText(MainActivity.this,"GROCERY LIST", Toast.LENGTH_LONG).show();
-
-//                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(j));
-//                        arrayAdapter.clear();
-//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
-                        String item = arrayAdapter.getItem(position);
-                        db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
-
-
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-
-                return false;
-            }
-        });
-
-        addItemB.setOnClickListener(this);
-        //listView.setOnItemClickListener(this);
-//        buttonLogout.setOnClickListener(this);
-//        editPwButton.setOnClickListener(this);
-  //      editUserNameButton.setOnClickListener(this);
-      //  listView.setOnItemClickListener(this);
-
-        buttonFriends.setOnClickListener(this);
-        //buttonGroceries.setOnClickListener(this);
-        buttonGroceries.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                Intent myIntent = new Intent(MainActivity.this, Grocery.class);
-
-                startActivity(myIntent);
-            }
-        });
-
-        listView.setAdapter(arrayAdapter);
-
-//        final DocumentReference docrefUser;
-//        final String id = firebaseAuth.getCurrentUser().getUid();
-//        docrefUser = db.collection("Users").document(id);
-//        docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                //user.getUsername();
-//                Household = documentSnapshot.getString("household");
-//
-//            }
-//        });
-
-
-//        update.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String id = firebaseAuth.getCurrentUser().getUid();
-//                //groceries(arrayAdapter, id, "Hardcoded ID");
-//                arrayAdapter.clear();
-//                repopulate(arrayAdapter, GetCurrentHouseholdName());
-//            }
-//        });
-
-        final DocumentReference docrefUser;
-        final String id = firebaseAuth.getCurrentUser().getUid();
-        docrefUser = db.collection("Users").document(id);
-        docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                //user.getUsername();
-                Household = documentSnapshot.getString("household");
-
-            }
-        });
-        final Context obj = this;
-
-        addMemberButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(obj);
-                builder.setTitle("Enter username of member to be invited");
-
-// Set up the input
-                final EditText input = new EditText(obj);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-               // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                builder.setView(input);
-
-// Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        userToBeAdded = input.getText().toString();
-                        System.out.println("getting username " +userToBeAdded);
-                        addMember(userToBeAdded);
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-
-
+                return true;
             }
         });
     }
+
+
 
     public void deleteGrocery(final String Household /*Name of the household the user is in*/, final String  item /*Item to be deleted*/){
         db.collection("Household").document(Household).collection("Grocery Items").document(item)
@@ -345,7 +327,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(), "Grocery Item Deleted!", item + " added to Stock!" );
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                "Grocery Item Deleted!", item + " added to Stock!", Calendar.getInstance().getTime().toString() );
                         notiCollection.sendInAppNotification(notiCollection);
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }
@@ -361,20 +344,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    //checks if arrayadapter contains the required string
-    public boolean contains(ArrayAdapter arrayAdapter, String string){
-
-        for (int i = 0; i < arrayAdapter.getCount(); i++) {
-
-            if (arrayAdapter.getItem(i).equals(string)) {
-                return true;
-
-            }
-
-        }
-        return false;
-
-    }
 
     //Function to check if grocery items collection contains the grocery
 
@@ -433,61 +402,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //adds the grocery item created in the function to the database
-    public void groceries(ArrayAdapter arrayAdapter, String userid, String Household){
-
-        String Grocerylist = "";
-        for (int i = 0; i < arrayAdapter.getCount() ; i++) {
-            /*if (i == arrayAdapter.getCount() - 1) {
-                Grocerylist += arrayAdapter.getItem(i);
-            } else {
-                Grocerylist += arrayAdapter.getItem(i) + ",";
-            }*/
-
-            if(!(arrayAdapter.getItem(i) == null || arrayAdapter.getItem(i).toString().equals(""))){
-                Groceries groceries = new Groceries(userid, "Describe", "stock");
-                db.collection("Household").document("Household").collection("Grocery Items").document(arrayAdapter.getItem(i).toString()).set(groceries);
-            }
-        }
-
-    }
 
     //Add grocery item to the database
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
+        if(item.equals("")){
+            return;
+        }
         String userid = firebaseAuth.getCurrentUser().getUid();
         Groceries groceries = new Groceries(userid, description, status);
         db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added!", item + " added to Stock!" );
+        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added!", item + " added to Stock!"
+        ,Calendar.getInstance().getTime().toString());
         notiCollection.sendInAppNotification(notiCollection);
     }
 
-    public void repopulate(final ArrayAdapter ArrayAdapter, String HouseholdName){
 
-        /*db.collection("Household").document(HouseholdName).collection("Grocery Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-
-                    ArrayAdapter.add(ds.getId());
-
-                }
-
-            }
-        });*/
-        db.collection("Household").document(HouseholdName).collection("Grocery Items").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    //List<String> list = new ArrayList<>();
-                    for(QueryDocumentSnapshot document : task.getResult()){
-                        arrayAdapter.add(document.getId());
-                    }
-                }
-            }
-        });
-
-    }
     public void realtime(final String householdName){
         db.collection("Household").document(householdName).collection("Grocery Items").whereEqualTo("status", "stock")
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -518,8 +448,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
                     break;
                 }
-//                addItemT.setText("");
-//                arrayAdapter.add(itemEntered);
 
                 if (!(GroceryItemContains(itemEntered, GetCurrentHouseholdName()))) {
 
@@ -528,17 +456,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     //repopulate(arrayAdapter, GetCurrentHouseholdName());
                     addItemT.setText("");
                     addDescription.setText("");
-
-
                 } else {
                     Toast.makeText(this, "You already have this grocery", Toast.LENGTH_SHORT).show();
-
+                    break;
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
                 break;
-
-
-
         }
         if (v == buttonLogout) {
             buttonLogout.setOnClickListener(
@@ -575,13 +498,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == editUserNameButton){
             editUserName();
         }
-        if(v == goToRecipes){
+        if(v == buttonRecipes){
             finish();
             startActivity(new Intent(getApplicationContext(), Recipes.class));
+            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
         }
         if(v == buttonFriends){
             finish();
             startActivity(new Intent(getApplicationContext(), Friends.class));
+            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+        }
+        if(v == buttonGroceries) {
+            finish();
+            Intent myIntent = new Intent(MainActivity.this, Grocery.class);
+            startActivity(myIntent);
+            overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
         }
     }
 
@@ -657,7 +588,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void editPw(){
+    void editPw(){
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_edit_pw, null);
 
@@ -666,6 +597,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final EditText PwReset = (EditText) mView.findViewById(R.id.PwReset);
         final EditText ComfirmPwReset = (EditText) mView.findViewById(R.id.ConfirmPwReset);
         final Button ButtonEditPw = (Button) mView.findViewById(R.id.ButtonChangeConfirm);
+        final ImageButton BackButton = (ImageButton) mView.findViewById(R.id.buttonBack);
 
         mBuilder.setView(mView);
         // Pops the dialog on the screen
@@ -697,7 +629,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-
+        BackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         ButtonEditPw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -748,8 +685,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void editUserName(){
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+    void editUserName(){
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(getApplicationContext());
         View mView = getLayoutInflater().inflate(R.layout.dialog_edit_username, null);
 
         final EditText PwCurrent = (EditText) mView.findViewById(R.id.PwCurrent);
@@ -811,9 +748,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         boolean userPresent = false;
                         for(DocumentSnapshot ds : queryDocumentSnapshots ){
                             userPresent = false;
-                            System.out.println("GETTING HERE " +ds.getString("username")+ " " +member);
                             if(ds.getString("username").equals(member)){
-                                System.out.println("GETTING HERE 222222222");
                                 String invites = ds.getString("invited");
                                 invites = householdName;
                                // System.out.println(invites);

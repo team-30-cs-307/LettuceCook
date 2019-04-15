@@ -19,6 +19,16 @@ public class InAppNotiCollection {
         String noti_title;
         String noti_body;
         String notifications;
+        String timeStamp;
+
+        InAppNotiCollection(String householdName, String sender_userName, String noti_title, String noti_body, String timeStamp){
+            this.householdName = householdName;
+            this.sender_userName = sender_userName;
+            this.noti_title = noti_title;
+            this.noti_body = noti_body;
+            this.notifications = "";
+            this.timeStamp = timeStamp;
+        }
 
         InAppNotiCollection(String householdName, String sender_userName, String noti_title, String noti_body){
             this.householdName = householdName;
@@ -28,7 +38,7 @@ public class InAppNotiCollection {
             this.notifications = "";
         }
 
-        void sendInAppNotification(final InAppNotiCollection inAppNotificationCollection){
+    void sendInAppNotification(final InAppNotiCollection inAppNotificationCollection){
             final FirebaseFirestore db = FirebaseFirestore.getInstance();
             final CollectionReference dbNoti = db.collection("Notification");
             final DocumentReference house = db.collection("Household").document(inAppNotificationCollection.householdName);

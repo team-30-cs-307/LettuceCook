@@ -4,7 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,11 +23,12 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.util.Calendar;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,6 +40,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -42,6 +48,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.annotation.Nullable;
 
@@ -50,9 +57,10 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
 public class Friends extends AppCompatActivity {
     private Button groceryButton;
     private Button friendsButton;
-    private Button friendRequestsButton;
     private Button stockButton;
     private Button recipesButton;
+
+    private Button friendRequestsButton;
     private Button showUsersButton;
     private TextView listOfUsers;
 
@@ -61,13 +69,20 @@ public class Friends extends AppCompatActivity {
     SearchView searchView;
     ArrayAdapter<String> adapter;
 
-    private Button showNotiButton;
+    private ImageButton showNotiButton;
     private String friendToBeAdded;
     private ListView requests_invites;
     private Button showRequestsButton;
     private RequestAdapter requestListAdapter;
-    ArrayList<String> notification_title;
     private ArrayList<String> requests = new ArrayList<>();
+
+    private DrawerLayout coordinatorLayout;
+    private ActionBarDrawerToggle t;
+
+    private ArrayList<String> notification_title = new ArrayList<String>();
+    private ArrayList<String> notification_body = new ArrayList<>();
+    private ArrayList<String> sender = new ArrayList<>();
+    private ArrayList<String[]> noti_details = new ArrayList<String[]>();
 
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     private String householdName;
@@ -82,6 +97,7 @@ public class Friends extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+
         showUsersButton = findViewById(R.id.showUsers);
         listOfUsers = findViewById(R.id.listUsers);
         listFriends = findViewById(R.id.listviewFriends);
@@ -109,6 +125,17 @@ public class Friends extends AppCompatActivity {
                 arrayHouseholds);
         listFriends.setAdapter(adapter);
 
+        coordinatorLayout = (DrawerLayout) findViewById(R.id.activity_drawer);
+//        additem.performClick();
+
+        coordinatorLayout.setOnTouchListener(new OnSwipeTouchListener(Friends.this) {
+            public void onSwipeRight() {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+        });
+
+
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             @Override
@@ -116,11 +143,11 @@ public class Friends extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
                 Notifications n = new Notifications();
                 try {
-                    n.sendNotification("dinner invitation", adapter.getItem(i)+ "has invited you for dinner", adapter.getItem(i), requestQueue);
+                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
                 } catch (InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "dinner invitation", adapter.getItem(i)+" has invited you !" );
+                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
                 notiCollection.sendInAppNotification(notiCollection);
                 Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
             }
@@ -135,26 +162,26 @@ public class Friends extends AppCompatActivity {
         showNotiButton = findViewById(R.id.showNotiButton);
         requests_invites = findViewById(R.id.requests_and_invites);
 
-
+        friendsButton.setTextColor(Color.parseColor("#5D993D"));
         recipesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,Recipes.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,Recipes.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,MainActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,Grocery.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,Grocery.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
 
@@ -187,8 +214,6 @@ public class Friends extends AppCompatActivity {
                 getRequests();
             }
         });
-
-
 
         final Context obj = this;
         friendRequestsButton.setOnClickListener(new View.OnClickListener() {
@@ -226,25 +251,6 @@ public class Friends extends AppCompatActivity {
                             }
                         });
 
-//                        db.collection("Household").addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                            boolean exists = false;
-//                            @Override
-//                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                                ArrayList<String> houses = new ArrayList<>();
-//                                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-//                                    houses.add(ds.getId());
-//                                }
-//                                if(!houses.contains(friendToBeAdded)){
-//                                    System.out.println("what is the upness");
-//                                    Toast.makeText(Friends.this, "Invalid household name!", Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
-//                                else{
-//                                    System.out.println("kjngkjenrkjgkjerngjen");
-//                                    sendFriendRequest(friendToBeAdded);
-//                                }
-//                            }
-//                        });
                         //System.out.println("getting username " +userToBeAdded);
 
                        // sendFriendRequest(friendToBeAdded);
@@ -261,54 +267,6 @@ public class Friends extends AppCompatActivity {
             }
         });
 
-
-
-//        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-//            @Override
-//            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//                if(notification_title.get(i).contains("dinner")){
-//                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-//                    inv.setMessage("Do you accept their invitation")
-//                            .setCancelable(false)
-//                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//                                    Notifications n = new Notifications();
-//                                    try {
-//                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
-//                                    } catch (InstantiationException e1) {
-//                                        e1.printStackTrace();
-//                                    } catch (IllegalAccessException e1) {
-//                                        e1.printStackTrace();
-//                                    }
-//                                    finish();
-//                                }
-//                            })
-//                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//                                    Notifications n = new Notifications();
-//                                    try {
-//                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
-//                                    } catch (InstantiationException e1) {
-//                                        e1.printStackTrace();
-//                                    } catch (IllegalAccessException e1) {
-//                                        e1.printStackTrace();
-//                                    }
-//                                    dialogInterface.cancel();
-//                                }
-//                            });
-//                    AlertDialog alertDialog = inv.create();
-//                    alertDialog.show();
-//                // }
-//
-//            }
-//                return true;
-//        }
-//        });
     }
 
 
@@ -554,22 +512,43 @@ public class Friends extends AppCompatActivity {
         mBuilder.setView(mView);
         listView = mView.findViewById(R.id.noti_view);
         final AlertDialog dialog = mBuilder.create();
+        dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
         dialog.show();
 
-        notification_title = new ArrayList<>();
-        final ArrayList<String> notification_body = new ArrayList<>();
-        final ArrayList<String> sender = new ArrayList<>();
+        ImageButton back_button = mView.findViewById(R.id.back_button);
 
-        db.collection("Household").document(household).
-                addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        notification_body.clear();
+        notification_title.clear();
+        sender.clear();
+
+        db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                final ArrayList<String> notifications = new ArrayList<String>(Arrays.asList(documentSnapshot.get("noti_list").toString().split(" ")));
+                db.collection("Notification").orderBy("timeStamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                        notification_body.clear();
-                        notification_title.clear();
-                        sender.clear();
-                        populateNoti(listView, db, household, notification_title, notification_body, sender);
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for(QueryDocumentSnapshot ds: queryDocumentSnapshots){
+                            if(notifications.contains(ds.getId())){
+                                notification_body.add(ds.get("noti_body").toString());
+                                notification_title.add(ds.get("noti_title").toString());
+                                sender.add(ds.get("sender_userName").toString());
+                            }
+                        }
+                        CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
+                        listView.setAdapter(customAdapter);
                     }
                 });
+            }
+        });
+
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -616,107 +595,7 @@ public class Friends extends AppCompatActivity {
                 return true;
             }
         });
-//        listView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//               //if(notification_title..equals("to their household")){
-//                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-//                    inv.setMessage("Do you accept their invitation")
-//                            .setCancelable(false)
-//                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//                                    Notifications n = new Notifications();
-//                                    try {
-//                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
-//                                    } catch (InstantiationException e1) {
-//                                        e1.printStackTrace();
-//                                    } catch (IllegalAccessException e1) {
-//                                        e1.printStackTrace();
-//                                    }
-//                                    finish();
-//                                }
-//                            })
-//                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//                                    Notifications n = new Notifications();
-//                                    try {
-//                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
-//                                    } catch (InstantiationException e1) {
-//                                        e1.printStackTrace();
-//                                    } catch (IllegalAccessException e1) {
-//                                        e1.printStackTrace();
-//                                    }
-//                                    dialogInterface.cancel();
-//                                }
-//                            });
-//                    AlertDialog alertDialog = inv.create();
-//                    alertDialog.show();
-//               // }
-//                return false;
-//            }
-//        });
-
     }
-
-
-
-
-
-    public void populateNoti(final ListView listView, final FirebaseFirestore db, final String household,
-                             final ArrayList<String> notification_title, final ArrayList<String> notification_body, final ArrayList<String> sender){
-
-
-
-//        notification_title.add("RJNCDKJDNCJNLCECNCNEJ");
-//        notification_body.add("kjenvuj");
-//        sender.add("ckjncj");
-
-        db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                String[] notifications = documentSnapshot.get("noti_list").toString().split(" ");
-                final int size = notifications.length;
-                for(int i=0; i<size; i++){
-
-                    db.collection("Notification").document(notifications[i]).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                            notification_title.add(documentSnapshot.get("noti_title").toString());
-                            notification_body.add(documentSnapshot.get("noti_body").toString());
-                            sender.add(documentSnapshot.get("sender_userName").toString());
-
-                            CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
-                            listView.setAdapter(customAdapter);
-
-                              //                            String[] noti_body = new String[1]; noti_body[0] = documentSnapshot.get("noti_body").toString();
-//                            String[] sender_username = new String[1]; sender_username[0] = documentSnapshot.get("sender_username").toString();
-
-//                            FriendsNotiCustomListView customListView = new FriendsNotiCustomListView(, noti_title, noti_body, sender_username);
-
-//                            arrayAdapter.add(documentSnapshot.get("noti_body").toString());
-                        }
-                    });
-                }
-
-            }
-        });
-
-
-
-    }
-
-    public void sendNoti(){
-        InAppNotiCollection noti = new InAppNotiCollection("totalwar1","aditya","alisha","have my babies");
-        noti.sendInAppNotification(noti);
-    }
-
 
 
     class CustomAdapter extends BaseAdapter{

@@ -5,12 +5,17 @@ import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -39,16 +44,19 @@ import android.support.design.widget.CoordinatorLayout;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.annotation.Nullable;
 
-public class Grocery extends AppCompatActivity {
+public class Grocery extends MainActivity {
     private Button Buttondelete;
     private Button Buttonupdate;
-    private Button Buttongrocery;
+
+    private Button ButtonGrocery;
     private Button ButtonStock;
     private Button ButtonRecipes;
-    private Button Buttonfriends;
+    private Button ButtonFriends;
+
     private ListView GroceryList;
     private ListView MoveToStockList;
     private EditText AdditemText;
@@ -60,13 +68,14 @@ public class Grocery extends AppCompatActivity {
     private int SnackFlag = 0;
     private Groceries grocery;
     private FirebaseAuth firebaseAuth;
+
     ArrayAdapter<String> GroceryArray;
     ArrayAdapter<String> StockArray;
     ArrayList<String> DeletedItems;
 
-    DrawerLayout coordinatorLayout;
-
-
+    private DrawerLayout coordinatorLayout;
+    private ActionBarDrawerToggle t;
+    private NavigationView nv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +83,15 @@ public class Grocery extends AppCompatActivity {
         setContentView(R.layout.activity_new_grocery);
         //setContentView(R.layout.activity_suggrecipe);
 
-
         Buttondelete = findViewById(R.id.DeleteGrocery);
         Buttonupdate = findViewById(R.id.updateToStock);
-        Buttongrocery = findViewById(R.id.buttonGrocery);
+
+        ButtonGrocery = findViewById(R.id.buttonGrocery);
         ButtonStock = findViewById(R.id.buttonStock);
-        ButtonRecipes = findViewById(R.id.go_to_recipes_button);
-        Buttonfriends = findViewById(R.id.buttonFriends);
+        ButtonRecipes = findViewById(R.id.buttonRecipes);
+        ButtonFriends = findViewById(R.id.buttonFriends);
+        ButtonGrocery.setTextColor(Color.parseColor("#5D993D"));
+
         GroceryList = findViewById(R.id.GroceryListView);
         MoveToStockList = findViewById(R.id.MoveToStockListView);
         AdditemText = findViewById(R.id.edit_text_add_item);
@@ -99,7 +110,6 @@ public class Grocery extends AppCompatActivity {
         GetCurrentHouseholdName();
         FirebaseApp.initializeApp(this);
 
-
         additem.setOnClickListener(Listen);
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
@@ -110,10 +120,11 @@ public class Grocery extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 //additem.performClick();
-                if(documentSnapshot.get("household").equals("")){
+                if(documentSnapshot.getString("household").equals("")){
                     finish();
                     startActivity(new Intent(getApplicationContext(), HouseholdActivity.class));
                 }
+                realtime(documentSnapshot.getString("household"));
             }
         });
 
@@ -121,25 +132,104 @@ public class Grocery extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
-        Buttonfriends.setOnClickListener(new View.OnClickListener() {
+        ButtonFriends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Friends.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
         ButtonRecipes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Recipes.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
-
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 //        additem.performClick();
 
+        coordinatorLayout.setOnTouchListener(new OnSwipeTouchListener(Grocery.this) {
+            public void onSwipeLeft() {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            }
+        });
 
+        t = new ActionBarDrawerToggle(this, coordinatorLayout,R.string.Open, R.string.Close);
+
+        coordinatorLayout.addDrawerListener(t);
+        t.syncState();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        nv = (NavigationView)findViewById(R.id.nv);
+
+        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.home:
+                        return true;
+                    case R.id.edit_name:
+                        editUserName();
+                        return true;
+                    case R.id.edit_pw:
+                        editPw();
+                        return true;
+                    case R.id.leave_house:
+                        AlertDialog.Builder logout_confir = new AlertDialog.Builder(getApplicationContext());
+                        logout_confir.setMessage("Are you sure you want to leave the household")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        leaveHousehold();
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog = logout_confir.create();
+                        alertDialog.show();
+                        return true;
+                    case R.id.logout:
+                        AlertDialog.Builder logout_confir1 = new AlertDialog.Builder(getApplicationContext());
+                        logout_confir1.setMessage("Are you sure you want to logout")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        firebaseAuth.signOut();
+                                        finish();
+                                        startActivity(new Intent(getApplicationContext(), SignIn.class));
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog1 = logout_confir1.create();
+                        alertDialog1.show();
+                        return true;
+                    default:
+                        return true;
+                }
+
+
+            }
+        });
 
 
         GroceryList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -200,18 +290,6 @@ public class Grocery extends AppCompatActivity {
 
                             }
                         });
-//                if(SnackFlag == 0){
-//                    deleteGrocery(GetCurrentHouseholdName(), item);
-//
-//                }
-//                else{
-//                    GroceryArray.add(item);
-//
-//                }
-
-
-                        //deleteGrocery(GetCurrentHouseholdName(), GroceryArray.getItem(position));
-
 
                     }
                 });
@@ -245,15 +323,6 @@ public class Grocery extends AppCompatActivity {
         });
 
         //additem.performClick();
-    }
-
-    public void moveToStock(String item, String household){
-
-        db.collection("Household").document(household).collection("Grocery Items").document(item)
-                .update(
-                        "status", "stock"
-                );
-
     }
 
 
@@ -294,7 +363,6 @@ public class Grocery extends AppCompatActivity {
                     if (ItemEntered.equals("")) {
                         Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
                         break;
-
                     }
 
                     //Toast.makeText(getApplicationContext(), GetCurrentHouseholdName(), Toast.LENGTH_SHORT).show();
@@ -340,7 +408,6 @@ public class Grocery extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Exception e) {
-
                 Household = "bye";
             }
         });
@@ -371,7 +438,7 @@ public class Grocery extends AppCompatActivity {
         Groceries groceries = new Groceries(userid, description, status);
         db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!" );
+        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString() );
         notiCollection.sendInAppNotification(notiCollection);
     }
 

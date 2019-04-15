@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:background="@color/colorGrey">
+    android:background="@color/colorPrimary">
 
     <ImageView
-    android:layout_width="120dp"
-    android:layout_height="120dp"
-    android:layout_marginBottom="15dp"
-    android:layout_marginTop="15dp"
-    android:background="@drawable/lettuce_cook_logo"/>
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/nav_header">
+    </ImageView>
 
 </LinearLayout>
