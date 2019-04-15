@@ -553,7 +553,7 @@ public class Friends extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(notification_title.get(i).contains("dinner")){
+                if(notification_title.get(i).contains("Dinner")){
                     AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                     inv.setMessage("Do you accept their invitation")
                             .setCancelable(false)

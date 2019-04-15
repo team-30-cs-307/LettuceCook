@@ -127,7 +127,7 @@ public class Recipes extends AppCompatActivity {
                                     for (QueryDocumentSnapshot ds : queryDocumentSnapshots) {
                                         if (temprec.contains(ds.getId())) {
                                             recipe2.add(ds.getString("recipe_title"));
-                                            recipeIngr.add(ds.getString("recipe_ingrediets"));
+                                            recipeIngr.add(ds.getString("recipe_ingredients"));
                                             recipeProc.add(ds.getString("recipe_procedure"));
                                             title = ds.getString("recipe_title");
                                             ingredients = ds.getString("recipe_ingredients");
@@ -156,6 +156,8 @@ public class Recipes extends AppCompatActivity {
                                 recipe_title.setText(recipe2.get(position));
                                 recipe_ingredients.setText(recipeIngr.get(position));
                                 recipe_procedure.setText(recipeProc.get(position));
+
+                                getMissingIngredients();
 
                                 mBuilder.setView(mView);
                                 // Pops the dialog on the screen
@@ -211,6 +213,11 @@ public class Recipes extends AppCompatActivity {
         });
 
     }
+
+    public void getMissingIngredients(){
+
+    }
+
 
 
 
