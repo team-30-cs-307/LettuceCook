@@ -2,6 +2,7 @@ package com.example.adityakotalwar.lettuce_cook;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -48,8 +49,10 @@ import org.json.JSONObject;
 import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SuggestedRecipe extends AppCompatActivity {
@@ -63,6 +66,11 @@ public class SuggestedRecipe extends AppCompatActivity {
     ArrayList<String> list = new ArrayList<>();
     private Button getRecipesButton;
     ArrayList<String> saved = new ArrayList<>();
+
+    private Button groceryButton;
+    private Button friendsButton;
+    private Button stockButton;
+    private Button recipesButton;
 
     ListView suggRecipeList;
     ArrayList<RecipeListViewItem> recipeSet = new ArrayList<>();
@@ -85,69 +93,102 @@ public class SuggestedRecipe extends AppCompatActivity {
         myList = (ListView) findViewById(R.id.listViewStock);
         chooseIngredients = findViewById(R.id.buttonChooseIngredients);
 
-       // getChoice = (Button) findViewById(R.id.getChoiceButton);
+        groceryButton = findViewById(R.id.buttonGrocery);
+        stockButton = findViewById(R.id.buttonStock);
+        friendsButton = findViewById(R.id.buttonFriends);
+        recipesButton = findViewById(R.id.buttonRecipes);
+
+        // getChoice = (Button) findViewById(R.id.getChoiceButton);
         getRecipesButton = findViewById(R.id.get_recipe);
 
-
-                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        String hName = documentSnapshot.getString("household");
-                        db.collection("Household").document(hName).collection("Grocery Items").whereEqualTo("status", "stock")
-                                .get()
-                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                        String selected = "";
-                                        //  ArrayList<String> list = new ArrayList<>();
-                                        list.clear();
-                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                                            list.add(document.getId());
-                                        }
-
-                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                                SuggestedRecipe.this,
-                                                android.R.layout.simple_list_item_multiple_choice,
-                                                list);
-                                        myList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                                        myList.setAdapter(adapter);
-                                    }
-                                });
-                    }
-                });
-
-
-
-
-        getRecipesButton.setOnClickListener(new View.OnClickListener() {
+        recipesButton.setTextColor(Color.parseColor("#5D993D"));
+        friendsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  String selected = "";
-                ArrayList<String> selected = new ArrayList<>();
-                int cntChoice = myList.getCount();
-                SparseBooleanArray sparseBooleanArray = myList.getCheckedItemPositions();
-                for (int i = 0; i < cntChoice; i++) {
-                    if (sparseBooleanArray.get(i)) {
-                        selected.add(myList.getItemAtPosition(i).toString());
-                    }
-                }
-                if(selected.isEmpty()){
-                    Toast.makeText(SuggestedRecipe.this,"YOU SUCK ATLEAST CHOOSE INGREDIENTS",Toast.LENGTH_LONG).show();
-                }
-                else{
-                    try {
-                        getRecipe(selected, recipes);
-                    } catch (UnirestException e) {
-                        e.printStackTrace();
-                    }
-                }
-              //  Toast.makeText(SuggestedRecipe.this,selected,Toast.LENGTH_LONG).show();
-//                for(String i : selected){
-//                    System.out.println(i+"HOUSE");
-//                }
-//                System.out.println(selected + "SELECTED");
+                startActivity(new Intent(SuggestedRecipe.this, Friends.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
+        stockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SuggestedRecipe.this,MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+        });
+        groceryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SuggestedRecipe.this,Grocery.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+        });
+
+        Intent intent = getIntent();
+        String tempo = intent.getStringExtra("ingredients");
+        ArrayList<String> ingredients =  new ArrayList<>(Arrays.asList(tempo.split(" ")));
+
+        try {
+            getRecipe(ingredients, recipes);
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+//                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                        String hName = documentSnapshot.getString("household");
+//                        db.collection("Household").document(hName).collection("Grocery Items").whereEqualTo("status", "stock")
+//                                .get()
+//                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                                    @Override
+//                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                                        String selected = "";
+//                                        //  ArrayList<String> list = new ArrayList<>();
+//                                        list.clear();
+//                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+//                                            list.add(document.getId());
+//                                        }
+//
+//                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+//                                                SuggestedRecipe.this,
+//                                                android.R.layout.simple_list_item_multiple_choice,
+//                                                list);
+//                                        myList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+//                                        myList.setAdapter(adapter);
+//                                    }
+//                                });
+//                    }
+//                });
+
+//        getRecipesButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//              //  String selected = "";
+//                ArrayList<String> selected = new ArrayList<>();
+//                int cntChoice = myList.getCount();
+//                SparseBooleanArray sparseBooleanArray = myList.getCheckedItemPositions();
+//                for (int i = 0; i < cntChoice; i++) {
+//                    if (sparseBooleanArray.get(i)) {
+//                        selected.add(myList.getItemAtPosition(i).toString());
+//                    }
+//                }
+//                if(selected.isEmpty()){
+//                    Toast.makeText(SuggestedRecipe.this,"YOU SUCK ATLEAST CHOOSE INGREDIENTS",Toast.LENGTH_LONG).show();
+//                }
+//                else{
+//                    try {
+//                        getRecipe(selected, recipes);
+//                    } catch (UnirestException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//              //  Toast.makeText(SuggestedRecipe.this,selected,Toast.LENGTH_LONG).show();
+////                for(String i : selected){
+////                    System.out.println(i+"HOUSE");
+////                }
+////                System.out.println(selected + "SELECTED");
+//            }
+//        });
 
         suggRecipeList = findViewById(R.id.listViewSuggestedRecipes);
 //        recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);

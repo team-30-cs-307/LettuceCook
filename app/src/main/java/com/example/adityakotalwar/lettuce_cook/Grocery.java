@@ -132,21 +132,21 @@ public class Grocery extends MainActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         ButtonFriends.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Friends.class));
-                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         ButtonRecipes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Recipes.class));
-                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         coordinatorLayout =  findViewById(R.id.activity_drawer);

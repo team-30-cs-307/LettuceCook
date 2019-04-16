@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -167,21 +168,21 @@ public class Friends extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Friends.this,Recipes.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Friends.this,MainActivity.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Friends.this,Grocery.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -513,6 +514,7 @@ public class Friends extends AppCompatActivity {
         listView = mView.findViewById(R.id.noti_view);
         final AlertDialog dialog = mBuilder.create();
         dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
         ImageButton back_button = mView.findViewById(R.id.back_button);

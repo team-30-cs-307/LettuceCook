@@ -25,6 +25,7 @@ public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implem
         TextView householdName;
         TextView time;
         ImageButton star_button;
+        ImageButton trash_button;
     }
 
     public CustomAdapterRecipe(ArrayList<RecipeListViewItem> recipeSet, Context context){
@@ -65,6 +66,7 @@ public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implem
             viewHolder.recipeName = (TextView) convertView.findViewById(R.id.recipeName);
             viewHolder.recipeSummary = (TextView) convertView.findViewById(R.id.recipeSummary);
             viewHolder.star_button = (ImageButton) convertView.findViewById(R.id.star_button);
+            viewHolder.trash_button = (ImageButton) convertView.findViewById(R.id.trash_button);
 
             result = convertView;
             convertView.setTag(viewHolder);
@@ -82,6 +84,7 @@ public class CustomAdapterRecipe extends ArrayAdapter<RecipeListViewItem> implem
         viewHolder.recipeSummary.setText(recipe.recipeSummary);
         viewHolder.householdName.setText(recipe.householdName);
         viewHolder.star_button.setVisibility(View.INVISIBLE);
+        viewHolder.trash_button.setVisibility(View.INVISIBLE);
         return convertView;
     }
 

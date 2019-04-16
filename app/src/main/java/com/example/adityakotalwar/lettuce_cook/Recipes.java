@@ -45,6 +45,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +69,8 @@ public class Recipes extends AppCompatActivity {
 
     private Button sharedRecipeButton;
     public ProgressDialog progressDialog;
+
+    ArrayList<String> list = new ArrayList<>();
 
     final FirebaseFirestore db =  FirebaseFirestore.getInstance();
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -171,9 +174,7 @@ public class Recipes extends AppCompatActivity {
                                             button_share.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    progressDialog.setMessage("Sharing Recipe with friends");
-                                                    progressDialog.show();
-
+                                                    dialog.dismiss();
                                                     db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                         @Override
                                                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -181,24 +182,63 @@ public class Recipes extends AppCompatActivity {
                                                             db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                                 @Override
                                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+
                                                                     String temp = documentSnapshot.getString("friends");
-                                                                    String[] friends = temp.split(" ");
-                                                                    for (int i = 0; i < friends.length; i++) {
-                                                                        final DocumentReference house = db.collection("Household").document(friends[i]);
-                                                                        house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                                            @Override
-                                                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                                                String shared_recipe = documentSnapshot.getString("shared_recipe_list");
-                                                                                if (shared_recipe.indexOf(recipe_id) == -1) {
-                                                                                    shared_recipe += (recipe_id + " ");
-                                                                                    house.update("shared_recipe_list", shared_recipe);
-                                                                                } else {
-                                                                                    Toast.makeText(getApplicationContext(), "The recipe is already shared with some of the hosueholds", Toast.LENGTH_LONG);
+                                                                    System.out.println("FRIENDS: " + temp);
+                                                                    ArrayList<String> friends = new ArrayList<>(Arrays.asList(temp.split(" ")));
+
+                                                                    AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
+                                                                    View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+                                                                    final ListView friend_list = mView.findViewById(R.id.listViewStock);
+                                                                    final Button submit_list = mView.findViewById(R.id.get_recipe);
+                                                                    final TextView plain_text = mView.findViewById(R.id.plain_text);
+                                                                    plain_text.setText("Friend Households");
+
+                                                                    mBuilder.setView(mView);
+                                                                    final AlertDialog dialog1 = mBuilder.create();
+                                                                    dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                                                    dialog1.show();
+
+                                                                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                                                            Recipes.this,
+                                                                            android.R.layout.simple_list_item_multiple_choice,friends
+                                                                    );
+                                                                    friend_list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                                                                    friend_list.setAdapter(adapter);
+
+                                                                    submit_list.setOnClickListener(new View.OnClickListener() {
+                                                                        @Override
+                                                                        public void onClick(View v) {
+                                                                            String ingrs = "";
+                                                                            int cntChoice = friend_list.getCount();
+                                                                            ArrayList<String> share_friends = new ArrayList<>();
+                                                                            SparseBooleanArray sparseBooleanArray = friend_list.getCheckedItemPositions();
+                                                                            for (int i = 0; i < cntChoice; i++) {
+                                                                                if (sparseBooleanArray.get(i)) {
+                                                                                    share_friends.add(friend_list.getItemAtPosition(i).toString());
+//                                                                          ingrs += friend_list.getItemAtPosition(i).toString() + " ";
                                                                                 }
                                                                             }
-                                                                        });
-                                                                    }
-                                                                    progressDialog.dismiss();
+
+                                                                            for (int i = 0; i < share_friends.size(); i++) {
+                                                                                final DocumentReference house = db.collection("Household").document(share_friends.get(i));
+                                                                                house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                                                    @Override
+                                                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                                                        String shared_recipe = documentSnapshot.getString("shared_recipe_list");
+                                                                                        if (shared_recipe.indexOf(recipe_id) == -1) {
+                                                                                            shared_recipe += (recipe_id + " ");
+                                                                                            house.update("shared_recipe_list", shared_recipe);
+                                                                                        } else {
+                                                                                            Toast.makeText(getApplicationContext(), "The recipe is already shared with some of the hosueholds", Toast.LENGTH_LONG);
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                            dialog1.dismiss();
+                                                                        }
+                                                                    });
                                                                 }
                                                             });
                                                         }
@@ -223,10 +263,71 @@ public class Recipes extends AppCompatActivity {
         chooseIngreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Recipes.this,SuggestedRecipe.class);
-                Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(Recipes.this,
-                        android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
-                startActivity(intent, bundle);
+//                Intent intent = new Intent(Recipes.this,SuggestedRecipe.class);
+//                Bundle bundle = ActivityOptionsCompat.makeCustomAnimation(Recipes.this,
+//                        android.R.anim.fade_in, android.R.anim.fade_out).toBundle();
+//                startActivity(intent, bundle);
+
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+                final ListView ingredients = mView.findViewById(R.id.listViewStock);
+                final Button submit = mView.findViewById(R.id.get_recipe);
+
+                mBuilder.setView(mView);
+                final AlertDialog dialog = mBuilder.create();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String hName = documentSnapshot.getString("household");
+                        db.collection("Household").document(hName).collection("Grocery Items").whereEqualTo("status", "stock")
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        String selected = "";
+                                        //  ArrayList<String> list = new ArrayList<>();
+                                        list.clear();
+                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                                            list.add(document.getId());
+                                        }
+
+                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                                Recipes.this,
+                                                android.R.layout.simple_list_item_multiple_choice,list
+                                                );
+                                        ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                                        ingredients.setAdapter(adapter);
+                                    }
+                                });
+                    }
+                });
+
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                        String ingrs = "";
+                        int cntChoice = ingredients.getCount();
+                        SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                        for (int i = 0; i < cntChoice; i++) {
+                            if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                                ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                            }
+                        }
+                        dialog.dismiss();
+                        Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
+                        intent.putExtra("ingredients", ingrs);
+                        startActivity(intent);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    }
+                });
+
+
             }
         });
 
@@ -235,28 +336,37 @@ public class Recipes extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Recipes.this, Friends.class));
-                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Recipes.this,MainActivity.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Recipes.this,Grocery.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         sharedRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Recipes.this, SavedRecipe.class));
-                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String house = documentSnapshot.getString("household");
+                        Intent intent = new Intent(Recipes.this, SavedRecipe.class);
+                        intent.putExtra("house",house);
+                        startActivity(intent);
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    }
+                });
+
             }
         });
 

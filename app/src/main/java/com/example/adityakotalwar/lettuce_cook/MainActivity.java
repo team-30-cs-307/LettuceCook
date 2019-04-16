@@ -505,18 +505,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == buttonRecipes){
             finish();
             startActivity(new Intent(getApplicationContext(), Recipes.class));
-            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         if(v == buttonFriends){
             finish();
             startActivity(new Intent(getApplicationContext(), Friends.class));
-            overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
         if(v == buttonGroceries) {
             finish();
             Intent myIntent = new Intent(MainActivity.this, Grocery.class);
             startActivity(myIntent);
-            overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
     }
 
