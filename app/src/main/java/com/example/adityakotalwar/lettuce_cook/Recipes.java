@@ -105,25 +105,27 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
 
         db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                final String house = documentSnapshot.getString("household");
+                String house = documentSnapshot.getString("household");
                 System.out.println(house);
                 db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        if (documentSnapshot.getString("recipe_list") != null) {
+                        if(documentSnapshot.getString("recipe_list") !=null) {
                             String[] tempRecipes = documentSnapshot.get("recipe_list").toString().split(" ");
                             final int size = tempRecipes.length;
                             final ArrayList<String> temprec = new ArrayList<>();
                             for (int i = 0; i < size; i++) {
                                 temprec.add(tempRecipes[i]);
                             }
-
-                            db.collection("SavedRecipe").orderBy("timestamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                     recipeSet.clear();
@@ -131,6 +133,7 @@ public class Recipes extends AppCompatActivity {
                                         if (temprec.contains(ds.getId())) {
                                             String recipe_title = ds.getString("recipe_title");
                                             recipeSet.add(new RecipeListViewItem(ds.getId(),house,"",recipe_title,""));
+
                                         }
                                     }
 
@@ -164,6 +167,12 @@ public class Recipes extends AppCompatActivity {
                                             final AlertDialog dialog = mBuilder.create();
                                             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                             dialog.show();
+                                getMissingIngredients();
+
+                                mBuilder.setView(mView);
+                                // Pops the dialog on the screen
+                                final AlertDialog dialog = mBuilder.create();
+                                dialog.show();
 
                                             button_back.setOnClickListener(new View.OnClickListener() {
                                                 @Override
@@ -372,14 +381,14 @@ public class Recipes extends AppCompatActivity {
 
     }
 
+    public void getMissingIngredients(){}
 
-//    public String GetHouseholdName(){
-//        String household = db.collection("Users").document(user.getUid()).get().getResult().getString("Household");
-//        return household;
-//    }
+    }
+
+
+
 
 }
-
 
 
 

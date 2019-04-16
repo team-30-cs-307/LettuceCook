@@ -217,7 +217,6 @@ public class HouseholdActivity extends AppCompatActivity implements View.OnClick
                         db.collection("Household").document(householdName).update("members", user.getUid());
 
                         db.collection("Household").document(householdName).update("noti_list", notification_id);
-//                        RequestQueue mRequestQue = Volley.newRequestQueue(getApplicationContext());
 
                         FirebaseMessaging.getInstance().subscribeToTopic(householdName);
 
@@ -295,7 +294,7 @@ public class HouseholdActivity extends AppCompatActivity implements View.OnClick
                                 e.printStackTrace();
                             }
                             /*Subscribes the user to the household*/
-                            FirebaseMessaging.getInstance().subscribeToTopic(householdName);
+                            FirebaseMessaging.getInstance().subscribeToTopic(hName);
                         }
                     });
                     // household.addMember(user.getUid());
