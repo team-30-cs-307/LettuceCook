@@ -112,8 +112,7 @@ public class Recipes extends AppCompatActivity {
         db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                String house = documentSnapshot.getString("household");
-                System.out.println(house);
+                final String house = documentSnapshot.getString("household");
                 db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -167,12 +166,7 @@ public class Recipes extends AppCompatActivity {
                                             final AlertDialog dialog = mBuilder.create();
                                             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                             dialog.show();
-                                getMissingIngredients();
-
-                                mBuilder.setView(mView);
-                                // Pops the dialog on the screen
-                                final AlertDialog dialog = mBuilder.create();
-                                dialog.show();
+                                            getMissingIngredients();
 
                                             button_back.setOnClickListener(new View.OnClickListener() {
                                                 @Override
@@ -387,8 +381,6 @@ public class Recipes extends AppCompatActivity {
 
 
 
-
-}
 
 
 
