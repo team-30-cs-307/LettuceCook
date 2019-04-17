@@ -136,62 +136,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         } catch (UnirestException e) {
             e.printStackTrace();
         }
-//                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                        String hName = documentSnapshot.getString("household");
-//                        db.collection("Household").document(hName).collection("Grocery Items").whereEqualTo("status", "stock")
-//                                .get()
-//                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                                    @Override
-//                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                                        String selected = "";
-//                                        //  ArrayList<String> list = new ArrayList<>();
-//                                        list.clear();
-//                                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-//                                            list.add(document.getId());
-//                                        }
-//
-//                                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-//                                                SuggestedRecipe.this,
-//                                                android.R.layout.simple_list_item_multiple_choice,
-//                                                list);
-//                                        myList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//                                        myList.setAdapter(adapter);
-//                                    }
-//                                });
-//                    }
-//                });
 
-//        getRecipesButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//              //  String selected = "";
-//                ArrayList<String> selected = new ArrayList<>();
-//                int cntChoice = myList.getCount();
-//                SparseBooleanArray sparseBooleanArray = myList.getCheckedItemPositions();
-//                for (int i = 0; i < cntChoice; i++) {
-//                    if (sparseBooleanArray.get(i)) {
-//                        selected.add(myList.getItemAtPosition(i).toString());
-//                    }
-//                }
-//                if(selected.isEmpty()){
-//                    Toast.makeText(SuggestedRecipe.this,"YOU SUCK ATLEAST CHOOSE INGREDIENTS",Toast.LENGTH_LONG).show();
-//                }
-//                else{
-//                    try {
-//                        getRecipe(selected, recipes);
-//                    } catch (UnirestException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//              //  Toast.makeText(SuggestedRecipe.this,selected,Toast.LENGTH_LONG).show();
-////                for(String i : selected){
-////                    System.out.println(i+"HOUSE");
-////                }
-////                System.out.println(selected + "SELECTED");
-//            }
-//        });
 
         suggRecipeList = findViewById(R.id.listViewSuggestedRecipes);
 //        recipe_adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, recipes);
@@ -224,7 +169,6 @@ public class SuggestedRecipe extends AppCompatActivity {
                 final String recipe_name = recipeIds.get((int) id)[1];
 
                 RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
-                System.out.println("Recipe ID: "+ id_recipe);
                 String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/"+id_recipe+"/information";
                 String url = Uri.parse(temp)
                         .buildUpon().build().toString();
@@ -408,12 +352,13 @@ public class SuggestedRecipe extends AppCompatActivity {
             View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
 
             final ListView ingredients = mView.findViewById(R.id.listViewStock);
-            final Button submit = mView.findViewById(R.id.get_recipe);
+            final Button suggestIngredient = mView.findViewById(R.id.buttonSubstitute);
             final TextView heading = mView.findViewById(R.id.plain_text);
             final Button askAFriendButton = mView.findViewById(R.id.buttonAskFriend);
             final Button addGroceryButton = mView.findViewById(R.id.buttonAddGrocery);
             askAFriendButton.setVisibility(View.VISIBLE);
             addGroceryButton.setVisibility(View.VISIBLE);
+            suggestIngredient.setVisibility(View.VISIBLE);
             heading.setText("Missing Ingredients");
 
             mBuilder.setView(mView);
@@ -432,7 +377,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         ingredients.setAdapter(adapter);
 
-            submit.setOnClickListener(new View.OnClickListener() {
+        suggestIngredient.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 //                        ArrayList<String> selected = new ArrayList<>();
@@ -442,14 +387,17 @@ public class SuggestedRecipe extends AppCompatActivity {
                     for (int i = 0; i < cntChoice; i++) {
                         if (sparseBooleanArray.get(i)) {
 //                                selected.add(ingredients.getItemAtPosition(i).toString());
-                            ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                            String ingr = ingredients.getItemAtPosition(i).toString().replace(' ', '+');
+                            getIngrSubstitute(ingr);
+
                         }
                     }
-                    dialog.dismiss();
-                    Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
-                    intent.putExtra("ingredients", ingrs);
-                    startActivity(intent);
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+//                    dialog.dismiss();
+//                    Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
+//                    intent.putExtra("ingredients", ingrs);
+//                    startActivity(intent);
+//                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 }
             });
 
@@ -508,7 +456,7 @@ public class SuggestedRecipe extends AppCompatActivity {
             ingr += "%2C";
         }
         ingr = ingr.substring(0, ingr.length()-3);
-        String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=5&ranking=1&ingredients="+ingr;
+        String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients?number=10&ranking=1&ingredients="+ingr;
         String url = Uri.parse(temp)
                 .buildUpon().build().toString();
 
@@ -571,6 +519,54 @@ public class SuggestedRecipe extends AppCompatActivity {
     }
 
     //Gets the household the user is in
+
+    void getIngrSubstitute(String ingredient){
+        RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+        String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/substitutes?ingredientName="+ingredient;
+        String url = Uri.parse(temp).buildUpon().build().toString();
+
+        System.out.println("INGI START");
+        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String message = response.getString("message");
+                            System.out.println("INGI " + message);
+                            ArrayList<String> substitutes = new ArrayList<>();
+                            JSONArray ingr_list = response.getJSONArray("substitutes");
+                            System.out.println("INGI rushank ");
+                            for(int i = 0; i < ingr_list.length(); i++){
+//                                JSONObject id =  ingr_list.getJSONObject(i);
+//                                String ingredient = id.getString("name")+": "+id.getString("amount") + " " + id.getString("unit") + "\n";
+                                substitutes.add(ingr_list.getString(i));
+                                System.out.println("INGI rushank "+ substitutes.get(i));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        System.out.println("INGI SUX");
+                        error.printStackTrace();
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("X-RapidAPI-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                        params.put("X-RapidAPI-Key", "489f0a43bbmshdbcadc67d147cfap1af9eajsnb1f4a4f4f5f9");
+                        return params;
+                    }
+
+                };
+
+                rq.add(request);
+
+    }
 
 
 }

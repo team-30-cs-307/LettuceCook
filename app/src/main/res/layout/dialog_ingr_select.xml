@@ -48,8 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="57dp"
-        android:layout_toStartOf="@+id/get_recipe"
+        android:layout_toLeftOf="@+id/get_recipe"
         android:text="Ask a friend"
         android:visibility="invisible" />
 
@@ -58,9 +57,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/buttonAskFriend"
+        android:layout_toLeftOf="@+id/buttonAskFriend"
         android:text="Add"
         android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/buttonSubstitute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/buttonAddGrocery"
+        android:text="Substitute"
+        android:visibility="invisible"/>
 
 
 </android.widget.RelativeLayout>

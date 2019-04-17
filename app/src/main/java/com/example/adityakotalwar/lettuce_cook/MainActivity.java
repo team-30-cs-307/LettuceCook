@@ -17,6 +17,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -112,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         dl.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this) {
             public void onSwipeRight() {
                 startActivity(new Intent(getApplicationContext(), Grocery.class));
@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonGroceries.setOnClickListener(this);
         buttonStock.setTextColor(Color.parseColor("#5D993D"));
 
+//        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
+
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -173,21 +175,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
                 //Toast.makeText(getApplicationContext(),arrayAdapter.getItem(i), Toast.LENGTH_LONG).show();
                 AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("What should happen to this item");
-                builder.setMessage("Message content of Title");
+                builder.setTitle("Update the Status");
+                builder.setMessage("what do you want to do with the item?");
                 builder.setCancelable(false);
 
-                builder.setPositiveButton("Remove from stock", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int j) {
-                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position));
+                        deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position).split(",")[0]);
                         //               Toast.makeText(MainActivity.this,"REMOVE FROM STOCK", Toast.LENGTH_LONG).show();
 //                        arrayAdapter.clear();
 //                        repopulate(arrayAdapter, GetCurrentHouseholdName());
                     }
                 });
 
-                builder.setNegativeButton("Remove from stock + Add to grocery", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Remove from stock & Add to grocery", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int j) {
                         Toast.makeText(MainActivity.this,"GROCERY LIST", Toast.LENGTH_LONG).show();
@@ -431,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         arrayAdapter.clear();
                         //repopulate(arrayAdapter, householdName);
                         for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
-                           arrayAdapter.add(doc.getId());
+                            arrayAdapter.add(doc.getId());
                         }
                     }
                 });

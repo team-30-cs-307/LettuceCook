@@ -1,4 +1,5 @@
 package com.example.adityakotalwar.lettuce_cook;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -292,8 +293,7 @@ public class Recipes extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                         String selected = "";
-                                        //  ArrayList<String> list = new ArrayList<>();
-                                        list.clear();
+                                          list.clear();
                                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                             list.add(document.getId());
                                         }
