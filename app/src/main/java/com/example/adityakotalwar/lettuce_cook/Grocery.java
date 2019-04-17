@@ -467,7 +467,8 @@ public class Grocery extends MainActivity {
     }
 
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
+        db = FirebaseFirestore.getInstance();//added by alisha
         //String userid = firebaseAuth.getCurrentUser().getUid();
         Groceries groceries = new Groceries(userid, description, status);
         db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);

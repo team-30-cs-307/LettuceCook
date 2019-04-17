@@ -60,7 +60,7 @@ public class SuggestedRecipe extends AppCompatActivity {
     ListView myList;
     Button getChoice;
     Button chooseIngredients;
-    private String Household;
+    private String household;
     String missingIngr = "";
 
     ArrayList<String> recipes = new ArrayList<String>();
@@ -169,6 +169,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 final String recipe_name = recipeIds.get((int) id)[1];
 
                 RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+                System.out.println("Recipe ID: "+ id_recipe);
                 String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/"+id_recipe+"/information";
                 String url = Uri.parse(temp)
                         .buildUpon().build().toString();
@@ -311,7 +312,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                final String household = documentSnapshot.getString("household");
+                household = documentSnapshot.getString("household");
                 db.collection("Household").document(household).collection("Grocery Items").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
 
                     @Override
@@ -323,7 +324,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                             miss = ingr;
                             for(QueryDocumentSnapshot qs : queryDocumentSnapshots){
                                 if((ingr.contains(qs.getId()) || qs.getId().contains(ingr)) && qs.getString("status").equals("stock")){
-                                 //   System.out.println("THIS IS THE ingredient     " + ingr);
+                                    System.out.println("THIS IS THE ingredient     " + ingr);
                                     contain = true;
                                     break;
                                 }
@@ -426,25 +427,29 @@ public class SuggestedRecipe extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                        ArrayList<String> selected = new ArrayList<>();
-                String ingrs = "";
+                ArrayList<String> ingToGrocery = new ArrayList<>();
                 int cntChoice = ingredients.getCount();
                 SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
                 for (int i = 0; i < cntChoice; i++) {
                     if (sparseBooleanArray.get(i)) {
 //                                selected.add(ingredients.getItemAtPosition(i).toString());
-                        ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                        ingToGrocery.add(ingredients.getItemAtPosition(i).toString());
                     }
                 }
-                dialog.dismiss();
-                Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
-                intent.putExtra("ingredients", ingrs);
-                startActivity(intent);
+
+                Grocery gr = new Grocery();
+
+                for(String i : ingToGrocery){
+                    gr.addItemToGroceryCollection(i, "", "grocery", household);
+                    list.remove(i);
+                }
+
+                Toast.makeText(SuggestedRecipe.this, "Ingredients added to grocery!", Toast.LENGTH_LONG).show();
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
     }
 
-    void putIntoGrocery(ArrayList<String> ingredients){}
 
     ArrayList<String[]> recipeIds = new ArrayList<>();
     void getRecipe(ArrayList<String> ingredients, final ArrayList<String> recipes) throws UnirestException {
