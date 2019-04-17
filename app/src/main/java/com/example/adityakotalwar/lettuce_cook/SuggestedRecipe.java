@@ -11,6 +11,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.SearchView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -58,8 +62,11 @@ import java.util.Map;
 public class SuggestedRecipe extends AppCompatActivity {
 
     ListView myList;
+    private String searchQuery;
     Button getChoice;
     Button chooseIngredients;
+    private String Household;
+    SearchView searchview;
     private String household;
     String missingIngr = "";
 
@@ -300,6 +307,46 @@ public class SuggestedRecipe extends AppCompatActivity {
 
         //Inflates the dialog box
     }
+
+
+
+
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        searchQuery = "";
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_search, menu);
+        MenuItem item = menu.findItem(R.id.menuSearch);
+        searchview = (SearchView)item.getActionView();
+
+        searchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+
+                searchQuery = s;
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                //adapterRecipe.getFilter().filter(s);
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+
+
+
+
+
 
     public void getMissingIngredients() {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();

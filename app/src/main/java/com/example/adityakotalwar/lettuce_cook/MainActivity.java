@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonGroceries;
     private Button buttonStock;
     private Button buttonRecipes;
+    private Button toggleNoti;
 
     private Button editPwButton;
     private Button editUserNameButton;
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
+        toggleNoti = findViewById(R.id.edit_notifications);
 
         buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);

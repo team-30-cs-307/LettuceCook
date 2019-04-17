@@ -22,6 +22,7 @@
         android:layout_gravity="center"
         tools:context=".MainActivity">
 
+
         <!--<include layout="@layout/activity_nav_drawer"/>-->
 
 
