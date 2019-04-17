@@ -82,9 +82,10 @@
             tools:ignore="MissingConstraints" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="157dp"
             android:layout_height="wrap_content"
             android:layout_gravity="right">
+
             <Button
                 android:id="@+id/button_share"
                 android:layout_width="30dp"
@@ -93,6 +94,7 @@
                 android:background="@drawable/share_button"
                 android:paddingRight="5dp"
                 tools:ignore="MissingConstraints"></Button>
+
             <Button
                 android:id="@+id/button_save"
                 android:layout_width="40dp"
@@ -113,6 +115,12 @@
             android:layout_gravity="left"
             android:background="@drawable/back_button"
             tools:ignore="MissingConstraints"></Button>
+
+        <Button
+            android:id="@+id/buttonMissingIngr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GET MISSING INGREDIENTS" />
     </LinearLayout>
 
 

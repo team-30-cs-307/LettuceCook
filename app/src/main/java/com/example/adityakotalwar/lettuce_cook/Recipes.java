@@ -332,7 +332,7 @@ public class Recipes extends AppCompatActivity {
 
 
             }
-        });
+    });
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
         friendsButton.setOnClickListener(new View.OnClickListener() {

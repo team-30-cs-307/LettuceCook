@@ -100,6 +100,7 @@ public class SuggestedRecipe extends AppCompatActivity {
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
 
+
         // getChoice = (Button) findViewById(R.id.getChoiceButton);
         getRecipesButton = findViewById(R.id.get_recipe);
 
@@ -210,6 +211,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 final Button button_save = mView.findViewById(R.id.button_save);
                 final Button button_back = mView.findViewById(R.id.button_back);
                 final Button button_share = mView.findViewById(R.id.button_share);
+                final Button missIngrButton = mView.findViewById(R.id.buttonMissingIngr);
                 button_share.setVisibility(View.INVISIBLE);
 
                 mBuilder.setView(mView);
@@ -249,8 +251,13 @@ public class SuggestedRecipe extends AppCompatActivity {
                                     recipe_title.setText(recipe_name);
                                     recipe_ingredients.setText(recipeIngr);
                                     recipe_procedure.setText(instructions);
-                                    getMissingIngredients();
 
+                                    missIngrButton.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            getMissingIngredients();
+                                        }
+                                    });
 
                                     //getMissingIngredients(ingredients);
 
@@ -345,6 +352,7 @@ public class SuggestedRecipe extends AppCompatActivity {
             }
         });
 
+
         //Inflates the dialog box
     }
 
@@ -394,7 +402,98 @@ public class SuggestedRecipe extends AppCompatActivity {
     void printMissingIngredients(ArrayList<String> recipe_ingr){
        // Grocery gr = new Grocery();
        // final String[] missingIngredients = getMissingIngredients().split(":");
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(SuggestedRecipe.this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+            final ListView ingredients = mView.findViewById(R.id.listViewStock);
+            final Button submit = mView.findViewById(R.id.get_recipe);
+            final TextView heading = mView.findViewById(R.id.plain_text);
+            final Button askAFriendButton = mView.findViewById(R.id.buttonAskFriend);
+            final Button addGroceryButton = mView.findViewById(R.id.buttonAddGrocery);
+            askAFriendButton.setVisibility(View.VISIBLE);
+            addGroceryButton.setVisibility(View.VISIBLE);
+            heading.setText("Missing Ingredients");
+
+            mBuilder.setView(mView);
+            final AlertDialog dialog = mBuilder.create();
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
+            list.clear();
+            for(String miss : recipe_ingr){
+                list.add(miss);
+            }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                SuggestedRecipe.this,
+                android.R.layout.simple_list_item_multiple_choice,list
+        );
+        ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        ingredients.setAdapter(adapter);
+
+            submit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                    String ingrs = "";
+                    int cntChoice = ingredients.getCount();
+                    SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                    for (int i = 0; i < cntChoice; i++) {
+                        if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                            ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                        }
+                    }
+                    dialog.dismiss();
+                    Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
+                    intent.putExtra("ingredients", ingrs);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+            });
+
+        askAFriendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                String ingrs = "";
+                int cntChoice = ingredients.getCount();
+                SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                        ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                    }
+                }
+                dialog.dismiss();
+                Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
+                intent.putExtra("ingredients", ingrs);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+
+        addGroceryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                String ingrs = "";
+                int cntChoice = ingredients.getCount();
+                SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                        ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                    }
+                }
+                dialog.dismiss();
+                Intent intent = new Intent(getApplicationContext(), SuggestedRecipe.class);
+                intent.putExtra("ingredients", ingrs);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
     }
 
     void putIntoGrocery(ArrayList<String> ingredients){}
