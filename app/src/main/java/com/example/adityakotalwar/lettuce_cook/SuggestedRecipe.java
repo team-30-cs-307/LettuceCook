@@ -66,9 +66,7 @@ public class SuggestedRecipe extends AppCompatActivity {
     ArrayList<String> recipes = new ArrayList<String>();
     ArrayList<String> list = new ArrayList<>();
     private Button getRecipesButton;
-    ArrayList<String> saved = new ArrayList<>();
-    ArrayList<String> ingredients = new ArrayList<>();
-    ArrayList<String> currentIngredients = new ArrayList<>();
+    ArrayList<String> ingredi = new ArrayList<>();
 
 
     private Button groceryButton;
@@ -244,7 +242,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                                         JSONObject id =  ingr_list.getJSONObject(i);
                                         String ingredient = id.getString("name")+": "+id.getString("amount") + " " + id.getString("unit") + "\n";
                                         recipeIngr += ingredient;
-                                        ingredients.add(id.getString("name"));
+                                        ingredi.add(id.getString("name"));
 //                                        System.out.println("INGI "+ ingredient);
                                     }
 //                                    System.out.println("Ingredients===="+recipeIngr);
@@ -369,7 +367,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                         ArrayList<String> missingIngr = new ArrayList<>();
                         boolean contain = false;
                         String miss = "";
-                        for(String ingr : ingredients){
+                        for(String ingr : ingredi){
                             miss = ingr;
                             for(QueryDocumentSnapshot qs : queryDocumentSnapshots){
                                 if((ingr.contains(qs.getId()) || qs.getId().contains(ingr)) && qs.getString("status").equals("stock")){
