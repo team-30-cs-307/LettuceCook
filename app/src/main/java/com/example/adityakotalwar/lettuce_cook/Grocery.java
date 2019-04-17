@@ -72,6 +72,7 @@ public class Grocery extends MainActivity {
     ArrayAdapter<String> GroceryArray;
     ArrayAdapter<String> StockArray;
     ArrayList<String> DeletedItems;
+    ArrayList<String> currentIngredients;
 
     private DrawerLayout coordinatorLayout;
     private ActionBarDrawerToggle t;
@@ -386,10 +387,42 @@ public class Grocery extends MainActivity {
         }
     };
 
+//    public ArrayList<String> getHouseholdIngredients() {
+//        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+//        System.out.println(db);
+//        firebaseAuth = FirebaseAuth.getInstance();
+//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        //final String id = firebaseAuth.getCurrentUser().getUid();
+//        //String household = GetCurrentHouseholdName();
+//
+//        System.out.println("THIS IS CURRENT USER    :     " +user.getUid());
+//
+//        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                final String household = documentSnapshot.getString("household");
+//                System.out.println(household + " HOUSEHOLSSSSSSSS");
+//                db.collection("Household").document(household).collection("Grocery").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                        currentIngredients = (ArrayList)queryDocumentSnapshots.getDocuments();
+//                        System.out.println("HERERERERERERERERE");
+//                    }
+//                });
+//            }
+//        });
+//
+//        for(String i:currentIngredients){
+//            System.out.println("CURRENT INGREDIENTS :   " +i);
+//        }
+//        return currentIngredients;
+//    }
 
     public String GetCurrentHouseholdName() {
         final DocumentReference docrefUser;
+        firebaseAuth = FirebaseAuth.getInstance();
         final String id = firebaseAuth.getCurrentUser().getUid();
+        db = FirebaseFirestore.getInstance();
         docrefUser = db.collection("Users").document(id);
         //String house = null;
         docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {

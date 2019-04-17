@@ -61,11 +61,15 @@ public class SuggestedRecipe extends AppCompatActivity {
     Button getChoice;
     Button chooseIngredients;
     private String Household;
+    String missingIngr = "";
 
     ArrayList<String> recipes = new ArrayList<String>();
     ArrayList<String> list = new ArrayList<>();
     private Button getRecipesButton;
     ArrayList<String> saved = new ArrayList<>();
+    ArrayList<String> ingredients = new ArrayList<>();
+    ArrayList<String> currentIngredients = new ArrayList<>();
+
 
     private Button groceryButton;
     private Button friendsButton;
@@ -197,6 +201,7 @@ public class SuggestedRecipe extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(SuggestedRecipe.this);
                 View mView = getLayoutInflater().inflate(R.layout.dialog_show_recipe, null);
 
@@ -239,12 +244,17 @@ public class SuggestedRecipe extends AppCompatActivity {
                                         JSONObject id =  ingr_list.getJSONObject(i);
                                         String ingredient = id.getString("name")+": "+id.getString("amount") + " " + id.getString("unit") + "\n";
                                         recipeIngr += ingredient;
+                                        ingredients.add(id.getString("name"));
 //                                        System.out.println("INGI "+ ingredient);
                                     }
 //                                    System.out.println("Ingredients===="+recipeIngr);
                                     recipe_title.setText(recipe_name);
                                     recipe_ingredients.setText(recipeIngr);
                                     recipe_procedure.setText(instructions);
+                                    getMissingIngredients();
+
+
+                                    //getMissingIngredients(ingredients);
 
                                     final String finalRecipeIngr = recipeIngr;
                                     button_save.setOnClickListener(new View.OnClickListener(){
@@ -339,6 +349,57 @@ public class SuggestedRecipe extends AppCompatActivity {
 
         //Inflates the dialog box
     }
+
+    public void getMissingIngredients() {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        System.out.println(db);
+        firebaseAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        //final String id = firebaseAuth.getCurrentUser().getUid();
+        //String household = GetCurrentHouseholdName();
+
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                final String household = documentSnapshot.getString("household");
+                db.collection("Household").document(household).collection("Grocery Items").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        ArrayList<String> missingIngr = new ArrayList<>();
+                        boolean contain = false;
+                        String miss = "";
+                        for(String ingr : ingredients){
+                            miss = ingr;
+                            for(QueryDocumentSnapshot qs : queryDocumentSnapshots){
+                                if((ingr.contains(qs.getId()) || qs.getId().contains(ingr)) && qs.getString("status").equals("stock")){
+                                 //   System.out.println("THIS IS THE ingredient     " + ingr);
+                                    contain = true;
+                                    break;
+                                }
+                            }
+                            if(!contain){
+                                missingIngr.add(miss);
+                            }
+                            else{
+                                contain = false;
+                            }
+                        }
+                        printMissingIngredients(missingIngr);
+                    }
+                });
+            }
+        });
+
+        //return missingIngr;
+    }
+    void printMissingIngredients(ArrayList<String> recipe_ingr){
+       // Grocery gr = new Grocery();
+       // final String[] missingIngredients = getMissingIngredients().split(":");
+
+    }
+
+    void putIntoGrocery(ArrayList<String> ingredients){}
 
     ArrayList<String[]> recipeIds = new ArrayList<>();
     void getRecipe(ArrayList<String> ingredients, final ArrayList<String> recipes) throws UnirestException {
