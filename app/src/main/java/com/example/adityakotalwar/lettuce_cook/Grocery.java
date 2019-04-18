@@ -387,36 +387,6 @@ public class Grocery extends MainActivity {
         }
     };
 
-//    public ArrayList<String> getHouseholdIngredients() {
-//        final FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        System.out.println(db);
-//        firebaseAuth = FirebaseAuth.getInstance();
-//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        //final String id = firebaseAuth.getCurrentUser().getUid();
-//        //String household = GetCurrentHouseholdName();
-//
-//        System.out.println("THIS IS CURRENT USER    :     " +user.getUid());
-//
-//        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                final String household = documentSnapshot.getString("household");
-//                System.out.println(household + " HOUSEHOLSSSSSSSS");
-//                db.collection("Household").document(household).collection("Grocery").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                        currentIngredients = (ArrayList)queryDocumentSnapshots.getDocuments();
-//                        System.out.println("HERERERERERERERERE");
-//                    }
-//                });
-//            }
-//        });
-//
-//        for(String i:currentIngredients){
-//            System.out.println("CURRENT INGREDIENTS :   " +i);
-//        }
-//        return currentIngredients;
-//    }
 
     public String GetCurrentHouseholdName() {
         final DocumentReference docrefUser;
@@ -467,18 +437,20 @@ public class Grocery extends MainActivity {
     }
 
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
-        db = FirebaseFirestore.getInstance();//added by alisha
-        //String userid = firebaseAuth.getCurrentUser().getUid();
-        Groceries groceries = new Groceries(userid, description, status);
-        db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
+        if(!GroceryItemContains(item, HouseholdName)) {
+            String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
+            db = FirebaseFirestore.getInstance();//added by alisha
+            //String userid = firebaseAuth.getCurrentUser().getUid();
+            Groceries groceries = new Groceries(userid, description, status);
+            db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString() );
-        notiCollection.sendInAppNotification(notiCollection);
+            InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString());
+            notiCollection.sendInAppNotification(notiCollection);
+        }
     }
 
     public boolean GroceryItemContains(final String groceryName, String HouseholdName){
-
+        db = FirebaseFirestore.getInstance();//added by alisha
         //First collection and second collection will always be the same
         db.collection("Household").document(HouseholdName).collection("Grocery Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override

@@ -1,6 +1,7 @@
 package com.example.adityakotalwar.lettuce_cook;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -200,7 +201,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                                     missIngrButton.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
-                                            getMissingIngredients();
+                                            getMissingIngredients(ingredi);
                                         }
                                     });
 
@@ -301,10 +302,10 @@ public class SuggestedRecipe extends AppCompatActivity {
         //Inflates the dialog box
     }
 
-    public void getMissingIngredients() {
+    public void getMissingIngredients(final ArrayList<String> ingredi) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         System.out.println(db);
-        firebaseAuth = FirebaseAuth.getInstance();
+       // firebaseAuth = FirebaseAuth.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         //final String id = firebaseAuth.getCurrentUser().getUid();
         //String household = GetCurrentHouseholdName();
@@ -349,8 +350,11 @@ public class SuggestedRecipe extends AppCompatActivity {
        // final String[] missingIngredients = getMissingIngredients().split(":");
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+
             AlertDialog.Builder mBuilder = new AlertDialog.Builder(SuggestedRecipe.this);
             View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+
 
             final ListView ingredients = mView.findViewById(R.id.listViewStock);
             final Button suggestIngredient = mView.findViewById(R.id.buttonSubstitute);
@@ -442,6 +446,7 @@ public class SuggestedRecipe extends AppCompatActivity {
                 for(String i : ingToGrocery){
                     gr.addItemToGroceryCollection(i, "", "grocery", household);
                     list.remove(i);
+                    repopulate(ingredients, list);
                 }
 
                 Toast.makeText(SuggestedRecipe.this, "Ingredients added to grocery!", Toast.LENGTH_LONG).show();
@@ -571,6 +576,15 @@ public class SuggestedRecipe extends AppCompatActivity {
 
                 rq.add(request);
 
+    }
+
+    void repopulate(ListView ingredients, ArrayList<String> list){
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                SuggestedRecipe.this,
+                android.R.layout.simple_list_item_multiple_choice,list
+        );
+        ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        ingredients.setAdapter(adapter);
     }
 
 
