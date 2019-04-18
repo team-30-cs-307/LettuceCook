@@ -73,7 +73,6 @@ public class Friends extends AppCompatActivity {
     private ImageButton showNotiButton;
     private String friendToBeAdded;
     private ListView requests_invites;
-    private Button showRequestsButton;
     private RequestAdapter requestListAdapter;
     private ArrayList<String> requests = new ArrayList<>();
 
@@ -154,11 +153,11 @@ public class Friends extends AppCompatActivity {
             }
         });
 
+        getRequests();
         showNotiButton = findViewById(R.id.showNotiButton);
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         friendRequestsButton = findViewById(R.id.friendRequest);
-        showRequestsButton = findViewById(R.id.showRequests);
 
         showNotiButton = findViewById(R.id.showNotiButton);
         requests_invites = findViewById(R.id.requests_and_invites);
@@ -209,12 +208,7 @@ public class Friends extends AppCompatActivity {
             }
         });
 
-        showRequestsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getRequests();
-            }
-        });
+
 
         final Context obj = this;
         friendRequestsButton.setOnClickListener(new View.OnClickListener() {
@@ -234,6 +228,26 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
                         friendToBeAdded = input.getText().toString();
+
+//                        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                            @Override
+//                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+//                                String house = documentSnapshot.getString("household");
+//                                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                                    @Override
+//                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+//
+//                                    }
+//                                });
+//                            }
+//                        });
+
+                        db.collection("Household").document(friendToBeAdded).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                            }
+                        });
 
                         db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
@@ -345,26 +359,35 @@ public class Friends extends AppCompatActivity {
                 house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String friends = documentSnapshot.getString("friends");
                         String friendRequests = documentSnapshot.getString("friendRequests");
-                        if (friendRequests == null) {
-                            friendRequests = hName;
-                        } else {
-                            friendRequests += " " + hName;
-                        }
-                        // System.out.println("this is fififiififiififfi "+friendRequests);
-                        db.collection("Household").document(friend).update("friendRequests", friendRequests);
 
-                         /*Sends notification if a household send a friend request to another user*/
-                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                        Notifications n = new Notifications();
-                        try {
-                            n.sendNotification("Friend Request", householdName + "has sent you a friend request!", friend, requestQueue);
-                        } catch (InstantiationException e1) {
-                            e1.printStackTrace();
-                        } catch (IllegalAccessException e1) {
-                            e1.printStackTrace();
+                        if(friends.contains(hName)){
+                            Toast.makeText(Friends.this,"You are already friends with " + hName, Toast.LENGTH_LONG);
                         }
+                        else if(friendRequests.contains(hName)){
+                            Toast.makeText(Friends.this,"Friend Request ahs been sent to " + hName, Toast.LENGTH_LONG);
+                        }
+                        else {
+                            if (friendRequests == null) {
+                                friendRequests = hName;
+                            } else {
+                                friendRequests += " " + hName;
+                            }
+                            // System.out.println("this is fififiififiififfi "+friendRequests);
+                            db.collection("Household").document(friend).update("friendRequests", friendRequests);
 
+                            /*Sends notification if a household send a friend request to another user*/
+                            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                            Notifications n = new Notifications();
+                            try {
+                                n.sendNotification("Friend Request", householdName + "has sent you a friend request!", friend, requestQueue);
+                            } catch (InstantiationException e1) {
+                                e1.printStackTrace();
+                            } catch (IllegalAccessException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         return;
 
                     }
@@ -391,12 +414,10 @@ public class Friends extends AppCompatActivity {
                         final int size = inviteForHousehold.length;
                         for (int i = 0; i < size; i++) {
                             requests.add(inviteForHousehold[i]);
-
                         }
                         for (String j : requests) {
                             if (!j.equals(" ") && !j.equals("")) {
                                 requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
-
                                 requests_invites.setAdapter(requestListAdapter);
                             }
                         }

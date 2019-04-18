@@ -19,73 +19,66 @@
             android:layout_height="match_parent"
             tools:context=".Friends">
 
-            <TextView
-                android:id="@+id/listUsers"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/showNotiButton"
-                android:layout_marginBottom="31dp"
-                android:layout_toStartOf="@+id/listviewFriends"
-                android:text="TextView"
-                tools:text="gyguguguguygugyugy" />
+            <ListView
+                android:id="@+id/listviewFriends"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true" />
 
+            <ListView
+                android:id="@+id/requests_and_invites"
+                android:layout_width="match_parent"
+                android:layout_height="149dp"
+                android:layout_below="@+id/listviewFriends"
+                android:layout_alignBottom="@+id/buttons"
+                 />
             <Button
                 android:id="@+id/showUsers"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/friendRequest"
-                android:layout_alignParentEnd="true"
-                android:layout_marginBottom="23dp"
+                android:layout_above="@+id/tabbar"
+                android:layout_margin="10dp"
                 android:text="Show users" />
 
-            <ImageButton
-                android:id="@+id/showNotiButton"
-                android:layout_width="39dp"
-                android:layout_height="47dp"
-                android:layout_alignBaseline="@+id/showRequests"
-                android:layout_alignBottom="@+id/showRequests"
+            <LinearLayout
+                android:id="@+id/buttons"
+                android:layout_above="@+id/tabbar"
+                android:padding="10dp"
+                android:gravity="center"
+                android:layout_margin="10dp"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="14dp"
-                android:layout_marginBottom="-20dp"
-                android:background="@drawable/notification" />
+                android:background="@drawable/layout_rounded_border"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/friendRequest"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/add_friend_button"
+
+                    />
+                <ImageButton
+                    android:id="@+id/showNotiButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/notification" />
+
+            </LinearLayout>
 
             <include layout="@layout/tabbar"
                 android:id="@+id/tabbar"/>
 
 
-            <ListView
-                android:id="@+id/listviewFriends"
-                android:layout_width="match_parent"
-                android:layout_height="290dp"
-                android:layout_above="@+id/showNotiButton"
-                android:layout_alignEnd="@+id/friendRequest"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true" />
 
-            <Button
-                android:id="@+id/friendRequest"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginBottom="52dp"
-                android:text="SEND FRIEND REQUEST" />
 
-            <Button
-                android:id="@+id/showRequests"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/showUsers"
-                android:layout_alignParentStart="true"
-                android:layout_marginBottom="79dp"
-                android:text="Friend Request" />
 
-            <ListView
-                android:id="@+id/requests_and_invites"
-                android:layout_width="400dp"
-                android:layout_height="200dp"
-                android:layout_alignBottom="@+id/friendRequest"
-                android:layout_toEndOf="@+id/listUsers" />
+
+
+
         </RelativeLayout>
     </FrameLayout>
 </android.support.v4.widget.DrawerLayout>

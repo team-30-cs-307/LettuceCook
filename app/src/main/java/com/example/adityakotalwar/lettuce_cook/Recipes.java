@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -67,6 +68,9 @@ public class Recipes extends AppCompatActivity {
     private Button stockButton;
     private Button recipesButton;
     private Button chooseIngreButton;
+    private Button searchButton;
+
+    private EditText recipeName;
 
     private Button sharedRecipeButton;
     public ProgressDialog progressDialog;
@@ -88,6 +92,8 @@ public class Recipes extends AppCompatActivity {
         recipesButton = findViewById(R.id.buttonRecipes);
         sharedRecipeButton = findViewById(R.id.SharedRecipeButton);
         chooseIngreButton = findViewById(R.id.buttonChooseIngredients);
+        searchButton = findViewById(R.id.search_button);
+        recipeName = findViewById(R.id.recipe_search);
         recipeView = findViewById(R.id.my_list_view2);
 
         progressDialog = new ProgressDialog(this);
@@ -125,7 +131,7 @@ public class Recipes extends AppCompatActivity {
                             for (int i = 0; i < size; i++) {
                                 temprec.add(tempRecipes[i]);
                             }
-                        db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                     recipeSet.clear();
@@ -293,7 +299,7 @@ public class Recipes extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                         String selected = "";
-                                          list.clear();
+                                        list.clear();
                                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                             list.add(document.getId());
                                         }
@@ -301,7 +307,7 @@ public class Recipes extends AppCompatActivity {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                                                 Recipes.this,
                                                 android.R.layout.simple_list_item_multiple_choice,list
-                                                );
+                                        );
                                         ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
                                         ingredients.setAdapter(adapter);
                                     }
@@ -332,7 +338,7 @@ public class Recipes extends AppCompatActivity {
 
 
             }
-    });
+        });
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
         friendsButton.setOnClickListener(new View.OnClickListener() {
@@ -373,11 +379,27 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = recipeName.getText().toString().trim();
+                if(name.isEmpty()){
+                    recipeName.setError("Enter a recipe");
+                }
+                else{
+                    Intent intent = new Intent(Recipes.this, SearchRecipe.class);
+                    intent.putExtra("recipe_name", name);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+            }
+        });
+
     }
 
     public void getMissingIngredients(){}
 
-    }
+}
 
 
 

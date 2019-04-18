@@ -11,8 +11,8 @@
         android:roundIcon="@drawable/lettuce_cook_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".SavedRecipe"></activity>
+        <activity android:name=".SearchRecipe"></activity>
+        <activity android:name=".SavedRecipe" />
         <activity
             android:name=".SignUp"
             android:theme="@style/AppThemeNoActionBar" />

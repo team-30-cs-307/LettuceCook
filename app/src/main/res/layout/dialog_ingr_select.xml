@@ -34,41 +34,73 @@
         android:background="@drawable/layout_rounded_border"
         tools:ignore="MissingConstraints" />
 
-    <Button
-        android:id="@+id/get_recipe"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="5dp"
+        android:background="@drawable/layout_rounded_border"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/forward_button"
-        tools:ignore="MissingConstraints" />
+        android:weightSum="4"
+        >
 
-    <Button
-        android:id="@+id/buttonAskFriend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/get_recipe"
-        android:text="Ask a friend"
-        android:visibility="invisible" />
+        <Button
+            android:id="@+id/buttonAskFriend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@null"
+            android:layout_weight="1"
+            android:layout_toLeftOf="@+id/get_recipe"
+            android:text="Ask a friend"
+            android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/buttonAddGrocery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/buttonAskFriend"
-        android:text="Add"
-        android:visibility="invisible" />
+        <Button
+            android:id="@+id/buttonAddGrocery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@null"
+            android:layout_weight="1"
+            android:text="Add"
+            android:visibility="invisible" />
 
-    <Button
-        android:id="@+id/buttonSubstitute"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/buttonSubstitute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@null"
+            android:layout_weight="1"
+            android:text="Substitute"
+            android:visibility="invisible"/>
+
+        <Button
+            android:id="@+id/get_recipe"
+            android:layout_width="35dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/forward_button"
+            tools:ignore="MissingConstraints" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/substitute"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/buttonAddGrocery"
-        android:text="Substitute"
-        android:visibility="invisible"/>
+        android:padding="20dp"
+        android:layout_margin="10dp"
+        android:layout_below="@id/listViewStock"
+        android:layout_above="@+id/linear"
+        android:textSize="14dp"
+        android:scrollbars = "vertical"
+        android:visibility="invisible"
+        android:background="@drawable/layout_rounded_border"
+        />
 
 
 </android.widget.RelativeLayout>

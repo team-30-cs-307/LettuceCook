@@ -12,125 +12,96 @@
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@drawable/wallpaper"
+            android:background="@color/colorGreyLight"
             tools:context=".NewGroceryActivity">
+            <RelativeLayout
+                android:id="@+id/details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp">
+            <EditText
+                android:id="@+id/edit_text_add_item"
+                android:layout_width="310dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:padding="10dp"
+                android:hint="Enter item"
+                android:background="@drawable/layout_border"
+                android:layout_marginBottom="5dp"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/edit_text_add_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/layout_border"
+                android:layout_below="@id/edit_text_add_item"
+                android:layout_alignParentLeft="true"
+                android:hint="Enter Description"
+                android:padding="10dp" />
+            <!--<Button-->
+            <!--android:id="@+id/button_add_item"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:layout_marginBottom="5dp"-->
+            <!--android:layout_marginLeft="5dp"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:background="@drawable/button_dark_green"-->
+            <!--android:textColor="@color/colorPrimary"-->
+            <!--android:text="Add item" />-->
+            <Button
+                android:id="@+id/button_add_item"
+                android:layout_height="42dp"
+                android:layout_width="42dp"
+                android:background="@drawable/add_button"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_alignParentRight="true"
+                />
+
+        </RelativeLayout>
+
 
             <!--<include layout="@layout/activity_nav_drawer"/>-->
 
 
             <ListView
                 android:id="@+id/GroceryListView"
-                android:layout_width="357dp"
-                android:layout_height="250dp"
-                android:layout_below="@+id/edit_text_add_item"
-                android:layout_margin="20dp"
-                android:background="@drawable/linear_layout_box"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="21dp"
-                android:layout_marginTop="57dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/details"
+                android:layout_above="@+id/updateToStock"
+                android:layout_margin="40dp"
+                android:background="@drawable/layout_rounded_border"
                 android:longClickable="true"
-                tools:layout_editor_absoluteX="0dp"
-                tools:layout_editor_absoluteY="0dp" />
-
-            <ListView
-                android:id="@+id/MoveToStockListView"
-                android:layout_width="357dp"
-                android:layout_height="190dp"
-                android:layout_below="@+id/GroceryListView"
-                android:layout_marginTop="0dp"
-                android:layout_marginLeft="21dp"
-                android:layout_marginRight="21dp"
-                android:background="@drawable/linear_layout_box"
-                android:longClickable="true"
-                android:layout_alignParentStart="true"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="0dp"
-
-                />
-
-
-
-
-            <EditText
-                android:id="@+id/edit_text_add_item"
-                android:layout_width="268dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:ems="10"
-                android:padding="10dp"
-                android:hint="Enter item"
-                android:background="@drawable/form_field_edit_text"
-                android:layout_margin="20dp"
-                android:inputType="textPersonName" />
-
-            <EditText
-                android:id="@+id/edit_text_add_description"
-                android:layout_width="268dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/form_field_edit_text"
-                android:layout_alignLeft="@+id/edit_text_add_item"
-                android:ems="10"
-                android:layout_marginTop="60dp"
-                android:hint="Enter Description"
-                android:padding="10dp" />
-
-            <!--<Button-->
-            <!--android:id="@+id/update"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_below="@+id/my_list_view2"-->
-            <!--android:layout_alignParentStart="true"-->
-            <!--android:layout_marginStart="152dp"-->
-            <!--android:layout_marginTop="11dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="Update" />-->
+                tools:ignore="NotSibling" />
 
             <Button
                 android:id="@+id/updateToStock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="47dp"
-                android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
-                android:text="Update"
-                />
-
-            <Button
-                android:id="@+id/DeleteGrocery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginBottom="47dp"
-                android:layout_marginLeft="20dp"
-                android:background="@drawable/common_google_signin_btn_icon_light_normal_background"
-                android:text="Delete"
-                />
-
-            <Button
-                android:id="@+id/button_add_item"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
-                android:background="@drawable/button_dark_green"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                android:layout_above="@+id/tabbar"
                 android:textColor="@color/colorPrimary"
-                android:layout_margin="20dp"
-                android:text="Add item" />
+                android:background="@drawable/button_dark_green"
+                android:text="Move to Stock"
+                />
 
-
-            <include layout="@layout/tabbar"/>
+            <include layout="@layout/tabbar"
+                android:id="@+id/tabbar"/>
 
         </RelativeLayout>
     </FrameLayout>
