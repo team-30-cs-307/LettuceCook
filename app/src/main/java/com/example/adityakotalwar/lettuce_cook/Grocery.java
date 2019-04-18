@@ -299,6 +299,8 @@ public class Grocery extends MainActivity {
                                         snackbar1.show();
 
                                         GroceryArray.add(item);
+
+
                                     }
                                 });
 
@@ -453,18 +455,20 @@ public class Grocery extends MainActivity {
     }
 
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
-        db = FirebaseFirestore.getInstance();//added by alisha
-        //String userid = firebaseAuth.getCurrentUser().getUid();
-        Groceries groceries = new Groceries(userid, description, status);
-        db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
+        if(!GroceryItemContains(item, HouseholdName)) {
+            String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
+            db = FirebaseFirestore.getInstance();//added by alisha
+            //String userid = firebaseAuth.getCurrentUser().getUid();
+            Groceries groceries = new Groceries(userid, description, status);
+            db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString() );
-        notiCollection.sendInAppNotification(notiCollection);
+            InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString());
+            notiCollection.sendInAppNotification(notiCollection);
+        }
     }
 
     public boolean GroceryItemContains(final String groceryName, String HouseholdName){
-
+        db = FirebaseFirestore.getInstance();//added by alisha
         //First collection and second collection will always be the same
         db.collection("Household").document(HouseholdName).collection("Grocery Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
