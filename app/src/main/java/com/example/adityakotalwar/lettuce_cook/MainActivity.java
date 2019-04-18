@@ -199,7 +199,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        repopulate(arrayAdapter, GetCurrentHouseholdName());
                         String item = arrayAdapter.getItem(position);
                         db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
-
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                "You ran out of "+item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString() );
+                        notiCollection.sendInAppNotification(notiCollection);
 
                     }
                 });
@@ -334,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onSuccess(Void aVoid) {
                         InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
-                                "Grocery Item Deleted!", item + " added to Stock!", Calendar.getInstance().getTime().toString() );
+                                 "You ran out of "+item, item + " removed from Stock", Calendar.getInstance().getTime().toString() );
                         notiCollection.sendInAppNotification(notiCollection);
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }

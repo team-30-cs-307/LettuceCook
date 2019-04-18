@@ -80,7 +80,9 @@ public class SavedRecipe extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), Friends.class));
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
-
+            public void onSwipeBottom(){
+                fillListView(house);
+            }
         });
 
         sharedRecipeList.setOnTouchListener(new OnSwipeTouchListener(SavedRecipe.this){
@@ -88,16 +90,7 @@ public class SavedRecipe extends AppCompatActivity {
                 fillListView(house);
             }
         });
-        recipeSet.clear();
-
         fillListView(house);
-
-        sharedRecipeList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
 
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
@@ -142,6 +135,7 @@ public class SavedRecipe extends AppCompatActivity {
     }
 
     void fillListView(final String house){
+        recipeSet.clear();
         db.collection("Household").document(house).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {

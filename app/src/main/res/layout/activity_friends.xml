@@ -23,6 +23,10 @@
             <ListView
                 android:id="@+id/listviewFriends"
                 android:layout_width="match_parent"
+                android:background="@drawable/layout_rounded_border"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_height="200dp"
                 android:layout_alignParentTop="true" />
 
@@ -30,23 +34,31 @@
                 android:id="@+id/requests_and_invites"
                 android:layout_width="match_parent"
                 android:layout_height="149dp"
+                android:background="@drawable/layout_rounded_border"
+                android:padding="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_below="@+id/listviewFriends"
-                android:layout_alignBottom="@+id/buttons"
+                android:layout_above="@+id/buttons"
+
                  />
-            <Button
-                android:id="@+id/showUsers"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/tabbar"
-                android:layout_margin="10dp"
-                android:text="Show users" />
+            <!--<Button-->
+                <!--android:id="@+id/showUsers"-->
+                <!--android:layout_width="100dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_above="@+id/tabbar"-->
+                <!--android:layout_margin="10dp"-->
+                <!--android:text="Show users" />-->
 
             <LinearLayout
                 android:id="@+id/buttons"
                 android:layout_above="@+id/tabbar"
                 android:padding="10dp"
                 android:gravity="center"
-                android:layout_margin="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
                 android:layout_alignParentRight="true"
                 android:background="@drawable/layout_rounded_border"
                 android:layout_width="wrap_content"

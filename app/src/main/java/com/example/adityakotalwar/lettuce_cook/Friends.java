@@ -63,7 +63,6 @@ public class Friends extends AppCompatActivity {
 
     private Button friendRequestsButton;
     private Button showUsersButton;
-    private TextView listOfUsers;
 
     ListView listFriends;
     ListView listView;
@@ -82,7 +81,7 @@ public class Friends extends AppCompatActivity {
     private ArrayList<String> notification_title = new ArrayList<String>();
     private ArrayList<String> notification_body = new ArrayList<>();
     private ArrayList<String> sender = new ArrayList<>();
-    private ArrayList<String[]> noti_details = new ArrayList<String[]>();
+    private ArrayList<InAppNotiCollection> notis = new ArrayList<>();
 
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     private String householdName;
@@ -98,8 +97,6 @@ public class Friends extends AppCompatActivity {
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
 
-        showUsersButton = findViewById(R.id.showUsers);
-        listOfUsers = findViewById(R.id.listUsers);
         listFriends = findViewById(R.id.listviewFriends);
 
         final ArrayList<String> arrayFriends = new ArrayList<>();
@@ -185,13 +182,6 @@ public class Friends extends AppCompatActivity {
             }
         });
 
-        showUsersButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTheUsers();
-            }
-        });
-
         showNotiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -229,25 +219,6 @@ public class Friends extends AppCompatActivity {
                     public void onClick(final DialogInterface dialog, int which) {
                         friendToBeAdded = input.getText().toString();
 
-//                        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                            @Override
-//                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                                String house = documentSnapshot.getString("household");
-//                                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                                    @Override
-//                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-//
-//                                    }
-//                                });
-//                            }
-//                        });
-
-                        db.collection("Household").document(friendToBeAdded).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                            }
-                        });
 
                         db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
@@ -274,7 +245,7 @@ public class Friends extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                        dialog.dismiss();
                     }
                 });
 
@@ -307,41 +278,41 @@ public class Friends extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void showTheUsers(){
-        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        // store the user details in a userCollection class
-        System.out.println(user.getUid());
-        final DocumentReference dr = db.collection("Users").document(user.getUid());
-        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                final String hName = documentSnapshot.getString("household");
-                    final DocumentReference dr2 = db.collection("Household").document(hName);
-                    dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot2) {
-                            db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    for(DocumentSnapshot ds : queryDocumentSnapshots ){
-                                        if(ds.getString("household").equals(hName)){
-                                            listOfUsers.append(ds.getString("username") + "\n");
-                                        }
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-                    // household.addMember(user.getUid());
-                    db.collection("Users").document(user.getUid()).update("invited", "");
-                    //   db.collection("Household").document(hName).update("members", household.getMembers());
-
-            }
-        });
-
-    }
+//    public void showTheUsers(){
+//        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//        // store the user details in a userCollection class
+//        System.out.println(user.getUid());
+//        final DocumentReference dr = db.collection("Users").document(user.getUid());
+//        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
+//                final String hName = documentSnapshot.getString("household");
+//                    final DocumentReference dr2 = db.collection("Household").document(hName);
+//                    dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//                        @Override
+//                        public void onSuccess(DocumentSnapshot documentSnapshot2) {
+//                            db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                                @Override
+//                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                                    for(DocumentSnapshot ds : queryDocumentSnapshots ){
+//                                        if(ds.getString("household").equals(hName)){
+//                                            listOfUsers.append(ds.getString("username") + "\n");
+//                                        }
+//                                    }
+//                                }
+//                            });
+//
+//                        }
+//                    });
+//                    // household.addMember(user.getUid());
+//                    db.collection("Users").document(user.getUid()).update("invited", "");
+//                    //   db.collection("Household").document(hName).update("members", household.getMembers());
+//
+//            }
+//        });
+//
+//    }
 
 
     public void sendFriendRequest(final String friend) {
@@ -366,13 +337,13 @@ public class Friends extends AppCompatActivity {
                             Toast.makeText(Friends.this,"You are already friends with " + hName, Toast.LENGTH_LONG);
                         }
                         else if(friendRequests.contains(hName)){
-                            Toast.makeText(Friends.this,"Friend Request ahs been sent to " + hName, Toast.LENGTH_LONG);
+                            Toast.makeText(Friends.this,"Friend Request has already has been sent to " + hName, Toast.LENGTH_LONG);
                         }
                         else {
                             if (friendRequests == null) {
-                                friendRequests = hName;
+                                friendRequests = hName + " ";
                             } else {
-                                friendRequests += " " + hName;
+                                friendRequests += hName + " ";
                             }
                             // System.out.println("this is fififiififiififfi "+friendRequests);
                             db.collection("Household").document(friend).update("friendRequests", friendRequests);
@@ -408,19 +379,12 @@ public class Friends extends AppCompatActivity {
                 db.collection("Household").document(householdName).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        System.out.println(documentSnapshot.getString("friendRequests") + "here");
-                        String[] inviteForHousehold = documentSnapshot.getString("friendRequests").toString().split(" ");
-                        ArrayList<String> requests = new ArrayList<>();
-                        final int size = inviteForHousehold.length;
-                        for (int i = 0; i < size; i++) {
-                            requests.add(inviteForHousehold[i]);
-                        }
-                        for (String j : requests) {
-                            if (!j.equals(" ") && !j.equals("")) {
-                                requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
-                                requests_invites.setAdapter(requestListAdapter);
-                            }
-                        }
+                        String tempo = documentSnapshot.getString("friendRequests");
+                        String[] inviteForHousehold = tempo.split(" ");
+                        ArrayList<String> requests = new ArrayList<>(Arrays.asList(inviteForHousehold));
+                        requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
+                        requests_invites.setAdapter(requestListAdapter);
+
                     }
                 });
             }
@@ -457,6 +421,7 @@ public class Friends extends AppCompatActivity {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 String friend = documentSnapshot.getString("friends");
+                                getRequests();
                                 if (friend == null) {
                                     friend = hName;
                                 } else {
@@ -484,6 +449,7 @@ public class Friends extends AppCompatActivity {
             }
         });
         requests.remove(newFriend);
+
     }
 
     public void decline(final String removeFriend){
@@ -501,10 +467,12 @@ public class Friends extends AppCompatActivity {
                         String newfriendRequests = removeFriendRequest(requests, removeFriend);
                         db.collection("Household").document(hName).update("friendRequests", newfriendRequests);
                         Toast.makeText(Friends.this, "Invitation declined!", Toast.LENGTH_LONG).show();
+                        getRequests();
                     }
                 });
             }
         });
+
     }
 
     private String removeFriendRequest(String [] mems, String user){
@@ -671,14 +639,15 @@ public class Friends extends AppCompatActivity {
         Context context;
 
         public RequestAdapter(Context context, ArrayList<String> invites) {
-
             this.invites = invites;
             this.context = context;
-
         }
         @Override
         public int getCount() {
-            return this.invites.size();
+            if(invites.get(0).equals(""))
+                return 0;
+            else
+                return this.invites.size();
         }
 
         @Override

@@ -462,7 +462,7 @@ public class Grocery extends MainActivity {
             Groceries groceries = new Groceries(userid, description, status);
             db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-            InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString());
+            InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, item + " restocked!", item + " moved from Grocery List to Stock!", Calendar.getInstance().getTime().toString());
             notiCollection.sendInAppNotification(notiCollection);
         }
     }
@@ -491,13 +491,20 @@ public class Grocery extends MainActivity {
 
     }
 
-    public void deleteGrocery(String Household /*Name of the household the user is in*/, String item /*Item to be deleted*/){
+    public void deleteGrocery(String Household /*Name of the household the user is in*/, final String item /*Item to be deleted*/){
+        firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseApp.initializeApp(this);
+
         db.collection("Household").document(Household).collection("Grocery Items").document(item)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(GetCurrentHouseholdName(), user.getUid(), item + "Deleted!", item + " is deleted from Grocery List!", Calendar.getInstance().getTime().toString());
+                        notiCollection.sendInAppNotification(notiCollection);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

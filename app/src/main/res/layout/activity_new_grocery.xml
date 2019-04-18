@@ -71,8 +71,6 @@
 
 
             <!--<include layout="@layout/activity_nav_drawer"/>-->
-
-
             <ListView
                 android:id="@+id/GroceryListView"
                 android:layout_width="match_parent"
