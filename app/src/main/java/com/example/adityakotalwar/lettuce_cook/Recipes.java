@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,11 +69,16 @@ public class Recipes extends AppCompatActivity {
     private Button stockButton;
     private Button recipesButton;
     private Button chooseIngreButton;
+    private Button searchButton;
+
+    private EditText recipeName;
 
     private Button sharedRecipeButton;
+    private String household;
     public ProgressDialog progressDialog;
 
     ArrayList<String> list = new ArrayList<>();
+    String recipe_ingr = "";
 
     final FirebaseFirestore db =  FirebaseFirestore.getInstance();
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -88,6 +95,8 @@ public class Recipes extends AppCompatActivity {
         recipesButton = findViewById(R.id.buttonRecipes);
         sharedRecipeButton = findViewById(R.id.SharedRecipeButton);
         chooseIngreButton = findViewById(R.id.buttonChooseIngredients);
+        searchButton = findViewById(R.id.search_button);
+        recipeName = findViewById(R.id.recipe_search);
         recipeView = findViewById(R.id.my_list_view2);
 
         progressDialog = new ProgressDialog(this);
@@ -125,7 +134,7 @@ public class Recipes extends AppCompatActivity {
                             for (int i = 0; i < size; i++) {
                                 temprec.add(tempRecipes[i]);
                             }
-                        db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
                                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                     recipeSet.clear();
@@ -151,6 +160,9 @@ public class Recipes extends AppCompatActivity {
                                             final TextView recipe_procedure = mView.findViewById(R.id.recipe_procedure);
                                             final Button button_back = mView.findViewById(R.id.button_back);
                                             final Button button_share = mView.findViewById(R.id.button_share);
+                                            final Button button_missingingr = mView.findViewById(R.id.buttonMissingIngr);
+
+                                            recipe_ingr = "";
 
                                             db.collection("SavedRecipe").document(recipeSet.get(position).id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
@@ -161,13 +173,48 @@ public class Recipes extends AppCompatActivity {
                                                 }
                                             });
 
+
                                             final String recipe_id = recipeSet.get(position).id;
                                             mBuilder.setView(mView);
                                             // Pops the dialog on the screen
                                             final AlertDialog dialog = mBuilder.create();
                                             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                                             dialog.show();
-                                            getMissingIngredients();
+                                            //getMissingIngredients();
+
+                                            button_missingingr.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    db.collection("SavedRecipe").document(recipeSet.get(position).id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                            recipe_ingr = documentSnapshot.getString("recipe_ingredients");
+                                                            System.out.println(recipe_ingr+ " RECIPE INGREEEEEEE");
+                                                            String[] ingrs = recipe_ingr.split("\n");
+                                                            System.out.println(recipe_ingr + " THIS IS SAVED INGRRRRRRR");
+                                                            ArrayList<String> finalingrs = new ArrayList<>();
+                                                            for(String tempingr : ingrs){
+                                                                String temp = "";
+                                                                System.out.println("TEMPINGRRRRRR     "+tempingr);
+                                                                for(int i=0; i<tempingr.length(); i++){
+                                                                    char ch = tempingr.charAt(i);
+                                                                    if(ch != ':'){
+                                                                        temp += ch;
+                                                                    }
+                                                                    else{
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                System.out.println("THID ID THE INGRREEE SAVEDDD    " + temp);
+                                                                finalingrs.add(temp);
+                                                                getMissingIngredients(finalingrs);
+
+                                                            }
+
+                                                        }
+                                                    });
+                                                }
+                                            });
 
                                             button_back.setOnClickListener(new View.OnClickListener() {
                                                 @Override
@@ -175,6 +222,8 @@ public class Recipes extends AppCompatActivity {
                                                     dialog.dismiss();
                                                 }
                                             });
+
+
                                             button_share.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -293,7 +342,7 @@ public class Recipes extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                                         String selected = "";
-                                          list.clear();
+                                        list.clear();
                                         for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                                             list.add(document.getId());
                                         }
@@ -301,7 +350,7 @@ public class Recipes extends AppCompatActivity {
                                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                                                 Recipes.this,
                                                 android.R.layout.simple_list_item_multiple_choice,list
-                                                );
+                                        );
                                         ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
                                         ingredients.setAdapter(adapter);
                                     }
@@ -332,7 +381,7 @@ public class Recipes extends AppCompatActivity {
 
 
             }
-    });
+        });
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
         friendsButton.setOnClickListener(new View.OnClickListener() {
@@ -373,11 +422,233 @@ public class Recipes extends AppCompatActivity {
             }
         });
 
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = recipeName.getText().toString().trim();
+                if(name.isEmpty()){
+                    recipeName.setError("Enter a recipe");
+                }
+                else{
+                    Intent intent = new Intent(Recipes.this, SearchRecipe.class);
+                    intent.putExtra("recipe_name", name);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+            }
+        });
+
+    }
+    public void getMissingIngredients(final ArrayList<String> ingredi) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        System.out.println(db);
+        // firebaseAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        //final String id = firebaseAuth.getCurrentUser().getUid();
+        //String household = GetCurrentHouseholdName();
+
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                household = documentSnapshot.getString("household");
+                db.collection("Household").document(household).collection("Grocery Items").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        ArrayList<String> missingIngr = new ArrayList<>();
+                        boolean contain = false;
+                        String miss = "";
+                        for(String ingr : ingredi){
+                            miss = ingr;
+                            for(QueryDocumentSnapshot qs : queryDocumentSnapshots){
+                                if((ingr.contains(qs.getId()) || qs.getId().contains(ingr)) && qs.getString("status").equals("stock")){
+                                    System.out.println("THIS IS THE ingredient     " + ingr);
+                                    contain = true;
+                                    break;
+                                }
+                            }
+                            if(!contain){
+                                missingIngr.add(miss);
+                            }
+                            else{
+                                contain = false;
+                            }
+                        }
+                        printMissingIngredients(missingIngr);
+                    }
+                });
+            }
+        });
+
+        //return missingIngr;
+    }
+    void printMissingIngredients(ArrayList<String> recipe_ingr){
+        // Grocery gr = new Grocery();
+        // final String[] missingIngredients = getMissingIngredients().split(":");
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+
+
+        final ListView ingredients = mView.findViewById(R.id.listViewStock);
+        final Button suggestIngredient = mView.findViewById(R.id.buttonSubstitute);
+        final TextView heading = mView.findViewById(R.id.plain_text);
+        final Button askAFriendButton = mView.findViewById(R.id.buttonAskFriend);
+        final Button addGroceryButton = mView.findViewById(R.id.buttonAddGrocery);
+        askAFriendButton.setVisibility(View.VISIBLE);
+        addGroceryButton.setVisibility(View.VISIBLE);
+        suggestIngredient.setVisibility(View.VISIBLE);
+        heading.setText("Missing Ingredients");
+
+        mBuilder.setView(mView);
+        final AlertDialog dialog = mBuilder.create();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+        list.clear();
+        for(String miss : recipe_ingr){
+            list.add(miss);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                Recipes.this,
+                android.R.layout.simple_list_item_multiple_choice,list
+        );
+        ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        ingredients.setAdapter(adapter);
+
+        suggestIngredient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String ingrs = "";
+                int cntChoice = ingredients.getCount();
+                SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+                        String ingr = ingredients.getItemAtPosition(i).toString().replace(' ', '+');
+                        getIngrSubstitute(ingr);
+
+                    }
+                }
+            }
+        });
+
+        askAFriendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                ArrayList<String> ingToFriend = new ArrayList<>();
+                int cntChoice = ingredients.getCount();
+                SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                        ingToFriend.add(ingredients.getItemAtPosition(i).toString());
+                    }
+                }
+                //dialog.dismiss();
+                for(String ing : ingToFriend) {
+                    RequestQueue requestQueue = Volley.newRequestQueue(Recipes.this);
+                    Notifications n = new Notifications();
+                    try {
+                        n.sendNotification("bobo", "We would like to borrow " + ing + " ingredient from your household", "bobo", requestQueue);
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    InAppNotiCollection notiCollection = new InAppNotiCollection("bobo", user.getUid(), "Asking for " + ing, "bobo" + " has invited you over", Calendar.getInstance().getTime().toString());
+                    notiCollection.sendInAppNotification(notiCollection);
+                    Toast.makeText(Recipes.this, "Sent message to  " + "bobo", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        addGroceryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                        ArrayList<String> selected = new ArrayList<>();
+                ArrayList<String> ingToGrocery = new ArrayList<>();
+                int cntChoice = ingredients.getCount();
+                SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                        ingToGrocery.add(ingredients.getItemAtPosition(i).toString());
+                    }
+                }
+
+                Grocery gr = new Grocery();
+
+                for(String i : ingToGrocery){
+                    gr.addItemToGroceryCollection(i, "", "grocery", household);
+                    list.remove(i);
+                    repopulate(ingredients, list);
+                }
+
+                Toast.makeText(Recipes.this, "Ingredients added to grocery!", Toast.LENGTH_LONG).show();
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
     }
 
-    public void getMissingIngredients(){}
+    void getIngrSubstitute(String ingredient){
+        RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+        String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/substitutes?ingredientName="+ingredient;
+        String url = Uri.parse(temp).buildUpon().build().toString();
+
+        System.out.println("INGI START");
+        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String message = response.getString("message");
+                            System.out.println("INGI " + message);
+                            ArrayList<String> substitutes = new ArrayList<>();
+                            JSONArray ingr_list = response.getJSONArray("substitutes");
+                            System.out.println("INGI rushank ");
+                            for(int i = 0; i < ingr_list.length(); i++){
+//                                JSONObject id =  ingr_list.getJSONObject(i);
+//                                String ingredient = id.getString("name")+": "+id.getString("amount") + " " + id.getString("unit") + "\n";
+                                substitutes.add(ingr_list.getString(i));
+                                System.out.println("INGI rushank "+ substitutes.get(i));
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("INGI SUX");
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("X-RapidAPI-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                params.put("X-RapidAPI-Key", "489f0a43bbmshdbcadc67d147cfap1af9eajsnb1f4a4f4f5f9");
+                return params;
+            }
+
+        };
+
+        rq.add(request);
 
     }
+    void repopulate(ListView ingredients, ArrayList<String> list){
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                Recipes.this,
+                android.R.layout.simple_list_item_multiple_choice,list
+        );
+        ingredients.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        ingredients.setAdapter(adapter);
+    }
+
+}
 
 
 

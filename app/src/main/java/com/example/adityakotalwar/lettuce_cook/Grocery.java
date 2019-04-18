@@ -14,6 +14,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,7 +59,6 @@ public class Grocery extends MainActivity {
     private Button ButtonFriends;
 
     private ListView GroceryList;
-    private ListView MoveToStockList;
     private EditText AdditemText;
     private EditText AddDescText;
     private Button additem;
@@ -71,7 +71,7 @@ public class Grocery extends MainActivity {
 
     ArrayAdapter<String> GroceryArray;
     ArrayAdapter<String> StockArray;
-    ArrayList<String> DeletedItems;
+    ArrayList<String> GroceryListItems = new ArrayList<>();
     ArrayList<String> currentIngredients;
 
     private DrawerLayout coordinatorLayout;
@@ -84,7 +84,6 @@ public class Grocery extends MainActivity {
         setContentView(R.layout.activity_new_grocery);
         //setContentView(R.layout.activity_suggrecipe);
 
-        Buttondelete = findViewById(R.id.DeleteGrocery);
         Buttonupdate = findViewById(R.id.updateToStock);
 
         ButtonGrocery = findViewById(R.id.buttonGrocery);
@@ -94,16 +93,13 @@ public class Grocery extends MainActivity {
         ButtonGrocery.setTextColor(Color.parseColor("#5D993D"));
 
         GroceryList = findViewById(R.id.GroceryListView);
-        MoveToStockList = findViewById(R.id.MoveToStockListView);
         AdditemText = findViewById(R.id.edit_text_add_item);
         additem = findViewById(R.id.button_add_item);
         AddDescText = findViewById(R.id.edit_text_add_description);
         GroceryArray = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        StockArray = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        GroceryList.setAdapter(GroceryArray);
-        MoveToStockList.setAdapter(StockArray);
 
-        GroceryList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+//        GroceryList.setAdapter(GroceryArray);
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -159,6 +155,43 @@ public class Grocery extends MainActivity {
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
+
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String house = documentSnapshot.getString("household");
+
+                db.collection("Household").document(house).collection("Grocery Items").whereEqualTo("status", "grocery")
+                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        GroceryListItems.clear();
+                        for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                            GroceryListItems.add(doc.getId());
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                Grocery.this,
+                                android.R.layout.simple_list_item_multiple_choice,GroceryListItems
+                        );
+                        GroceryList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                        GroceryList.setAdapter(adapter);
+                    }
+                });
+//            addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                            @Override
+//                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                                //System.out.println("going in here");
+//                                GroceryArray.clear();
+//                                //repopulate(arrayAdapter, householdName);
+//                                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+//                                    GroceryArray.add(doc.getId());
+//                                }
+//                            }
+//                        });
+            }
+        });
+
 
         t = new ActionBarDrawerToggle(this, coordinatorLayout,R.string.Open, R.string.Close);
 
@@ -240,21 +273,14 @@ public class Grocery extends MainActivity {
                 logout_confir.setMessage("Do you want to add this grocery to stock or delete the item?")
                         .setCancelable(false)
 
-                        .setPositiveButton("Add to stock", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                String item = GroceryArray.getItem(position);
-                                deleteGrocery(GetCurrentHouseholdName(), item);
-                                StockArray.add(item);
-                            }
-                        })
-                        .setNeutralButton("Go back", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("BACK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
                             }
                         })
-                .setNegativeButton("Delete from everywhere", new DialogInterface.OnClickListener() {
+
+                .setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         SnackFlag = 0;
@@ -285,8 +311,8 @@ public class Grocery extends MainActivity {
                             public void onDismissed(Snackbar snackbar, int event) {
                                 //see Snackbar.Callback docs for event details
                                 if (SnackFlag == 0) {
-
                                     deleteGrocery(GetCurrentHouseholdName(), item);
+                                    repopulate(GetCurrentHouseholdName());
                                 }
 
                             }
@@ -301,24 +327,28 @@ public class Grocery extends MainActivity {
             }
         });
 
-        MoveToStockList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = StockArray.getItem(position);
-                StockArray.remove(item);
-                addItemToGroceryCollection(item, "", "grocery", GetCurrentHouseholdName());
-            }
-        });
+//        MoveToStockList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                String item = StockArray.getItem(position);
+//                StockArray.remove(item);
+//                addItemToGroceryCollection(item, "", "grocery", GetCurrentHouseholdName());
+//            }
+//        });
 
         Buttonupdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i = 0; i< StockArray.getCount(); i++){
-
-                    addItemToGroceryCollection(StockArray.getItem(i), "", "stock", GetCurrentHouseholdName());
-
+                int cntChoice = GroceryList.getCount();
+                SparseBooleanArray sparseBooleanArray = GroceryList.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+//                                selected.add(ingredients.getItemAtPosition(i).toString());
+                        addItemToGroceryCollection(GroceryList.getItemAtPosition(i).toString(), "","stock", GetCurrentHouseholdName());
+                        repopulate(GetCurrentHouseholdName());
+                    }
                 }
-                StockArray.clear();
+
 
             }
         });
@@ -340,17 +370,6 @@ public class Grocery extends MainActivity {
 
     }
 
-    public boolean ArrayadapterContains(String item, ArrayAdapter arrayAdapter){
-
-        for(int i = 0; i < arrayAdapter.getCount(); i++){
-            if(arrayAdapter.getItem(i).equals(item)){
-                return true;
-
-            }
-
-        }
-        return false;
-    }
 
 
     private View.OnClickListener Listen = new View.OnClickListener() {
@@ -359,7 +378,6 @@ public class Grocery extends MainActivity {
             switch (view.getId()) {
                 case R.id.button_add_item:
                     flag = 0;
-                    realtime(GetCurrentHouseholdName());
                     String ItemEntered = AdditemText.getText().toString();
                     if (ItemEntered.equals("")) {
                         Toast.makeText(getApplicationContext(), "Please enter an item", Toast.LENGTH_SHORT).show();
@@ -375,6 +393,7 @@ public class Grocery extends MainActivity {
                         addItemToGroceryCollection(ItemEntered, Description, "grocery", GetCurrentHouseholdName());
                         AdditemText.setText("");
                         AddDescText.setText("");
+                        repopulate(GetCurrentHouseholdName());
                         Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_SHORT).show();
                     }else{
 
@@ -386,37 +405,6 @@ public class Grocery extends MainActivity {
             }
         }
     };
-
-//    public ArrayList<String> getHouseholdIngredients() {
-//        final FirebaseFirestore db = FirebaseFirestore.getInstance();
-//        System.out.println(db);
-//        firebaseAuth = FirebaseAuth.getInstance();
-//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        //final String id = firebaseAuth.getCurrentUser().getUid();
-//        //String household = GetCurrentHouseholdName();
-//
-//        System.out.println("THIS IS CURRENT USER    :     " +user.getUid());
-//
-//        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(DocumentSnapshot documentSnapshot) {
-//                final String household = documentSnapshot.getString("household");
-//                System.out.println(household + " HOUSEHOLSSSSSSSS");
-//                db.collection("Household").document(household).collection("Grocery").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-//                        currentIngredients = (ArrayList)queryDocumentSnapshots.getDocuments();
-//                        System.out.println("HERERERERERERERERE");
-//                    }
-//                });
-//            }
-//        });
-//
-//        for(String i:currentIngredients){
-//            System.out.println("CURRENT INGREDIENTS :   " +i);
-//        }
-//        return currentIngredients;
-//    }
 
     public String GetCurrentHouseholdName() {
         final DocumentReference docrefUser;
@@ -467,18 +455,20 @@ public class Grocery extends MainActivity {
     }
 
     public void addItemToGroceryCollection(String item, String description, String status, String HouseholdName){
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
-        db = FirebaseFirestore.getInstance();//added by alisha
-        //String userid = firebaseAuth.getCurrentUser().getUid();
-        Groceries groceries = new Groceries(userid, description, status);
-        db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
+        if(!GroceryItemContains(item, HouseholdName)) {
+            String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();//added by alisha
+            db = FirebaseFirestore.getInstance();//added by alisha
+            //String userid = firebaseAuth.getCurrentUser().getUid();
+            Groceries groceries = new Groceries(userid, description, status);
+            db.collection("Household").document(HouseholdName).collection("Grocery Items").document(item).set(groceries);
 
-        InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, "Grocery Item Added to Grocery list!", item + " added to Grocery!", Calendar.getInstance().getTime().toString() );
-        notiCollection.sendInAppNotification(notiCollection);
+            InAppNotiCollection notiCollection = new InAppNotiCollection(HouseholdName, userid, item + " restocked!", item + " moved from Grocery List to Stock!", Calendar.getInstance().getTime().toString());
+            notiCollection.sendInAppNotification(notiCollection);
+        }
     }
 
     public boolean GroceryItemContains(final String groceryName, String HouseholdName){
-
+        db = FirebaseFirestore.getInstance();//added by alisha
         //First collection and second collection will always be the same
         db.collection("Household").document(HouseholdName).collection("Grocery Items").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -501,13 +491,20 @@ public class Grocery extends MainActivity {
 
     }
 
-    public void deleteGrocery(String Household /*Name of the household the user is in*/, String item /*Item to be deleted*/){
+    public void deleteGrocery(String Household /*Name of the household the user is in*/, final String item /*Item to be deleted*/){
+        firebaseAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        final FirebaseUser user = firebaseAuth.getCurrentUser();
+        FirebaseApp.initializeApp(this);
+
         db.collection("Household").document(Household).collection("Grocery Items").document(item)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(GetCurrentHouseholdName(), user.getUid(), item + "Deleted!", item + " is deleted from Grocery List!", Calendar.getInstance().getTime().toString());
+                        notiCollection.sendInAppNotification(notiCollection);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -518,6 +515,26 @@ public class Grocery extends MainActivity {
                     }
                 });
 
+    }
+
+    public void repopulate(String house){
+        db.collection("Household").document(house).collection("Grocery Items").whereEqualTo("status", "grocery")
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                GroceryListItems.clear();
+                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                    GroceryListItems.add(doc.getId());
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                        Grocery.this,
+                        android.R.layout.simple_list_item_multiple_choice,GroceryListItems
+                );
+                GroceryList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                GroceryList.setAdapter(adapter);
+            }
+        });
     }
 
 }

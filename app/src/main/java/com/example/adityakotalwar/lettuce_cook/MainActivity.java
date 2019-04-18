@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonFriends;
     private Button buttonGroceries;
     private Button buttonStock;
+    private Button buttonMaps;
     private Button buttonRecipes;
     private Button toggleNoti;
 
@@ -160,11 +161,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
+        buttonMaps = (Button) findViewById(R.id.buttonMaps);
         buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
         buttonStock = findViewById(R.id.buttonStock);
 
         buttonRecipes.setOnClickListener(this);
         buttonFriends.setOnClickListener(this);
+        buttonMaps.setOnClickListener(this);
         buttonGroceries.setOnClickListener(this);
         buttonStock.setTextColor(Color.parseColor("#5D993D"));
 
@@ -201,7 +204,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        repopulate(arrayAdapter, GetCurrentHouseholdName());
                         String item = arrayAdapter.getItem(position);
                         db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
-
+                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                "You ran out of "+item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString() );
+                        notiCollection.sendInAppNotification(notiCollection);
 
                     }
                 });
@@ -336,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onSuccess(Void aVoid) {
                         InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
-                                "Grocery Item Deleted!", item + " added to Stock!", Calendar.getInstance().getTime().toString() );
+                                 "You ran out of "+item, item + " removed from Stock", Calendar.getInstance().getTime().toString() );
                         notiCollection.sendInAppNotification(notiCollection);
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }
@@ -521,6 +526,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent myIntent = new Intent(MainActivity.this, Grocery.class);
             startActivity(myIntent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        }
+        if(v == buttonMaps) {
+            finish();
+            Intent myIntent = new Intent(getApplicationContext(), MapsActivity.class);
+            startActivity(myIntent);
+            overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
         }
     }
 
