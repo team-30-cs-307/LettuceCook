@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:layout_margin="10dp"
+    android:background="@drawable/layout_border_thick">
+
+    <TextView
+        android:id="@+id/recipeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/timeOfPost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/recipeName"
+        />
+
+    <TextView
+        android:id="@+id/householdName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/star_button"
+        android:layout_alignParentRight="true"
+        android:padding="5dp"
+        android:textSize="15dp"
+        android:textFontWeight="700"
+        android:textColor="@android:color/darker_gray"
+    />
+
+    <TextView
+        android:id="@+id/recipeSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:padding = "5dp"
+        android:layout_below="@+id/householdName"
+    />
+
+    <ImageButton
+        android:id="@+id/trash_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/trash_button"
+        android:layout_alignBottom="@+id/star_button"
+        android:layout_marginRight="5dp"
+        android:layout_toStartOf="@+id/star_button"/>
+    <ImageButton
+        android:id="@+id/star_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/star_button"/>
+
+
+
+</RelativeLayout>

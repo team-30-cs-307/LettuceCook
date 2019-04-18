@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:paddingBottom="10dp"
     android:layout_gravity="center"
+    android:background="@null"
     tools:context=".Friends">
 
     <TextView
@@ -13,30 +14,33 @@
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
+        android:background="@drawable/layout_rounded_border"
         android:padding="15dp"
-        android:layout_marginRight="-10dp"
         android:textSize="20dp"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/colorPrimaryDark"
         android:text="Notifications"
-        android:fontFamily="sans-serif-medium"/>
+        android:fontFamily="sans-serif-black"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:layout_below="@+id/edit_text_add_item"
+        android:background="@drawable/layout_rounded_border"
+        android:layout_toEndOf="@+id/plain_text"
+        android:layout_alignParentStart="true"
+        >
     <ListView
         android:id="@+id/noti_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/edit_text_add_item"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="70dp"
-        android:background="@drawable/linear_layout_box"
-        android:layout_toEndOf="@+id/plain_text"
-        android:layout_alignParentStart="true"
+        android:padding="30dp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/invite_name"
+        android:textFontWeight="700"
         android:layout_width="match_parent"
         android:layout_height="30dp"
         />
@@ -57,6 +61,7 @@
         android:background="@drawable/back_button"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="10dp"
+        android:layout_marginBottom="20dp"
         android:layout_alignParentRight="true"/>
 
 </android.widget.RelativeLayout>

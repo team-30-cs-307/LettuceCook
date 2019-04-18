@@ -36,7 +36,7 @@ public class NewGroceryActivity extends AppCompatActivity {
         Buttonupdate = findViewById(R.id.updateToStock);
         Buttongrocery = findViewById(R.id.buttonGrocery);
         ButtonStock = findViewById(R.id.buttonStock);
-        ButtonRecipes = findViewById(R.id.go_to_recipes_button);
+        ButtonRecipes = findViewById(R.id.buttonRecipes);
         Buttonfriends  =findViewById(R.id.buttonFriends);
         GroceryList = findViewById(R.id.GroceryListView);
         MoveToStockList = findViewById(R.id.MoveToStockListView);

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorGreyLight">#E8E8E8</color>
     <color name="colorGrey">#A0A0A0</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#287348</color>
-    <color name="colorAccentLight">#4d8c68</color>
-    <color name="colorButton">#287348</color>
+    <color name="colorPrimaryDark">#4E7A2A</color>
+    <color name="colorAccent">#74B53F</color>
+    <color name="colorAccentLight">#74B53F</color>
+    <color name="colorButton">#74B53F</color>
 </resources>
+
+
+    <!--#345F41&lt;!&ndash;&ndash;&gt;-->

@@ -4,18 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/wallpaper_1"
+    android:background="@drawable/side_nav_bar"
     tools:context=".SignIn"
-    android:gravity="center">
+    android:gravity="center"
+    android:padding="50dp">
 
     <LinearLayout
-        android:layout_width="350dp"
-        android:layout_height="500dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/linear_layout_box"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
-        android:paddingTop="20dp"
+        android:gravity="center"
+        android:background="@drawable/layout_rounded_border"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp"
         tools:ignore="MissingConstraints">
 
         <!--Put form controls here-->
@@ -29,8 +32,10 @@
         <EditText
             android:id="@+id/Email"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:layout_marginBottom="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:padding = "10dp"
+            android:background="@drawable/layout_border"
             android:gravity="center"
             android:hint="Email"
             android:inputType="textEmailAddress"></EditText>
@@ -38,16 +43,18 @@
         <EditText
             android:id="@+id/Password"
             android:layout_width="fill_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
+            android:padding = "10dp"
+            android:background="@drawable/layout_border"
             android:gravity="center"
             android:hint="Password"
             android:inputType="textPassword"></EditText>
 
         <Button
             android:id="@+id/ButtonSignIn"
-            android:layout_width="100dp"
-            android:layout_height="50dp"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/button_dark_green"
             android:textColor="@color/colorPrimary"
@@ -57,7 +64,7 @@
             android:id="@+id/textViewForgotPw"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:layout_marginTop="15dp"
             android:text="Forgot Passsword?"
             android:textAlignment="center" />
 
@@ -65,7 +72,7 @@
             android:id="@+id/textViewSignUp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:layout_marginTop="15dp"
             android:text="Don't Have an account? SignUp Here"
             android:textAlignment="center" />
     </LinearLayout>

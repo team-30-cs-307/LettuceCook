@@ -3,31 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".SignIn">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:background="@drawable/linear_layout_box"
-        android:paddingLeft="50dp"
-        android:paddingRight="50dp"
-        android:paddingTop="20dp"
+        android:background="@drawable/layout_rounded_border"
+        android:padding="40dp"
+        android:layout_margin="20dp"
         tools:ignore="MissingConstraints">
 
         <EditText
             android:id="@+id/PwCurrent"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:background="@drawable/layout_border"
             android:hint="Enter your current password"
             android:inputType="textPassword"></EditText>
         <EditText
             android:id="@+id/PwReset"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:background="@drawable/layout_border"
             android:hint="Enter new password"
             android:inputType="textPassword"></EditText>
 
@@ -35,17 +38,25 @@
             android:id="@+id/ConfirmPwReset"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="20dp"
+            android:padding="10dp"
+            android:background="@drawable/layout_border"
             android:hint="Confirm New Password"
             android:inputType="textPassword"></EditText>
 
         <Button
             android:id="@+id/ButtonChangeConfirm"
             android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:background="@drawable/button_dark_green"
             android:textColor="#FFFFFF"
             android:text="Reset"></Button>
+        <ImageButton
+            android:id="@+id/buttonBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="left"
+            android:background="@drawable/back_button"/>
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

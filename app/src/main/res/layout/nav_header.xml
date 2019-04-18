@@ -11,15 +11,5 @@
     android:layout_height="wrap_content"
     android:background="@drawable/nav_header">
     </ImageView>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginTop="-40dp"
-        android:textSize="20dp"
-        android:paddingLeft="10dp"
-        android:text="Hello, $USER"
-        android:textColor="@color/colorPrimary"
-        android:background="@null"/>
 
 </LinearLayout>

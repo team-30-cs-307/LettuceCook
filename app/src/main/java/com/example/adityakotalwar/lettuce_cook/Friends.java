@@ -4,7 +4,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -53,9 +58,10 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
 public class Friends extends AppCompatActivity {
     private Button groceryButton;
     private Button friendsButton;
-    private Button friendRequestsButton;
     private Button stockButton;
     private Button recipesButton;
+
+    private Button friendRequestsButton;
     private Button showUsersButton;
     private TextView listOfUsers;
 
@@ -70,6 +76,9 @@ public class Friends extends AppCompatActivity {
     private Button showRequestsButton;
     private RequestAdapter requestListAdapter;
     private ArrayList<String> requests = new ArrayList<>();
+
+    private DrawerLayout coordinatorLayout;
+    private ActionBarDrawerToggle t;
 
     private ArrayList<String> notification_title = new ArrayList<String>();
     private ArrayList<String> notification_body = new ArrayList<>();
@@ -89,6 +98,7 @@ public class Friends extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+
         showUsersButton = findViewById(R.id.showUsers);
         listOfUsers = findViewById(R.id.listUsers);
         listFriends = findViewById(R.id.listviewFriends);
@@ -116,6 +126,17 @@ public class Friends extends AppCompatActivity {
                 arrayHouseholds);
         listFriends.setAdapter(adapter);
 
+        coordinatorLayout = (DrawerLayout) findViewById(R.id.activity_drawer);
+//        additem.performClick();
+
+        coordinatorLayout.setOnTouchListener(new OnSwipeTouchListener(Friends.this) {
+            public void onSwipeRight() {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+            }
+        });
+
+
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             @Override
@@ -142,26 +163,26 @@ public class Friends extends AppCompatActivity {
         showNotiButton = findViewById(R.id.showNotiButton);
         requests_invites = findViewById(R.id.requests_and_invites);
 
-
+        friendsButton.setTextColor(Color.parseColor("#5D993D"));
         recipesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,Recipes.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,Recipes.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         stockButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,MainActivity.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,MainActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
         groceryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Friends.this,Grocery.class);
-                startActivity(intent);
+                startActivity(new Intent(Friends.this,Grocery.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -493,6 +514,7 @@ public class Friends extends AppCompatActivity {
         listView = mView.findViewById(R.id.noti_view);
         final AlertDialog dialog = mBuilder.create();
         dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
 
         ImageButton back_button = mView.findViewById(R.id.back_button);
@@ -533,7 +555,7 @@ public class Friends extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(notification_title.get(i).contains("dinner")){
+                if(notification_title.get(i).contains("Dinner")){
                     AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                     inv.setMessage("Do you accept their invitation")
                             .setCancelable(false)

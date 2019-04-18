@@ -1,63 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_margin="10dp"
+    android:padding="10dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_rounded_border"
     >
 
-    <TextView
-        android:id="@+id/recipe_title"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="9dp"
+        tools:layout_editor_absoluteY="4dp">
 
-        android:padding="10dp"
-        android:textSize="20dp" />
+        <TextView
+            android:id="@+id/recipe_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-black"
+            android:padding="10dp"
+            android:textSize="20dp"
+            tools:ignore="MissingConstraints" />
 
-    <TextView
-        android:id="@+id/recipe_ingredients"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recipe_title"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_toEndOf="@+id/recipe_title"
-        android:padding="10dp"
-        android:textSize="12dp" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/recipe_title"
+            android:background="@android:color/darker_gray"
+            tools:ignore="MissingConstraints" />
 
-    <TextView
-        android:id="@+id/recipe_procedure"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/recipe_ingredients"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:layout_toEndOf="@+id/recipe_ingredients"
-        android:padding="5dp"
-        android:textSize="12dp" />
+        <TextView
+            android:id="@+id/ing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recipe_title"
+            android:fontFamily="sans-serif-medium"
+            android:paddingTop="10dp"
+            android:text="Ingredients"
+            android:textSize="15dp"
+            tools:ignore="MissingConstraints" >
 
-    <Button
-        android:id="@+id/button_save"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_gravity="right"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@drawable/button_dark_green"
-        android:textColor="#FFFFFF"
-        android:text="Save Recipe"></Button>
+        </TextView>
 
-    <Button
-        android:id="@+id/button_back"
-        android:layout_width="75dp"
-        android:layout_height="50dp"
-        android:layout_gravity="right"
-        android:background="@drawable/button_dark_green"
-        android:text="Back"
-        android:layout_toStartOf="@+id/button_save"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="5dp"
-        android:textColor="#FFFFFF"></Button>
+        <TextView
+            android:id="@+id/recipe_ingredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ing"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@+id/recipe_title"
+            android:background="@drawable/layout_border"
+            android:padding="10dp"
+            android:textSize="12dp"
+            tools:ignore="MissingConstraints" />
+
+        <Button android:id="@+id/buttonMissingIngr"
+            android:background="@drawable/missing_ingr_button"
+            android:layout_below="@id/recipe_ingredients"
+            android:layout_gravity="right"
+            android:layout_marginTop="-40dp"
+            android:layout_height="50dp"
+            android:layout_width="50dp" />
+        <TextView
+            android:id="@+id/proc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/recipe_ingredients"
+            android:fontFamily="sans-serif-medium"
+            android:text="Procedure"
+            android:textSize="15dp"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/recipe_procedure"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/proc"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/proc"
+            android:background="@drawable/layout_border"
+            android:padding="10dp"
+            android:textSize="12dp"
+            tools:ignore="MissingConstraints" />
+
+        <LinearLayout
+            android:layout_width="157dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+
+            <Button
+                android:id="@+id/button_share"
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:background="@drawable/share_button"
+                android:paddingRight="5dp"
+                tools:ignore="MissingConstraints"></Button>
+
+            <Button
+                android:id="@+id/button_save"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/star_button"
+                tools:ignore="MissingConstraints"></Button>
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="left"
+            android:background="@drawable/back_button"
+            tools:ignore="MissingConstraints"></Button>
+
+
+    </LinearLayout>
 
 
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

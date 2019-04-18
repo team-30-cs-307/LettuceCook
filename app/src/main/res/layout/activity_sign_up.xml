@@ -4,84 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/trial"
+    android:background="@drawable/side_nav_bar"
     tools:context=".SignUp"
     android:gravity="center"
     android:padding="50dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@drawable/layout_rounded_border"
         android:orientation="vertical"
         android:paddingLeft="40dp"
-        android:paddingRight="40dp">
+        android:paddingRight="40dp"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp"
+        >
 
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="50dp"
             android:background="@drawable/lettuce_cook_logo"
             android:scaleType="fitStart"
             android:elevation="20dp"
-            android:layout_margin="40dp"/>
-            >
+            />
 
             <!--Put form controls here-->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+        <EditText
                 android:id="@+id/UserName"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:padding = "10dp"
                 android:gravity="center"
+                android:background="@drawable/layout_border"
                 android:hint="User Name"
                 android:inputType="text"
-                android:textColor="#FFFFFF" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/Email"
+                />
+        <EditText
+            android:id="@+id/Email"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:padding = "10dp"
                 android:gravity="center"
                 android:hint="Email"
                 android:inputType="textEmailAddress"
-                android:textColor="#FFFFFF" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+                android:background="@drawable/layout_border"
+                />
+        <EditText
                 android:id="@+id/Password"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:padding = "10dp"
                 android:gravity="center"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:textColor="#FFFFFF" />
-        </android.support.design.widget.TextInputLayout>
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <android.support.design.widget.TextInputEditText
+                android:background="@drawable/layout_border"
+                />
+        <EditText
                 android:id="@+id/ConfirmPassword"
                 android:layout_width="fill_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
+                android:padding = "10dp"
                 android:gravity="center"
                 android:hint="Confirm Password"
                 android:inputType="textPassword"
-                android:textColor="#FFFFFF" />
-        </android.support.design.widget.TextInputLayout>
+                android:background="@drawable/layout_border"
+                />
 
         <Button
             android:id="@+id/ButtonSignup"
@@ -91,17 +85,15 @@
             android:layout_marginTop="30dp"
             android:background="@drawable/button_dark_green"
             android:text="Signup"
-            android:textColor="#FFFFFF"></Button>
-
+            android:textColor="#FFFFFF"/>
 
         <TextView
             android:id="@+id/textViewSignIn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="15dp"
+            android:layout_marginTop="15dp"
             android:text="Have an account? SignIn Here"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF" />
+            android:textAlignment="center" />
     </LinearLayout>
 
 
