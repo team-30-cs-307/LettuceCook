@@ -590,6 +590,8 @@ public class Friends extends AppCompatActivity {
                         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             if (notification_title.get(i).contains("Dinner")) {
+                                dialog.dismiss();
+
                                 AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                                 inv.setMessage("Do you accept their invitation")
                                         .setCancelable(false)
@@ -605,7 +607,7 @@ public class Friends extends AppCompatActivity {
                                                 } catch (IllegalAccessException e1) {
                                                     e1.printStackTrace();
                                                 }
-                                                finish();
+                                               // finish();
                                             }
                                         })
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -628,16 +630,19 @@ public class Friends extends AppCompatActivity {
                                 // }
 
                             } else if (notification_title.get(i).contains("Asking")) {
+                                dialog.dismiss();
+                                final int selected = i;
+
                                 AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                                 inv.setMessage("Do you want to give the ingredient?")
                                         .setCancelable(false)
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                System.out.println("THIS IS INGREGINENT GIVINGGGGGGG thit hthithit    " + notification_title.get(i).length());
-                                                final String givingingr = notification_title.get(i).substring(11);
+                                                System.out.println("THIS IS INGREGINENT GIVINGGGGGGG thit hthithit    " + notification_title.get(selected).length());
+                                                final String givingingr = notification_title.get(selected).substring(11);
                                                 System.out.println("THIS IS INGREGINENT GIVINGGGGGGG     " + givingingr);
-                                                final String givingHousehold = notification_body.get(i).substring(0, notification_body.get(i).indexOf(' '));
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
                                                 db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                     @Override
                                                     public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -648,13 +653,13 @@ public class Friends extends AppCompatActivity {
                                                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                                 Notifications n = new Notifications();
                                                 try {
-                                                    n.sendNotification("Accepted!", householdName + " wants to come over!", user.getUid(), requestQueue);
+                                                    n.sendNotification("Ingredient found!", householdName + " has the ingredient!", user.getUid(), requestQueue);
                                                 } catch (InstantiationException e1) {
                                                     e1.printStackTrace();
                                                 } catch (IllegalAccessException e1) {
                                                     e1.printStackTrace();
                                                 }
-                                                finish();
+                                              //  finish();
                                             }
                                         })
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
