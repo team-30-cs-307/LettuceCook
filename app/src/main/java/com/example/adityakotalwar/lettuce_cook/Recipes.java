@@ -296,7 +296,7 @@ public class Recipes extends AppCompatActivity {
                                                                                 });
                                                                             }
                                                                             String recipes_shared_with_friends = documentSnapshot.getString("recipe_shared_with_friends");
-                                                                            recipes_shared_with_friends += recipe_id + " ";
+                                                                            recipes_shared_with_friends += (recipe_id + " ");
                                                                             house.update("recipe_shared_with_friends", recipes_shared_with_friends);
                                                                             dialog1.dismiss();
                                                                         }
@@ -377,7 +377,7 @@ public class Recipes extends AppCompatActivity {
                         for (int i = 0; i < cntChoice; i++) {
                             if (sparseBooleanArray.get(i)) {
 //                                selected.add(ingredients.getItemAtPosition(i).toString());
-                                ingrs += ingredients.getItemAtPosition(i).toString() + " ";
+                                ingrs += (ingredients.getItemAtPosition(i).toString() + " ");
                             }
                         }
                         dialog.dismiss();

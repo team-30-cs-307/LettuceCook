@@ -71,9 +71,7 @@ public class Grocery extends MainActivity {
     private FirebaseAuth firebaseAuth;
 
     ArrayAdapter<String> GroceryArray;
-    ArrayAdapter<String> StockArray;
     ArrayList<String> GroceryListItems = new ArrayList<>();
-    ArrayList<String> currentIngredients;
 
     private DrawerLayout coordinatorLayout;
     private ActionBarDrawerToggle t;
@@ -187,17 +185,6 @@ public class Grocery extends MainActivity {
                         GroceryList.setAdapter(adapter);
                     }
                 });
-//            addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                                //System.out.println("going in here");
-//                                GroceryArray.clear();
-//                                //repopulate(arrayAdapter, householdName);
-//                                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-//                                    GroceryArray.add(doc.getId());
-//                                }
-//                            }
-//                        });
             }
         });
 

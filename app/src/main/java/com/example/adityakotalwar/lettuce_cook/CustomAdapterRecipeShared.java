@@ -138,7 +138,7 @@ class CustomAdapterRecipeShared extends ArrayAdapter<RecipeListViewItem> impleme
                             ArrayList<String> friends = new ArrayList<>(Arrays.asList(tempo.split(" ")));
 
                             String recipes = documentSnapshot.getString("recipe_shared_with_friends");
-                            recipes = recipes.replace(recipe.id+" ", "");
+                            recipes = recipes.replace((recipe.id+" "), "");
                             dr.update("recipe_shared_with_friends", recipes);
 
                             for(int i=0; i<friends.size(); i++){
@@ -150,7 +150,7 @@ class CustomAdapterRecipeShared extends ArrayAdapter<RecipeListViewItem> impleme
                                         String shared_recipe_list = documentSnapshot.getString("shared_recipe_list");
                                         if(shared_recipe_list.contains(recipe.id)) {
                                             shared_recipe_list = shared_recipe_list.replace(recipe.id + " ", "");
-                                            drf.update("shared_recipe_list", recipe.id);
+                                            drf.update("shared_recipe_list", shared_recipe_list);
                                         }
                                     }
                                 });

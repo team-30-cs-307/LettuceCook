@@ -236,7 +236,8 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String hName = documentSnapshot.getString("household");
-                        showNoti(hName);
+                        Boolean noti_stat = documentSnapshot.getBoolean("noti");
+                        showNoti(hName, noti_stat);
                     }
                 });
 
@@ -534,29 +535,30 @@ public class Friends extends AppCompatActivity {
         return newMems;
     }
 
-    public void showNoti(final String household){
+    public void showNoti(final String household, final Boolean noti){
 
         final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
-        mBuilder.setView(mView);
-        listView = mView.findViewById(R.id.noti_view);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+        if(noti == true) {
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
+            mBuilder.setView(mView);
+            listView = mView.findViewById(R.id.noti_view);
+            final AlertDialog dialog = mBuilder.create();
+            dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
 
-        final ImageButton back_button = mView.findViewById(R.id.back_button);
+            final ImageButton back_button = mView.findViewById(R.id.back_button);
 
-        notification_body.clear();
-        notification_title.clear();
-        sender.clear();
-        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-          //      if (documentSnapshot.getBoolean("noti")) {
+            notification_body.clear();
+            notification_title.clear();
+            sender.clear();
+            db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    //      if (documentSnapshot.getBoolean("noti")) {
                     db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -607,7 +609,7 @@ public class Friends extends AppCompatActivity {
                                                 } catch (IllegalAccessException e1) {
                                                     e1.printStackTrace();
                                                 }
-                                               // finish();
+                                                // finish();
                                             }
                                         })
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -659,7 +661,7 @@ public class Friends extends AppCompatActivity {
                                                 } catch (IllegalAccessException e1) {
                                                     e1.printStackTrace();
                                                 }
-                                              //  finish();
+                                                //  finish();
                                             }
                                         })
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -685,10 +687,31 @@ public class Friends extends AppCompatActivity {
                             return true;
                         }
                     });
-               // }
-            }
-        });
+                    // }
+                }
+            });
+        }
+        else{
+            new AlertDialog.Builder(Friends.this)
+                    .setTitle("Notifications cannot be viewed")
+                    .setMessage("Set Notification toggle to on to view notificatonsAre you sure you want to delete this entry!")
 
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton("Change the Setting", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            finish();
+                            startActivity(new Intent(Friends.this,MainActivity.class));
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
 
     }
 

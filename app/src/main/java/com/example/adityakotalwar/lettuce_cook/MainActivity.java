@@ -16,6 +16,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonStock;
     private Button buttonMaps;
     private Button buttonRecipes;
+    private Button buttonUpdate;
+    private Button buttonDelete;
     private Button toggleNoti;
     private Switch notiToggle;
 
@@ -157,41 +160,85 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        GetCurrentHouseholdName();
+
         addItemB = (ImageButton) findViewById(R.id.button_add_item);
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
-        notiToggle = findViewById(R.id.switch1);
 
         buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
         buttonMaps = (Button) findViewById(R.id.buttonMaps);
         buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
         buttonStock = findViewById(R.id.buttonStock);
-
-
-
+        buttonUpdate = findViewById(R.id.updateButton);
+        buttonDelete = findViewById(R.id.deleteButton);
+        notiToggle = findViewById(R.id.switch1);
 
         buttonRecipes.setOnClickListener(this);
         buttonFriends.setOnClickListener(this);
         buttonMaps.setOnClickListener(this);
         buttonGroceries.setOnClickListener(this);
+
         buttonStock.setTextColor(Color.parseColor("#5D993D"));
 
 //        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
+
         notiToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(notiToggle.isChecked()){
+                    db.collection("Users").document(user.getUid()).update("noti", true);
 
                     Toast.makeText(MainActivity.this,"Rushank is a bitch", Toast.LENGTH_SHORT).show();
                 }else{
+                    db.collection("Users").document(user.getUid()).update("noti", false);
                     Toast.makeText(MainActivity.this,"Rushank is a not a bitch", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        notiToggle.setActivated(true);
+
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String house = documentSnapshot.getString("household");
+                Boolean noti = documentSnapshot.getBoolean("noti");
+
+                if(noti){
+                    notiToggle.setChecked(true);
+                    FirebaseMessaging.getInstance().subscribeToTopic(GetCurrentHouseholdName());
+//                    notiToggle.setActivated(true);
+                }
+                else{
+                    notiToggle.setChecked(false);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(GetCurrentHouseholdName());
+
+//                    notiToggle.setActivated(false);
+                }
+                db.collection("Household").document(house).collection("Grocery Items").whereEqualTo("status", "stock")
+                        .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        stock.clear();
+                        for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                            stock.add(doc.getId());
+                        }
+
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                MainActivity.this,
+                                android.R.layout.simple_list_item_multiple_choice,stock
+                        );
+                        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                        listView.setAdapter(adapter);
+                    }
+                });
+            }
+        });
+
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
@@ -205,9 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(DialogInterface dialogInterface, int j) {
                         deleteGrocery(GetCurrentHouseholdName(), arrayAdapter.getItem(position).split(",")[0]);
-                        //               Toast.makeText(MainActivity.this,"REMOVE FROM STOCK", Toast.LENGTH_LONG).show();
-//                        arrayAdapter.clear();
-//                        repopulate(arrayAdapter, GetCurrentHouseholdName());
+                        repopulate(GetCurrentHouseholdName());
                     }
                 });
 
@@ -226,13 +271,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     "You ran out of " + item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString());
                             notiCollection.sendInAppNotification(notiCollection);
                         }
-
+                        repopulate(GetCurrentHouseholdName());
                     }
                 });
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
 
                 return false;
+            }
+        });
+
+        buttonUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int cntChoice = listView.getCount();
+                SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+                        String item = listView.getItemAtPosition(i).toString();
+                        deleteGrocery(GetCurrentHouseholdName(), item);
+                        db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
+                        if(noti_switch.isChecked()) {
+                            InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                    "You ran out of " + item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString());
+                            notiCollection.sendInAppNotification(notiCollection);
+                        }
+                    }
+                }
+                repopulate(GetCurrentHouseholdName());
+
+            }
+        });
+
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int cntChoice = listView.getCount();
+                SparseBooleanArray sparseBooleanArray = listView.getCheckedItemPositions();
+                for (int i = 0; i < cntChoice; i++) {
+                    if (sparseBooleanArray.get(i)) {
+                        String item = listView.getItemAtPosition(i).toString();
+                        deleteGrocery(GetCurrentHouseholdName(), item);
+
+//                        db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
+//                        if(noti_switch.isChecked()) {
+//                            InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+//                                    "You ran out of " + item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString());
+//                            notiCollection.sendInAppNotification(notiCollection);
+//                        }
+                    }
+                }
+                repopulate(GetCurrentHouseholdName());
             }
         });
 
@@ -384,11 +473,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onSuccess(Void aVoid) {
                         noti_switch = (Switch) findViewById(R.id.noti_switch);
-                        if(noti_switch.isChecked()) {
+//                        if(noti_switch.isChecked()) {
                             InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
                                     "You ran out of " + item, item + " removed from Stock", Calendar.getInstance().getTime().toString());
                             notiCollection.sendInAppNotification(notiCollection);
-                        }
+//                        }
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -509,6 +598,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 }
                 Toast.makeText(getApplicationContext(), "Item Added", Toast.LENGTH_SHORT).show();
+                repopulate(GetCurrentHouseholdName());
                 break;
         }
         if (v == buttonLogout) {
@@ -849,6 +939,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    public void repopulate(String house){
+        db.collection("Household").document(house).collection("Grocery Items").whereEqualTo("status", "stock")
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                stock.clear();
+                for (QueryDocumentSnapshot doc: queryDocumentSnapshots){
+                    stock.add(doc.getId());
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                        MainActivity.this,
+                        android.R.layout.simple_list_item_multiple_choice, stock
+                );
+                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                listView.setAdapter(adapter);
+            }
+        });
+    }
 }
 
 
