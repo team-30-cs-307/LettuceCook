@@ -95,6 +95,8 @@ public class SavedRecipe extends AppCompatActivity {
 
         sharedRecipeList.setOnTouchListener(new OnSwipeTouchListener(SavedRecipe.this){
             public void onSwipeBottom(){
+                recipeSet.clear();
+                sharedRecipeSet.clear();
                 fillListView(house);
                 fillList2View(house);
             }
