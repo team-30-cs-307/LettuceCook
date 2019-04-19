@@ -384,6 +384,7 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String tempo = documentSnapshot.getString("friendRequests");
+                        //if(tempo)
                         String[] inviteForHousehold = tempo.split(" ");
                         ArrayList<String> requests = new ArrayList<>(Arrays.asList(inviteForHousehold));
                         requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
