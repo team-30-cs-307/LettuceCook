@@ -61,6 +61,7 @@ public class Friends extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
 
     private Button friendRequestsButton;
 
@@ -96,6 +97,7 @@ public class Friends extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
 
         listFriends = findViewById(R.id.listviewFriends);
 
@@ -142,22 +144,49 @@ public class Friends extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
+            public void onSwipeLeft(){
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            }
         });
 
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
-                Notifications n = new Notifications();
-                try {
-                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
-                notiCollection.sendInAppNotification(notiCollection);
-                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                AlertDialog.Builder inv_confir = new AlertDialog.Builder(Friends.this);
+                System.out.println("INVITE: "+adapter.getItem(i));
+                inv_confir.setMessage("Do you want to invite "+ adapter.getItem(i)+" the house for dinner?")
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int posi) {
+                                System.out.println("INVITE: " + adapter.getItem(i));
+                                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
+                                Notifications n = new Notifications();
+                                try {
+                                    System.out.println("INVITE: " + adapter.getItem(i));
+                                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
+                                } catch (InstantiationException | IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
+                                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
+                                notiCollection.sendInAppNotification(notiCollection);
+                                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+                                dialogInterface.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = inv_confir.create();
+                alertDialog.show();
+
+
             }
         });
 
@@ -188,6 +217,13 @@ public class Friends extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Friends.this,Grocery.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });

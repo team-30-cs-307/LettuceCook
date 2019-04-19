@@ -160,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
-        toggleNoti = findViewById(R.id.edit_notifications);
 
         buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
@@ -411,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-
         if(flag == 1){
             return true;
         }
@@ -428,24 +426,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         docrefUser.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-
-                //user.getUsername();
                 Household = documentSnapshot.getString("household");
-                //Household = "hi";
-                //System.out.println("\n\n\n\n\n\n\n\n" + Household+ "\n\n\n\n\n\n");
-                //house = documentSnapshot.getString("household");
-
             }
         });
         docrefUser.get().addOnFailureListener(new OnFailureListener() {
-
             @Override
             public void onFailure(@NonNull Exception e) {
-
                 Household = "bye";
             }
         });
-
         return Household;
 
     }
@@ -479,7 +468,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
-
     }
 
 

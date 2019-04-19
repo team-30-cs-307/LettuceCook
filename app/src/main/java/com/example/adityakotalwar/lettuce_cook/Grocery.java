@@ -57,6 +57,7 @@ public class Grocery extends MainActivity {
     private Button ButtonStock;
     private Button ButtonRecipes;
     private Button ButtonFriends;
+    private Button ButtonMaps;
 
     private ListView GroceryList;
     private EditText AdditemText;
@@ -90,6 +91,7 @@ public class Grocery extends MainActivity {
         ButtonStock = findViewById(R.id.buttonStock);
         ButtonRecipes = findViewById(R.id.buttonRecipes);
         ButtonFriends = findViewById(R.id.buttonFriends);
+        ButtonMaps = findViewById(R.id.buttonMaps);
         ButtonGrocery.setTextColor(Color.parseColor("#5D993D"));
 
         GroceryList = findViewById(R.id.GroceryListView);
@@ -143,6 +145,13 @@ public class Grocery extends MainActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), Recipes.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+        ButtonMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });

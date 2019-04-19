@@ -69,6 +69,7 @@ public class SearchRecipe extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
     private Button searchButton;
 
     private String content;
@@ -93,6 +94,7 @@ public class SearchRecipe extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
 
         recipeView = findViewById(R.id.my_list_view2);
 
@@ -184,6 +186,13 @@ public class SearchRecipe extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SearchRecipe.this,Recipes.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
