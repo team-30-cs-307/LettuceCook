@@ -593,6 +593,7 @@ public class Friends extends AppCompatActivity {
                             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             if (notification_title.get(i).contains("Dinner")) {
                                 dialog.dismiss();
+                                final int selected = i;
 
                                 AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
                                 inv.setMessage("Do you accept their invitation")
@@ -600,31 +601,47 @@ public class Friends extends AppCompatActivity {
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                                Notifications n = new Notifications();
-                                                try {
-                                                    n.sendNotification("Accepted!", householdName + " wants to come over!", user.getUid(), requestQueue);
-                                                } catch (InstantiationException e1) {
-                                                    e1.printStackTrace();
-                                                } catch (IllegalAccessException e1) {
-                                                    e1.printStackTrace();
-                                                }
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Accepted!", house + " wants to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                    }
+                                                });
+
                                                 // finish();
                                             }
                                         })
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                                Notifications n = new Notifications();
-                                                try {
-                                                    n.sendNotification("Rejected!", householdName + " doesn't want to come over!", user.getUid(), requestQueue);
-                                                } catch (InstantiationException e1) {
-                                                    e1.printStackTrace();
-                                                } catch (IllegalAccessException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                dialogInterface.cancel();
+                                            public void onClick(final DialogInterface dialogInterface, int i) {
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Rejected!", householdName + " doesn't want to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                        dialogInterface.cancel();
+                                                    }
+                                                });
                                             }
                                         });
                                 AlertDialog alertDialog = inv.create();
@@ -636,14 +653,12 @@ public class Friends extends AppCompatActivity {
                                 final int selected = i;
 
                                 AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-                                inv.setMessage("Do you want to give the ingredient?")
-                                        .setCancelable(false)
+                                inv.setMessage("Do you want to share the ingredient?")
+                                        .setCancelable(true)
                                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                System.out.println("THIS IS INGREGINENT GIVINGGGGGGG thit hthithit    " + notification_title.get(selected).length());
                                                 final String givingingr = notification_title.get(selected).substring(11);
-                                                System.out.println("THIS IS INGREGINENT GIVINGGGGGGG     " + givingingr);
                                                 final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
                                                 db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                     @Override
@@ -655,11 +670,11 @@ public class Friends extends AppCompatActivity {
                                                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                                 Notifications n = new Notifications();
                                                 try {
-                                                    n.sendNotification("Ingredient found!", householdName + " has the ingredient!", user.getUid(), requestQueue);
-                                                } catch (InstantiationException e1) {
-                                                    e1.printStackTrace();
-                                                } catch (IllegalAccessException e1) {
-                                                    e1.printStackTrace();
+                                                    n.sendNotification("Ingredient found!", householdName + " has the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
                                                 }
                                                 //  finish();
                                             }
@@ -667,14 +682,16 @@ public class Friends extends AppCompatActivity {
                                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
                                                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                                 Notifications n = new Notifications();
+
                                                 try {
-                                                    n.sendNotification("Rejected!", householdName + " doesn't want to come over!", user.getUid(), requestQueue);
-                                                } catch (InstantiationException e1) {
-                                                    e1.printStackTrace();
-                                                } catch (IllegalAccessException e1) {
-                                                    e1.printStackTrace();
+                                                    n.sendNotification("No Luck!", householdName + " doesn't have the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
                                                 }
                                                 dialogInterface.cancel();
                                             }
