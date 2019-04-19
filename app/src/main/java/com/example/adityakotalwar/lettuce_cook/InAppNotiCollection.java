@@ -14,12 +14,12 @@ import javax.annotation.Nullable;
 
 public class InAppNotiCollection {
 
-        String householdName;
-        String sender_userName;
-        String noti_title;
-        String noti_body;
-        String notifications;
-        String timeStamp;
+        public String householdName;
+        public String sender_userName;
+        public String noti_title;
+        public String noti_body;
+        public String notifications;
+        public String timeStamp;
 
         InAppNotiCollection(String householdName, String sender_userName, String noti_title, String noti_body, String timeStamp){
             this.householdName = householdName;
@@ -59,6 +59,7 @@ public class InAppNotiCollection {
                                     notifications += documentReference.getId() + " ";
                                     house.update("noti_list", notifications);
                                 }
+
                             });
                         }
                     });

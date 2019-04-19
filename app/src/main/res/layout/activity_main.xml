@@ -20,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity"
+            android:id="@+id/Main">
 
 
         <!--<include layout="@layout/activity_nav_drawer"/>-->
@@ -36,7 +37,7 @@
                 >
                 <EditText
                     android:id="@+id/edit_text_add_item"
-                    android:layout_width="310dp"
+                    android:layout_width="280dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:padding="10dp"
