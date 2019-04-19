@@ -539,28 +539,89 @@ public class Recipes extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                        ArrayList<String> selected = new ArrayList<>();
-                ArrayList<String> ingToFriend = new ArrayList<>();
+                final ArrayList<String> ingToFriend = new ArrayList<>();
                 int cntChoice = ingredients.getCount();
                 SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
                 for (int i = 0; i < cntChoice; i++) {
                     if (sparseBooleanArray.get(i)) {
 //                                selected.add(ingredients.getItemAtPosition(i).toString());
                         ingToFriend.add(ingredients.getItemAtPosition(i).toString());
+                        list.remove(ingredients.getItemAtPosition(i).toString());
                     }
                 }
+                System.out.println("ingtofriends    " +ingToFriend.get(0));
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        final String household = documentSnapshot.getString("household");
+                        db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                String temp = documentSnapshot.getString("friends");
+                                System.out.println("FRIENDS: " + temp);
+                                ArrayList<String> friends = new ArrayList<>(Arrays.asList(temp.split(" ")));
+
+                                AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
+                                View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
+
+                                final ListView friend_list = mView.findViewById(R.id.listViewStock);
+                                final Button submit_list = mView.findViewById(R.id.get_recipe);
+                                final TextView plain_text = mView.findViewById(R.id.plain_text);
+                                plain_text.setText("Friend Households");
+
+                                mBuilder.setView(mView);
+                                final AlertDialog dialog1 = mBuilder.create();
+                                dialog1.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog1.show();
+
+                                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                                        Recipes.this,
+                                        android.R.layout.simple_list_item_multiple_choice,friends
+                                );
+                                friend_list.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                                friend_list.setAdapter(adapter);
+
+                                submit_list.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String ingrs = "";
+                                        int cntChoice = friend_list.getCount();
+                                        ArrayList<String> select_friends = new ArrayList<>();
+                                        SparseBooleanArray sparseBooleanArray = friend_list.getCheckedItemPositions();
+                                        for (int i = 0; i < cntChoice; i++) {
+                                            if (sparseBooleanArray.get(i)) {
+                                                select_friends.add(friend_list.getItemAtPosition(i).toString());
+//                                                                          ingrs += friend_list.getItemAtPosition(i).toString() + " ";
+                                            }
+                                        }
+
+                                        for (int i = 0; i < select_friends.size(); i++) {
+                                            for(String ing : ingToFriend) {
+                                                RequestQueue requestQueue = Volley.newRequestQueue(Recipes.this);
+                                                Notifications n = new Notifications();
+                                                try {
+                                                    n.sendNotification(select_friends.get(i), household +" would like to borrow " + ing + " ingredient from your household", "bobo", requestQueue);
+                                                } catch (InstantiationException | IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                InAppNotiCollection notiCollection = new InAppNotiCollection(select_friends.get(i), user.getUid(), "Asking for " + ing, household + " has asked for an ingredient", Calendar.getInstance().getTime().toString());
+                                                notiCollection.sendInAppNotification(notiCollection);
+                                                Toast.makeText(Recipes.this, "Sent message to  " + select_friends.get(i), Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                        dialog1.dismiss();
+
+                                    }
+
+                                });
+
+                            }
+                        });
+                    }
+                });
                 //dialog.dismiss();
-                for(String ing : ingToFriend) {
-                    RequestQueue requestQueue = Volley.newRequestQueue(Recipes.this);
-                    Notifications n = new Notifications();
-                    try {
-                        n.sendNotification("bobo", "We would like to borrow " + ing + " ingredient from your household", "bobo", requestQueue);
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    InAppNotiCollection notiCollection = new InAppNotiCollection("bobo", user.getUid(), "Asking for " + ing, "bobo" + " has invited you over", Calendar.getInstance().getTime().toString());
-                    notiCollection.sendInAppNotification(notiCollection);
-                    Toast.makeText(Recipes.this, "Sent message to  " + "bobo", Toast.LENGTH_LONG).show();
-                }
+                repopulate(ingredients, list);
             }
         });
 
