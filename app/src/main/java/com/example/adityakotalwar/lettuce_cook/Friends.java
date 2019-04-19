@@ -383,9 +383,9 @@ public class Friends extends AppCompatActivity {
                         }
                         else {
                             if (friendRequests == null) {
-                                friendRequests = hName + " ";
+                                friendRequests = hName;
                             } else {
-                                friendRequests += hName + " ";
+                                friendRequests += " " + hName;
                             }
                             // System.out.println("this is fififiififiififfi "+friendRequests);
                             db.collection("Household").document(friend).update("friendRequests", friendRequests);
@@ -451,9 +451,9 @@ public class Friends extends AppCompatActivity {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String currFriend = documentSnapshot.getString("friends");
                         if(currFriend == null){
-                            currFriend = newFriend;
+                            currFriend = newFriend + " ";
                         }else{
-                            currFriend += " " + newFriend;
+                            currFriend +=  newFriend + " ";
                         }
                         String[] currFriendRequests = documentSnapshot.getString("friendRequests").split(" ");
                         String newFriendRequests = removeFriendRequest(currFriendRequests, newFriend);
@@ -466,9 +466,9 @@ public class Friends extends AppCompatActivity {
                                 String friend = documentSnapshot.getString("friends");
                                 getRequests();
                                 if (friend == null) {
-                                    friend = hName;
+                                    friend = (hName + " ");
                                 } else {
-                                    friend += " " + hName;
+                                    friend += (hName + " ");
                                 }
                                 // System.out.println("this is fififiififiififfi "+friendRequests);
                                 db.collection("Household").document(newFriend).update("friends", friend);
