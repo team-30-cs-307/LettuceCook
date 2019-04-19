@@ -21,9 +21,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +60,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int flag = 0;
     private String description;
     private EditText addDescription;
+    private Switch noti_switch;
 
     private Button buttonFriends;
     private Button buttonGroceries;
@@ -127,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
 
-
         final TextView userNameDisp = findViewById(R.id.UserNameTextView);
         final TextView householdDisp = findViewById(R.id.HouseholdTextView);
         firebaseAuth = FirebaseAuth.getInstance();
@@ -164,6 +167,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonMaps = (Button) findViewById(R.id.buttonMaps);
         buttonGroceries = (Button) findViewById(R.id.buttonGrocery);
         buttonStock = findViewById(R.id.buttonStock);
+
+
+
 
         buttonRecipes.setOnClickListener(this);
         buttonFriends.setOnClickListener(this);
@@ -204,9 +210,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        repopulate(arrayAdapter, GetCurrentHouseholdName());
                         String item = arrayAdapter.getItem(position);
                         db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
-                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
-                                "You ran out of "+item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString() );
-                        notiCollection.sendInAppNotification(notiCollection);
+                        if(noti_switch.isChecked()) {
+                            InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                    "You ran out of " + item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString());
+                            notiCollection.sendInAppNotification(notiCollection);
+                        }
 
                     }
                 });
@@ -233,12 +241,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         final Context obj = this;
+//        noti_switch = (Switch) findViewById(R.id.noti_switch);
 
         nv = (NavigationView)findViewById(R.id.nv);
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
+
+//                noti_switch = (Switch) findViewById(R.id.noti_switch);
+//                System.out.println("HERERERERERERERER");
+//                noti_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                    @Override
+//                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                        final boolean isChecked = b;
+//                        db.collection("Users").document(user.getUid()).update("noti", isChecked);
+//                    }
+//                });
+
                 switch(id)
                 {
                     case R.id.home:
@@ -324,6 +344,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         });
                         break;
+                    case R.id.noti_switch:
+                        noti_switch = (Switch) findViewById(R.id.noti_switch);
+                        System.out.println("HERERERERERERERER rushank");
+                        noti_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            @Override
+                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                                final boolean isChecked = b;
+                                db.collection("Users").document(user.getUid()).update("noti", isChecked);
+                            }
+                        });
+                        break;
                     default:
                         return true;
                 }
@@ -334,15 +365,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+
     public void deleteGrocery(final String Household /*Name of the household the user is in*/, final String  item /*Item to be deleted*/){
         db.collection("Household").document(Household).collection("Grocery Items").document(item)
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
-                                 "You ran out of "+item, item + " removed from Stock", Calendar.getInstance().getTime().toString() );
-                        notiCollection.sendInAppNotification(notiCollection);
+                        noti_switch = (Switch) findViewById(R.id.noti_switch);
+                        if(noti_switch.isChecked()) {
+                            InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
+                                    "You ran out of " + item, item + " removed from Stock", Calendar.getInstance().getTime().toString());
+                            notiCollection.sendInAppNotification(notiCollection);
+                        }
                         Toast.makeText(getApplicationContext(), "Grocery deleted", Toast.LENGTH_SHORT).show();
                     }
                 })
