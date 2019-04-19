@@ -40,8 +40,13 @@ public class SavedRecipe extends AppCompatActivity {
     private DrawerLayout coordinatorLayout;
 
     ListView sharedRecipeList;
+    ListView recipeShared;
+
     ArrayList<RecipeListViewItem> recipeSet = new ArrayList<>();
+    ArrayList<RecipeListViewItem> sharedRecipeSet = new ArrayList<>();
+
     private static CustomAdapterSharedRecipe adapterRecipe;
+    private static CustomAdapterSharedRecipe sharedAdapterRecipe;
 
     private FirebaseFirestore db;
     private FirebaseUser user;
@@ -68,6 +73,7 @@ public class SavedRecipe extends AppCompatActivity {
         savedRecipeButton = findViewById(R.id.SavedRecipeButton);
 
         sharedRecipeList = findViewById(R.id.shared_recipe_list);
+        recipeShared = findViewById(R.id.recipe_shared_with_friends);
 
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 
@@ -91,7 +97,7 @@ public class SavedRecipe extends AppCompatActivity {
             }
         });
         fillListView(house);
-
+        fillList2View(house);
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
         recipesButton.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +162,34 @@ public class SavedRecipe extends AppCompatActivity {
                         }
                         adapterRecipe = new CustomAdapterSharedRecipe(recipeSet, getApplicationContext(), house);
                         sharedRecipeList.setAdapter(adapterRecipe);
+                    }
+                });
+            }
+        });
+    }
+
+    void fillList2View(final String house){
+        sharedRecipeSet.clear();
+        db.collection("Household").document(house).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                final String[] temp_recipe = documentSnapshot.getString("recipe_shared_with_friends").split(" ");
+                final ArrayList<String> shared_recipe = new ArrayList<>(Arrays.asList(temp_recipe));
+                db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for(QueryDocumentSnapshot ds: queryDocumentSnapshots){
+                            if(shared_recipe.contains(ds.getId())){
+                                String id = ds.getId();
+                                String title = ds.getString("recipe_title");
+                                String owner = ds.getString("recipe_owner");
+                                String desc = ds.getString("recipe_procedure");
+                                String timestamp = ds.getString("timestamp");
+                                sharedRecipeSet.add(new RecipeListViewItem(id, owner, timestamp, title, desc));
+                            }
+                        }
+                        sharedAdapterRecipe = new CustomAdapterSharedRecipe(sharedRecipeSet, getApplicationContext(), house);
+                        recipeShared.setAdapter(sharedAdapterRecipe);
                     }
                 });
             }

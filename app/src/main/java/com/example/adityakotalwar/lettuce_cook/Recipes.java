@@ -84,6 +84,7 @@ public class Recipes extends AppCompatActivity {
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     private DrawerLayout coordinatorLayout;
+    private String content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,9 +233,11 @@ public class Recipes extends AppCompatActivity {
                                                         @Override
                                                         public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                             String household = documentSnapshot.getString("household");
-                                                            db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                            final DocumentReference house = db.collection("Household").document(household);
+
+                                                            house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                                 @Override
-                                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                                public void onSuccess(final DocumentSnapshot documentSnapshot) {
 
                                                                     String temp = documentSnapshot.getString("friends");
                                                                     System.out.println("FRIENDS: " + temp);
@@ -289,6 +292,9 @@ public class Recipes extends AppCompatActivity {
                                                                                     }
                                                                                 });
                                                                             }
+                                                                            String recipes_shared_with_friends = documentSnapshot.getString("recipe_shared_with_friends");
+                                                                            recipes_shared_with_friends += recipe_id + " ";
+                                                                            house.update("recipe_shared_with_friends", recipes_shared_with_friends);
                                                                             dialog1.dismiss();
                                                                         }
                                                                     });
@@ -491,13 +497,13 @@ public class Recipes extends AppCompatActivity {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(Recipes.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_ingr_select, null);
 
-
-
         final ListView ingredients = mView.findViewById(R.id.listViewStock);
         final Button suggestIngredient = mView.findViewById(R.id.buttonSubstitute);
         final TextView heading = mView.findViewById(R.id.plain_text);
         final Button askAFriendButton = mView.findViewById(R.id.buttonAskFriend);
         final Button addGroceryButton = mView.findViewById(R.id.buttonAddGrocery);
+        final TextView subsIngre = mView.findViewById(R.id.substitute);
+
         askAFriendButton.setVisibility(View.VISIBLE);
         addGroceryButton.setVisibility(View.VISIBLE);
         suggestIngredient.setVisibility(View.VISIBLE);
@@ -522,16 +528,61 @@ public class Recipes extends AppCompatActivity {
         suggestIngredient.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String ingrs = "";
+                subsIngre.setVisibility(View.VISIBLE);
+                content = "";
                 int cntChoice = ingredients.getCount();
                 SparseBooleanArray sparseBooleanArray = ingredients.getCheckedItemPositions();
                 for (int i = 0; i < cntChoice; i++) {
                     if (sparseBooleanArray.get(i)) {
+                        subsIngre.append(ingredients.getItemAtPosition(i).toString().toUpperCase() + "\n\n");
+//                            System.out.println("INGI : "+ ingredients.getItemAtPosition(i).toString().toUpperCase() + "\n");
                         String ingr = ingredients.getItemAtPosition(i).toString().replace(' ', '+');
-                        getIngrSubstitute(ingr);
+
+                        RequestQueue rq = Volley.newRequestQueue(getApplicationContext());
+                        String temp = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/substitutes?ingredientName="+ingr;
+                        String url = Uri.parse(temp).buildUpon().build().toString();
+
+                        final JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                                new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        try {
+                                            String message = response.getString("message");
+                                            subsIngre.append(message + "\n");
+                                            System.out.println("INGI m: "+ message + "\n");
+                                            JSONArray ingr_list = response.getJSONArray("substitutes");
+                                            for(int i = 0; i < ingr_list.length(); i++){
+                                                subsIngre.append("    " + ingr_list.getString(i) + "\n");
+                                            }
+//
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        }) {
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("X-RapidAPI-Host", "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com");
+                                params.put("X-RapidAPI-Key", "489f0a43bbmshdbcadc67d147cfap1af9eajsnb1f4a4f4f5f9");
+                                return params;
+                            }
+
+                        };
+
+                        rq.add(request);
+
+
+
 
                     }
                 }
+                subsIngre.setText(content);
             }
         });
 

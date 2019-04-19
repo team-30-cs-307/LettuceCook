@@ -79,17 +79,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-               switch (menuItem.getItemId()){
-                   case R.id.action_market:
-                       System.out.println("MARKET: ");
-                       nearByPlace("market");
-                       break;
-                   case R.id.action_restaurant:
-                       nearByPlace("restaurant");
-                       break;
+                switch (menuItem.getItemId()){
+                    case R.id.action_market:
+                        System.out.println("MARKET: ");
+                        nearByPlace("market");
+                        break;
+                    case R.id.action_restaurant:
+                        nearByPlace("restaurant");
+                        break;
                     default:
                         break;
-               }
+                }
 
                 return true;
             }
@@ -114,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 markerOptions.position(latLng);
                                 markerOptions.title(placeName);
                                 if(placeType.equals("market")){
-                                 //   markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_market));
+                                    //   markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_market));
                                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                                 }else if(placeType.equals("restaurant")){
                                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
@@ -145,7 +145,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlacesURL.append("&keyword=market");
 //        googlePlacesURL.append("&sensor=true");
         googlePlacesURL.append("&key="+getResources().getString(R.string.browser_key));
-      //  Log.d("getURL",googlePlacesURL.toString());
+        //  Log.d("getURL",googlePlacesURL.toString());
 //        String temp = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=40.425869,-86.908066&radius=1500&type=restaurant&keyword=market&key=AIzaSyCVAS_dHnAxNGh2u4qzPicBNkHNIQLin1k";
         System.out.println("OMGOMOGMOG"+googlePlacesURL.toString());
         return googlePlacesURL.toString();
@@ -232,7 +232,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
         }
-        }
+    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -269,4 +269,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 }
-
