@@ -264,8 +264,9 @@ public class Friends extends AppCompatActivity {
                                     for (DocumentSnapshot ds : queryDocumentSnapshots) {
                                         houses.add(ds.getId());
                                     }
-                                        sendFriendRequest(friendToBeAdded);
-                                        Toast.makeText(Friends.this, "Request has been sent", Toast.LENGTH_LONG).show();
+                                    //    sendFriendRequest(friendToBeAdded);
+                                        sendFriendRequest(spinner.getSelectedItem().toString());
+                                        Toast.makeText(Friends.this, "Spinner: " + spinner.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
 
                                     //    }
                         }
