@@ -21,5 +21,7 @@
         app:itemBackground="@color/colorPrimary"
         app:itemIconTint="@drawable/nav_selector"
         app:itemTextColor="@drawable/nav_selector"
+        android:background="@drawable/layout_rounded_border"
+        android:layout_margin="10dp"
         app:menu="@menu/bottom_menu" />
 </RelativeLayout>
