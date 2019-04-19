@@ -14,18 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         tools:context=".MainActivity"
             android:id="@+id/Main">
-
-
-        <!--<include layout="@layout/activity_nav_drawer"/>-->
-
 
             <RelativeLayout
                 android:id="@+id/details"
@@ -92,7 +86,20 @@
         <include layout="@layout/tabbar"
             android:id="@+id/tabbar"/>
 
-    </RelativeLayout>
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="55dp"
+                android:text="Notifications    "
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
     </FrameLayout>
 
     <android.support.design.widget.NavigationView

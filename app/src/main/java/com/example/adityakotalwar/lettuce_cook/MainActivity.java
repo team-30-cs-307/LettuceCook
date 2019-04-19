@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonMaps;
     private Button buttonRecipes;
     private Button toggleNoti;
+    private Switch notiToggle;
 
     private Button editPwButton;
     private Button editUserNameButton;
@@ -160,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addItemT = (EditText) findViewById(R.id.edit_text_add_item);
         listView = (ListView) findViewById(R.id.my_list_view2);
         addDescription = (EditText) findViewById(R.id.edit_text_add_description);
+        notiToggle = findViewById(R.id.switch1);
 
         buttonRecipes = (Button) findViewById(R.id.buttonRecipes);
         buttonFriends = (Button) findViewById(R.id.buttonFriends);
@@ -179,7 +181,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, stock);
+        notiToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(notiToggle.isChecked()){
 
+                    Toast.makeText(MainActivity.this,"Rushank is a bitch", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(MainActivity.this,"Rushank is a not a bitch", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int position, long l) {
