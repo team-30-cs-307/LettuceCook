@@ -49,9 +49,18 @@
         <ListView
             android:id="@+id/shared_recipe_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/tabbar"
+            android:layout_height="300dp"
             android:layout_below="@+id/buttons"
+            android:layout_margin="20dp"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="0dp" />
+
+        <ListView
+            android:id="@+id/recipe_shared_with_friends"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@+id/shared_recipe_list"
+            android:layout_above="@+id/tabbar"
             android:layout_margin="20dp"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="0dp" />

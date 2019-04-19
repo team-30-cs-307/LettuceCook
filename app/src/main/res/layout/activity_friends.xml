@@ -13,13 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".Friends">
 
+            <TextView
+                android:id="@+id/fren"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Friends"
+                android:layout_marginLeft="20dp"
+                android:fontFamily="sans-serif-black"
+                android:textSize="15dp"
+                android:padding="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/layout_border"
+                android:textColor="@color/colorAccentLight"
+                android:layout_alignParentTop="true"
+                />
             <ListView
                 android:id="@+id/listviewFriends"
                 android:layout_width="match_parent"
@@ -27,21 +39,39 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_height="200dp"
-                android:layout_alignParentTop="true" />
-
+                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fren"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp"
+                />
+            <TextView
+                android:id="@+id/req"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="Requests"
+                android:layout_marginLeft="20dp"
+                android:fontFamily="sans-serif-black"
+                android:textSize="15dp"
+                android:padding="5dp"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/layout_border"
+                android:textColor="@color/colorAccentLight"
+                android:layout_below="@+id/listviewFriends"
+                />
             <ListView
                 android:id="@+id/requests_and_invites"
                 android:layout_width="match_parent"
-                android:layout_height="149dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/layout_rounded_border"
                 android:padding="10dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:layout_below="@+id/listviewFriends"
-                android:layout_above="@+id/buttons"
-
+                android:layout_below="@+id/req"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp"
                  />
             <!--<Button-->
                 <!--android:id="@+id/showUsers"-->
@@ -54,7 +84,7 @@
             <LinearLayout
                 android:id="@+id/buttons"
                 android:layout_above="@+id/tabbar"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:gravity="center"
                 android:layout_marginBottom="10dp"
                 android:layout_marginRight="20dp"
@@ -65,8 +95,8 @@
                 android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/friendRequest"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginRight="10dp"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentEnd="true"
@@ -75,8 +105,8 @@
                     />
                 <ImageButton
                     android:id="@+id/showNotiButton"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentRight="true"
                     android:background="@drawable/notification" />
 
@@ -84,12 +114,6 @@
 
             <include layout="@layout/tabbar"
                 android:id="@+id/tabbar"/>
-
-
-
-
-
-
 
 
         </RelativeLayout>

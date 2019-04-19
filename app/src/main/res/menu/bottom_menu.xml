@@ -6,14 +6,14 @@
         android:id="@+id/action_market"
         android:title="Market"
         android:enabled="true"
-        android:icon="@drawable/ic_local_grocery_store_black_24dp"
+        android:icon="@drawable/shopping_cart_big"
         app:showAsAction="ifRoom"
         />
     <item
         android:id="@+id/action_restaurant"
         android:title="Restaurant"
         android:enabled="true"
-        android:icon="@drawable/ic_restaurant_black_24dp"
+        android:icon="@drawable/restaurant_big"
         app:showAsAction="ifRoom"
         />
 </menu>

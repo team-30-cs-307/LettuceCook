@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
@@ -62,7 +63,6 @@ public class Friends extends AppCompatActivity {
     private Button recipesButton;
 
     private Button friendRequestsButton;
-    private Button showUsersButton;
 
     ListView listFriends;
     ListView listView;
@@ -88,7 +88,7 @@ public class Friends extends AppCompatActivity {
     String friendRequests;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
 
@@ -99,28 +99,40 @@ public class Friends extends AppCompatActivity {
 
         listFriends = findViewById(R.id.listviewFriends);
 
-        final ArrayList<String> arrayFriends = new ArrayList<>();
-        final ArrayList<String> arrayHouseholds = new ArrayList<>();
-        //final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                for (DocumentSnapshot ds : queryDocumentSnapshots) {
+//                    if (ds.getString("household")!=null && !arrayHouseholds.contains(ds.getString("household"))) {
+//                        arrayFriends.add(ds.getString("username"));
+//                        arrayHouseholds.add(ds.getString("household"));
+//                    }
+//                }
+//            }
+//        });
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-                    if (ds.getString("household")!=null && !arrayHouseholds.contains(ds.getString("household"))) {
-                        arrayFriends.add(ds.getString("username"));
-                        arrayHouseholds.add(ds.getString("household"));
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String house = documentSnapshot.getString("household");
+                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String t = documentSnapshot.getString("friends");
+                        final ArrayList<String> arrayFriends =  new ArrayList<>(Arrays.asList(t.split(" ")));
+                        adapter = new ArrayAdapter<>(
+                                Friends.this,
+                                android.R.layout.simple_list_item_1,
+                                arrayFriends);
+                        listFriends.setAdapter(adapter);
                     }
-                }
+                });
             }
         });
         //  arrayFriends.addAll(Arrays.asList(getResources().getStringArray(R.array.array_friends)));
 
-        adapter = new ArrayAdapter<>(
-                Friends.this,
-                android.R.layout.simple_list_item_1,
-                arrayHouseholds);
-        listFriends.setAdapter(adapter);
 
         coordinatorLayout = (DrawerLayout) findViewById(R.id.activity_drawer);
 //        additem.performClick();
@@ -131,7 +143,6 @@ public class Friends extends AppCompatActivity {
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
-
 
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -153,7 +164,6 @@ public class Friends extends AppCompatActivity {
         getRequests();
         showNotiButton = findViewById(R.id.showNotiButton);
 
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         friendRequestsButton = findViewById(R.id.friendRequest);
 
         showNotiButton = findViewById(R.id.showNotiButton);
@@ -205,36 +215,65 @@ public class Friends extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(obj);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_spinner, null);
                 builder.setTitle("Enter household name to send friend request to");
+                final Spinner spinner = (Spinner) mView.findViewById(R.id.spinner);
 
 // Set up the input
-                final EditText input = new EditText(obj);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                builder.setView(input);
+//                final EditText input = new EditText(obj);
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//                // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                builder.setView(input);
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String house = documentSnapshot.getString("household");
+                        db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                final String friends = documentSnapshot.getString("friends");
+                                db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        final ArrayAdapter<String> adapter;
+                                        ArrayList<String> houses = new ArrayList<>();
+                                        for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                                            if(!friends.contains(ds.getId()))
+                                                houses.add(ds.getId());
+                                        }
+                                        adapter = new ArrayAdapter<String>(obj,android.R.layout.simple_spinner_item,houses);
+                                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                        spinner.setAdapter(adapter);
+                                    }
+                                });
 
-// Set up the buttons
+                            }
+                        });
+                    }
+                });
+
+                // Set up the buttons
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
-                        friendToBeAdded = input.getText().toString();
+                    //    friendToBeAdded = input.getText().toString();
+                            db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    ArrayList<String> houses = new ArrayList<>();
+                                    for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                                        houses.add(ds.getId());
+                                    }
+                                    //    sendFriendRequest(friendToBeAdded);
+                                        sendFriendRequest(spinner.getSelectedItem().toString());
+                                        Toast.makeText(Friends.this, "Spinner: " + spinner.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
+
+                                    //    }
+                        }
 
 
-                        db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ArrayList<String> houses = new ArrayList<>();
-                                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-                                    houses.add(ds.getId());
-                                }
-                                if(!houses.contains(friendToBeAdded)){
-                                    Toast.makeText(Friends.this, "Invalid household name!", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                else{
-                                    sendFriendRequest(friendToBeAdded);
-                                }
-                            }
+
+
                         });
 
                         //System.out.println("getting username " +userToBeAdded);
@@ -248,8 +287,10 @@ public class Friends extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+                builder.setView(mView);
+                AlertDialog dialog = builder.create();
+                dialog.show();
 
-                builder.show();
             }
         });
 
@@ -272,48 +313,12 @@ public class Friends extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 adapter.getFilter().filter(s);
+                listFriends.setVisibility(View.VISIBLE);
                 return false;
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
-
-//    public void showTheUsers(){
-//        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
-//        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        // store the user details in a userCollection class
-//        System.out.println(user.getUid());
-//        final DocumentReference dr = db.collection("Users").document(user.getUid());
-//        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//            @Override
-//            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-//                final String hName = documentSnapshot.getString("household");
-//                    final DocumentReference dr2 = db.collection("Household").document(hName);
-//                    dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-//                        @Override
-//                        public void onSuccess(DocumentSnapshot documentSnapshot2) {
-//                            db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                                @Override
-//                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                                    for(DocumentSnapshot ds : queryDocumentSnapshots ){
-//                                        if(ds.getString("household").equals(hName)){
-//                                            listOfUsers.append(ds.getString("username") + "\n");
-//                                        }
-//                                    }
-//                                }
-//                            });
-//
-//                        }
-//                    });
-//                    // household.addMember(user.getUid());
-//                    db.collection("Users").document(user.getUid()).update("invited", "");
-//                    //   db.collection("Household").document(hName).update("members", household.getMembers());
-//
-//            }
-//        });
-//
-//    }
-
 
     public void sendFriendRequest(final String friend) {
 
@@ -380,6 +385,7 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String tempo = documentSnapshot.getString("friendRequests");
+                        //if(tempo)
                         String[] inviteForHousehold = tempo.split(" ");
                         ArrayList<String> requests = new ArrayList<>(Arrays.asList(inviteForHousehold));
                         requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
@@ -551,6 +557,56 @@ public class Friends extends AppCompatActivity {
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                    Notifications n = new Notifications();
+                                    try {
+                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
+                                    } catch (InstantiationException e1) {
+                                        e1.printStackTrace();
+                                    } catch (IllegalAccessException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                    finish();
+                                }
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                    Notifications n = new Notifications();
+                                    try {
+                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
+                                    } catch (InstantiationException e1) {
+                                        e1.printStackTrace();
+                                    } catch (IllegalAccessException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                    dialogInterface.cancel();
+                                }
+                            });
+                    AlertDialog alertDialog = inv.create();
+                    alertDialog.show();
+                    // }
+
+                }
+                else if(notification_title.get(i).contains("Asking")){
+                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+                    inv.setMessage("Do you want to give the ingredient?")
+                            .setCancelable(false)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    System.out.println("THIS IS INGREGINENT GIVINGGGGGGG thit hthithit    " +notification_title.get(i).length());
+                                    final String givingingr = notification_title.get(i).substring(11);
+                                    System.out.println("THIS IS INGREGINENT GIVINGGGGGGG     " +givingingr);
+                                    final String givingHousehold = notification_body.get(i).substring(0, notification_body.get(i).indexOf(' '));
+                                    db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            Grocery gr = new Grocery();
+                                            gr.addItemToGroceryCollection(givingingr, "", "stock", givingHousehold);
+                                        }
+                                    });
                                     RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                                     Notifications n = new Notifications();
                                     try {

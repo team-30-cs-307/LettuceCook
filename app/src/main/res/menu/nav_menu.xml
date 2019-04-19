@@ -2,8 +2,6 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <item android:id="@+id/home"
         android:title="Home"/>
     <item android:id="@+id/edit_name"
@@ -18,12 +16,9 @@
         android:title="Logout"/>
     <item
         android:id="@+id/edit_notifications"
-
-        android:enabled="true"
         android:title="Notifications"
         android:visible="true"
         app:actionLayout="@layout/switch_item"
-        app:showAsAction="always" />
-
+        app:showAsAction="always"/>
 
 </menu>
