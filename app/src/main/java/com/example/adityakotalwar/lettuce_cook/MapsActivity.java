@@ -127,10 +127,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 markerOptions.position(latLng);
                                 markerOptions.title(placeName);
                                 if(placeType.equals("market")){
-                                    //   markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_market));
-                                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
+                                       markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.shopping_cart));
+                                //    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA));
                                 }else if(placeType.equals("restaurant")){
-                                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                                    markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.restaurant));
+                                 //   markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
                                 }else{
                                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 

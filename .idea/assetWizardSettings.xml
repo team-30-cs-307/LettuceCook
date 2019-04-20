@@ -45,7 +45,6 @@
                                   <option name="values">
                                     <map>
                                       <entry key="outputName" value="marker_restaurant" />
-                                      <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>
                                   </option>

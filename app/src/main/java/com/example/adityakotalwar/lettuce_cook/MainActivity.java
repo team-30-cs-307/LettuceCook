@@ -193,10 +193,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(notiToggle.isChecked()){
                     db.collection("Users").document(user.getUid()).update("noti", true);
 
-                    Toast.makeText(MainActivity.this,"Rushank is a bitch", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"Notifications are on", Toast.LENGTH_SHORT).show();
                 }else{
                     db.collection("Users").document(user.getUid()).update("noti", false);
-                    Toast.makeText(MainActivity.this,"Rushank is a not a bitch", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"Notifications are off", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AlertDialog.Builder builder =  new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Update the Status");
                 builder.setMessage("what do you want to do with the item?");
-                builder.setCancelable(false);
+                builder.setCancelable(true);
 
                 builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     @Override
