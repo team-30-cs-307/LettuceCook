@@ -383,9 +383,9 @@ public class Friends extends AppCompatActivity {
                         }
                         else {
                             if (friendRequests == null) {
-                                friendRequests = hName;
+                                friendRequests = hName + " ";
                             } else {
-                                friendRequests += " " + hName;
+                                friendRequests += hName + " ";
                             }
                             // System.out.println("this is fififiififiififfi "+friendRequests);
                             db.collection("Household").document(friend).update("friendRequests", friendRequests);
@@ -525,10 +525,10 @@ public class Friends extends AppCompatActivity {
         for(int i=0; i< mems.length; i++){
             if(!mems[i].equalsIgnoreCase(user)){
                 if(newMems.length()==0){
-                    newMems = mems[i];
+                    newMems = mems[i] + " ";
                 }
                 else {
-                    newMems += " " + mems[i];
+                    newMems += mems[i] + " ";
                 }
             }
         }
