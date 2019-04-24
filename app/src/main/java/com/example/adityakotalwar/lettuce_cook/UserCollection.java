@@ -5,10 +5,6 @@ public class UserCollection {
     private String username, email, household, userId, invited;
     private boolean noti = false;
 
-    public UserCollection(){
-
-    }
-
     public UserCollection(String username, String email, String userId, String household, String invited, boolean noti){
         this.username = username;
         this.email = email;

@@ -27,7 +27,10 @@ public class Household {
         this.members = members;
         this.friendRequests = friendRequests;
         this.friends = friends;
-
+        this.noti_list = "";
+        this.recipe_list = "";
+        this.shared_recipe_list = "";
+        this.recipe_shared_with_friends = "";
     }
 
     public Household(){

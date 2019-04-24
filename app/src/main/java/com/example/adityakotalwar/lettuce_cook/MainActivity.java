@@ -289,13 +289,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 for (int i = 0; i < cntChoice; i++) {
                     if (sparseBooleanArray.get(i)) {
                         String item = listView.getItemAtPosition(i).toString();
-                        deleteGrocery(GetCurrentHouseholdName(), item);
+
                         db.collection("Household").document(GetCurrentHouseholdName()).collection("Grocery Items").document(item).update("status", "grocery");
-                        if(noti_switch.isChecked()) {
                             InAppNotiCollection notiCollection = new InAppNotiCollection(Household, firebaseAuth.getCurrentUser().getUid(),
                                     "You ran out of " + item, item + " removed from Stock and added to Grocery List", Calendar.getInstance().getTime().toString());
                             notiCollection.sendInAppNotification(notiCollection);
-                        }
+
                     }
                 }
                 repopulate(GetCurrentHouseholdName());
