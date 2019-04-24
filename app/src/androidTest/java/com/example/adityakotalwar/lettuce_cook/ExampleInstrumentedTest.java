@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.Gravity;
 
+import androidx.test.espresso.action.GeneralLocation;
+import androidx.test.espresso.action.GeneralSwipeAction;
+import androidx.test.espresso.action.Press;
+import androidx.test.espresso.action.Swipe;
 import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
@@ -26,14 +30,17 @@ import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.anything;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -57,6 +64,8 @@ public class ExampleInstrumentedTest {
     private String username;
     private String password;
     private String ingredientTomatch;
+    private String missingIngredient;
+    private String recipeToBeSearched;
     //private String actualFriend;
 
 
@@ -79,6 +88,8 @@ public class ExampleInstrumentedTest {
          username = "armo@armo.com";
          password = "armo123";
          ingredientTomatch="banana";
+         missingIngredient = "honey";
+         recipeToBeSearched = "Butter Chicken";
 
 
 
@@ -199,7 +210,8 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void MissingIngredientsPageTest(){
+    public void MissingIngredientsPageTest(){               //User story 4 #2 checks for the missing ingredient and checks that
+                                                            //it is not the same as the ingredient in stock
 
         onView(withId(R.id.buttonChooseIngredients)).perform(click());
         try {
@@ -233,27 +245,156 @@ public class ExampleInstrumentedTest {
 
 
         onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).perform(click());
-        onView(withId(R.id.buttonAskFriend)).perform(click());
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.buttonAddGrocery)).perform(click());
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        onView(withId(R.id.buttonSubstitute)).perform(click());
+
         try {
             TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        //onView(withId(R.id.buttonAddGrocery)).perform(click());
+
+
+
+
         onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).check(matches(
                 not(withText(ingredientTomatch))));
+
+
+    }
+
+    @Test
+    public void AddedtoGroceryMissingTest(){            //User story 5 add missing ingredient to grocery list
+                                                                //Checks with ingredient banana and matches with missing
+                                                        //ingredient honey
+
+
+        onView(withId(R.id.buttonChooseIngredients)).perform(click());
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).perform(click());
+        onView(withId(R.id.get_recipe)).perform(click());
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything()).inAdapterView(withId(R.id.listViewSuggestedRecipes)).atPosition(0).perform(click());
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        onView(withId(R.id.buttonMissingIngr)).perform(click());
+
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+
+        onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).perform(click());
+
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.buttonAddGrocery)).perform(click());
+
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(isRoot()).perform(pressBack());
+        onView(isRoot()).perform(pressBack());
+        onView(isRoot()).perform(pressBack());
+
+        onView(withId(R.id.rec)).perform(
+                new GeneralSwipeAction(Swipe.FAST,
+                        GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT, Press.FINGER));
+
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.Main)).perform(
+                new GeneralSwipeAction(Swipe.FAST,
+                        GeneralLocation.CENTER_LEFT, GeneralLocation.CENTER_RIGHT, Press.FINGER));
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onData(anything()).inAdapterView(withId(R.id.GroceryListView)).atPosition(0).check(matches(withText(missingIngredient)));
+
+    }
+
+    @Test
+    public void RequestFriend(){            //request a friend for ingredients, will do when it starts working.
+                                            //User story 6
+
+//        onData(anything()).inAdapterView(withId(R.id.my_list_view2)).atPosition(0).perform(click());
+//
+//        try {
+//            TimeUnit.SECONDS.sleep(2);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        onView(withId(R.id.buttonMissingIngr)).perform(click());
+//        onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).perform(click());
+//        try {
+//            TimeUnit.SECONDS.sleep(1);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        onView(withId(R.id.buttonAskFriend)).perform(click());
+//        try {
+//            TimeUnit.SECONDS.sleep(1);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        onData(anything()).inAdapterView(withId(R.id.listViewStock)).atPosition(0).perform(click());
+//        onView(withId(R.id.get_recipe)).perform(click());
+
+    }
+
+    @Test
+    public void SearchingForRecipeTest(){
+
+        onView(withId(R.id.recipe_search))
+                .perform(replaceText(recipeToBeSearched), closeSoftKeyboard());
+
+        onView(withId(R.id.search_button)).perform(click());
+
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        onData(anything()).inAdapterView(withId(R.id.my_list_view2)).atPosition(1).perform(click());
+
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
 
