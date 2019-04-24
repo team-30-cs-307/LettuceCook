@@ -61,6 +61,7 @@ public class Friends extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
 
     private Button friendRequestsButton;
 
@@ -96,6 +97,7 @@ public class Friends extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
 
         listFriends = findViewById(R.id.listviewFriends);
 
@@ -142,22 +144,49 @@ public class Friends extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
+            public void onSwipeLeft(){
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+            }
         });
 
         listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
-                Notifications n = new Notifications();
-                try {
-                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
-                notiCollection.sendInAppNotification(notiCollection);
-                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                AlertDialog.Builder inv_confir = new AlertDialog.Builder(Friends.this);
+                System.out.println("INVITE: "+adapter.getItem(i));
+                inv_confir.setMessage("Do you want to invite "+ adapter.getItem(i)+" the house for dinner?")
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int posi) {
+                                System.out.println("INVITE: " + adapter.getItem(i));
+                                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
+                                Notifications n = new Notifications();
+                                try {
+                                    System.out.println("INVITE: " + adapter.getItem(i));
+                                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
+                                } catch (InstantiationException | IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
+                                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
+                                notiCollection.sendInAppNotification(notiCollection);
+                                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+                                dialogInterface.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = inv_confir.create();
+                alertDialog.show();
+
+
             }
         });
 
@@ -191,6 +220,13 @@ public class Friends extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
 
         showNotiButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,7 +236,8 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String hName = documentSnapshot.getString("household");
-                        showNoti(hName);
+                        Boolean noti_stat = documentSnapshot.getBoolean("noti");
+                        showNoti(hName, noti_stat);
                     }
                 });
 
@@ -414,9 +451,9 @@ public class Friends extends AppCompatActivity {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String currFriend = documentSnapshot.getString("friends");
                         if(currFriend == null){
-                            currFriend = newFriend;
+                            currFriend = newFriend + " ";
                         }else{
-                            currFriend += " " + newFriend;
+                            currFriend +=  newFriend + " ";
                         }
                         String[] currFriendRequests = documentSnapshot.getString("friendRequests").split(" ");
                         String newFriendRequests = removeFriendRequest(currFriendRequests, newFriend);
@@ -429,9 +466,9 @@ public class Friends extends AppCompatActivity {
                                 String friend = documentSnapshot.getString("friends");
                                 getRequests();
                                 if (friend == null) {
-                                    friend = hName;
+                                    friend = (hName + " ");
                                 } else {
-                                    friend += " " + hName;
+                                    friend += (hName + " ");
                                 }
                                 // System.out.println("this is fififiififiififfi "+friendRequests);
                                 db.collection("Household").document(newFriend).update("friends", friend);
@@ -488,160 +525,211 @@ public class Friends extends AppCompatActivity {
         for(int i=0; i< mems.length; i++){
             if(!mems[i].equalsIgnoreCase(user)){
                 if(newMems.length()==0){
-                    newMems = mems[i];
+                    newMems = mems[i] + " ";
                 }
                 else {
-                    newMems += " " + mems[i];
+                    newMems += mems[i] + " ";
                 }
             }
         }
         return newMems;
     }
 
-    public void showNoti(final String household){
+    public void showNoti(final String household, final Boolean noti){
 
         final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
-        mBuilder.setView(mView);
-        listView = mView.findViewById(R.id.noti_view);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+        if(noti == true) {
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
+            mBuilder.setView(mView);
+            listView = mView.findViewById(R.id.noti_view);
+            final AlertDialog dialog = mBuilder.create();
+            dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
 
-        ImageButton back_button = mView.findViewById(R.id.back_button);
+            final ImageButton back_button = mView.findViewById(R.id.back_button);
 
-        notification_body.clear();
-        notification_title.clear();
-        sender.clear();
-
-        db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                final ArrayList<String> notifications = new ArrayList<String>(Arrays.asList(documentSnapshot.get("noti_list").toString().split(" ")));
-                db.collection("Notification").orderBy("timeStamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            for(QueryDocumentSnapshot ds: queryDocumentSnapshots){
-                            if(notifications.contains(ds.getId())){
-                                notification_body.add(ds.get("noti_body").toString());
-                                notification_title.add(ds.get("noti_title").toString());
-                                sender.add(ds.get("sender_userName").toString());
-                            }
-                        }
-                        CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
-                        listView.setAdapter(customAdapter);
-                    }
-                });
-            }
-        });
-
-        back_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(notification_title.get(i).contains("Dinner")){
-                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-                    inv.setMessage("Do you accept their invitation")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            notification_body.clear();
+            notification_title.clear();
+            sender.clear();
+            db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    //      if (documentSnapshot.getBoolean("noti")) {
+                    db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            final ArrayList<String> notifications = new ArrayList<String>(Arrays.asList(documentSnapshot.get("noti_list").toString().split(" ")));
+                            db.collection("Notification").orderBy("timeStamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    dialogInterface.cancel();
-                                }
-                            });
-                    AlertDialog alertDialog = inv.create();
-                    alertDialog.show();
-                    // }
-
-                }
-                else if(notification_title.get(i).contains("Asking")){
-                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-                    inv.setMessage("Do you want to give the ingredient?")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    System.out.println("THIS IS INGREGINENT GIVINGGGGGGG thit hthithit    " +notification_title.get(i).length());
-                                    final String givingingr = notification_title.get(i).substring(11);
-                                    System.out.println("THIS IS INGREGINENT GIVINGGGGGGG     " +givingingr);
-                                    final String givingHousehold = notification_body.get(i).substring(0, notification_body.get(i).indexOf(' '));
-                                    db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                            Grocery gr = new Grocery();
-                                            gr.addItemToGroceryCollection(givingingr, "", "stock", givingHousehold);
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot ds : queryDocumentSnapshots) {
+                                        if (notifications.contains(ds.getId())) {
+                                            notification_body.add(ds.get("noti_body").toString());
+                                            notification_title.add(ds.get("noti_title").toString());
+                                            sender.add(ds.get("sender_userName").toString());
                                         }
-                                    });
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
                                     }
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    dialogInterface.cancel();
+                                    CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
+                                    listView.setAdapter(customAdapter);
                                 }
                             });
-                    AlertDialog alertDialog = inv.create();
-                    alertDialog.show();
-                    // }
+                        }
+                    });
 
+                    back_button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (notification_title.get(i).contains("Dinner")) {
+                                dialog.dismiss();
+                                final int selected = i;
+
+                                AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+                                inv.setMessage("Do you accept their invitation")
+                                        .setCancelable(false)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Accepted!", house + " wants to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                    }
+                                                });
+
+                                                // finish();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(final DialogInterface dialogInterface, int i) {
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Rejected!", householdName + " doesn't want to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                        dialogInterface.cancel();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                AlertDialog alertDialog = inv.create();
+                                alertDialog.show();
+                                // }
+
+                            } else if (notification_title.get(i).contains("Asking")) {
+                                dialog.dismiss();
+                                final int selected = i;
+
+                                AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+                                inv.setMessage("Do you want to share the ingredient?")
+                                        .setCancelable(true)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String givingingr = notification_title.get(selected).substring(11);
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        Grocery gr = new Grocery();
+                                                        gr.addItemToGroceryCollection(givingingr, "", "stock", givingHousehold);
+                                                    }
+                                                });
+                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                Notifications n = new Notifications();
+                                                try {
+                                                    n.sendNotification("Ingredient found!", householdName + " has the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                //  finish();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                Notifications n = new Notifications();
+
+                                                try {
+                                                    n.sendNotification("No Luck!", householdName + " doesn't have the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                dialogInterface.cancel();
+                                            }
+                                        });
+                                AlertDialog alertDialog = inv.create();
+                                alertDialog.show();
+                                // }
+
+                            }
+                            return true;
+                        }
+                    });
+                    // }
                 }
-                return true;
-            }
-        });
+            });
+        }
+        else{
+            new AlertDialog.Builder(Friends.this)
+                    .setTitle("Notifications cannot be viewed")
+                    .setMessage("Set Notification toggle to on to view notificatonsAre you sure you want to delete this entry!")
+
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton("Change the Setting", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            finish();
+                            startActivity(new Intent(Friends.this,MainActivity.class));
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
     }
 
 

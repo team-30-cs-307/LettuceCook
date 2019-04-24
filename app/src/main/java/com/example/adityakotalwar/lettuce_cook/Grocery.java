@@ -57,6 +57,7 @@ public class Grocery extends MainActivity {
     private Button ButtonStock;
     private Button ButtonRecipes;
     private Button ButtonFriends;
+    private Button ButtonMaps;
 
     private ListView GroceryList;
     private EditText AdditemText;
@@ -70,9 +71,7 @@ public class Grocery extends MainActivity {
     private FirebaseAuth firebaseAuth;
 
     ArrayAdapter<String> GroceryArray;
-    ArrayAdapter<String> StockArray;
     ArrayList<String> GroceryListItems = new ArrayList<>();
-    ArrayList<String> currentIngredients;
 
     private DrawerLayout coordinatorLayout;
     private ActionBarDrawerToggle t;
@@ -90,6 +89,7 @@ public class Grocery extends MainActivity {
         ButtonStock = findViewById(R.id.buttonStock);
         ButtonRecipes = findViewById(R.id.buttonRecipes);
         ButtonFriends = findViewById(R.id.buttonFriends);
+        ButtonMaps = findViewById(R.id.buttonMaps);
         ButtonGrocery.setTextColor(Color.parseColor("#5D993D"));
 
         GroceryList = findViewById(R.id.GroceryListView);
@@ -146,6 +146,13 @@ public class Grocery extends MainActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
+        ButtonMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 //        additem.performClick();
 
@@ -178,17 +185,6 @@ public class Grocery extends MainActivity {
                         GroceryList.setAdapter(adapter);
                     }
                 });
-//            addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                                //System.out.println("going in here");
-//                                GroceryArray.clear();
-//                                //repopulate(arrayAdapter, householdName);
-//                                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-//                                    GroceryArray.add(doc.getId());
-//                                }
-//                            }
-//                        });
             }
         });
 

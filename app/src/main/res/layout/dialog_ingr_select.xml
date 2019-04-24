@@ -80,7 +80,7 @@
             android:layout_width="35dp"
             android:layout_height="50dp"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/forward_button"
             tools:ignore="MissingConstraints" />

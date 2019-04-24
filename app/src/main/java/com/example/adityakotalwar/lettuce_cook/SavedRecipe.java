@@ -34,6 +34,7 @@ public class SavedRecipe extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
 
     private Button savedRecipeButton;
 
@@ -46,7 +47,7 @@ public class SavedRecipe extends AppCompatActivity {
     ArrayList<RecipeListViewItem> sharedRecipeSet = new ArrayList<>();
 
     private static CustomAdapterSharedRecipe adapterRecipe;
-    private static CustomAdapterSharedRecipe sharedAdapterRecipe;
+    private static CustomAdapterRecipeShared sharedAdapterRecipe;
 
     private FirebaseFirestore db;
     private FirebaseUser user;
@@ -70,6 +71,7 @@ public class SavedRecipe extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
         savedRecipeButton = findViewById(R.id.SavedRecipeButton);
 
         sharedRecipeList = findViewById(R.id.shared_recipe_list);
@@ -93,7 +95,10 @@ public class SavedRecipe extends AppCompatActivity {
 
         sharedRecipeList.setOnTouchListener(new OnSwipeTouchListener(SavedRecipe.this){
             public void onSwipeBottom(){
+                recipeSet.clear();
+                sharedRecipeSet.clear();
                 fillListView(house);
+                fillList2View(house);
             }
         });
         fillListView(house);
@@ -128,7 +133,13 @@ public class SavedRecipe extends AppCompatActivity {
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
-
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SavedRecipe.this, MapsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
         savedRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,7 +199,7 @@ public class SavedRecipe extends AppCompatActivity {
                                 sharedRecipeSet.add(new RecipeListViewItem(id, owner, timestamp, title, desc));
                             }
                         }
-                        sharedAdapterRecipe = new CustomAdapterSharedRecipe(sharedRecipeSet, getApplicationContext(), house);
+                        sharedAdapterRecipe = new CustomAdapterRecipeShared(sharedRecipeSet, getApplicationContext(), house);
                         recipeShared.setAdapter(sharedAdapterRecipe);
                     }
                 });

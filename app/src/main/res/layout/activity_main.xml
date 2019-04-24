@@ -14,18 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         tools:context=".MainActivity"
             android:id="@+id/Main">
-
-
-        <!--<include layout="@layout/activity_nav_drawer"/>-->
-
 
             <RelativeLayout
                 android:id="@+id/details"
@@ -82,17 +76,61 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@+id/details"
-                android:layout_margin="40dp"
-                android:layout_above="@id/tabbar"
+                android:layout_marginLeft="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_above="@id/updateButton"
                 android:background="@drawable/layout_rounded_border"
                 android:longClickable="true"
                 tools:layout_editor_absoluteX="0dp"
                 tools:layout_editor_absoluteY="0dp" />
 
+            <Button
+                android:id="@+id/updateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="40dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:layout_above="@+id/switch1"
+                android:textColor="@color/colorPrimary"
+                android:background="@drawable/button_dark_green"
+                android:text="Move to Grocery List"
+                tools:ignore="NotSibling" />
+
+            <Button
+                android:id="@+id/deleteButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="40dp"
+                android:layout_marginBottom="10dp"
+                android:padding="5dp"
+                android:layout_above="@+id/tabbar"
+                android:textColor="@color/colorPrimary"
+                android:background="@drawable/trash_button"
+
+                />
+
         <include layout="@layout/tabbar"
             android:id="@+id/tabbar"/>
 
-    </RelativeLayout>
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="40dp"
+                android:layout_above="@+id/tabbar"
+                android:text="Notifications"
+                android:textColor="@color/colorGrey"
+                android:textOff="OFF"
+                android:textOn="ON"
+                />
+
+        </RelativeLayout>
     </FrameLayout>
 
     <android.support.design.widget.NavigationView
