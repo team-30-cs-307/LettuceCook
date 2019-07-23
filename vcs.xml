@@ -10,6 +10,10 @@
           <option name="url" value="https://github.com/team-30-cs-307/LettuceCook.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/jrushank/DiasparkCRM" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
     <option name="cloneParentDir" value="C:\Users\Rushank\Desktop" />
