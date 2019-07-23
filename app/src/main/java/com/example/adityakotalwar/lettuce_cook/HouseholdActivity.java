@@ -214,8 +214,12 @@ public class HouseholdActivity extends AppCompatActivity implements View.OnClick
                     @Override
                     public void onSuccess(Void aVoid) {
                         db.collection("Users").document(user.getUid()).update("household", householdName);
-                        db.collection("Household").document(householdName).update("members", user.getUid());
-
+                        db.collection("Household").document(householdName).update("members", user.getUid()+" ");
+                        db.collection("Household").document(householdName).update("friendRequests", "");
+                        db.collection("Household").document(householdName).update("friends", "");
+                        db.collection("Household").document(householdName).update("shared_recipe_list", "");
+                        db.collection("Household").document(householdName).update("recipe_shared_with_friends", "");
+                        db.collection("Household").document(householdName).update("recipe_list", "");
                         db.collection("Household").document(householdName).update("noti_list", notification_id);
 
                         FirebaseMessaging.getInstance().subscribeToTopic(householdName);

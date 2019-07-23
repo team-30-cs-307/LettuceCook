@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/home"
         android:title="Home"/>
@@ -13,5 +14,11 @@
         android:title="Leave Household"/>
     <item android:id="@+id/logout"
         android:title="Logout"/>
+    <item
+        android:id="@+id/edit_notifications"
+        android:title="Notifications"
+        android:visible="true"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="always"/>
 
 </menu>

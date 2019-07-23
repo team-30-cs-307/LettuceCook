@@ -34,14 +34,20 @@ public class SavedRecipe extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
 
     private Button savedRecipeButton;
 
     private DrawerLayout coordinatorLayout;
 
     ListView sharedRecipeList;
+    ListView recipeShared;
+
     ArrayList<RecipeListViewItem> recipeSet = new ArrayList<>();
+    ArrayList<RecipeListViewItem> sharedRecipeSet = new ArrayList<>();
+
     private static CustomAdapterSharedRecipe adapterRecipe;
+    private static CustomAdapterRecipeShared sharedAdapterRecipe;
 
     private FirebaseFirestore db;
     private FirebaseUser user;
@@ -65,9 +71,11 @@ public class SavedRecipe extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
         savedRecipeButton = findViewById(R.id.SavedRecipeButton);
 
         sharedRecipeList = findViewById(R.id.shared_recipe_list);
+        recipeShared = findViewById(R.id.recipe_shared_with_friends);
 
         coordinatorLayout =  findViewById(R.id.activity_drawer);
 
@@ -80,25 +88,21 @@ public class SavedRecipe extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), Friends.class));
                 overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
-
-        });
-
-        sharedRecipeList.setOnTouchListener(new OnSwipeTouchListener(SavedRecipe.this){
             public void onSwipeBottom(){
                 fillListView(house);
             }
         });
-        recipeSet.clear();
 
-        fillListView(house);
-
-        sharedRecipeList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        sharedRecipeList.setOnTouchListener(new OnSwipeTouchListener(SavedRecipe.this){
+            public void onSwipeBottom(){
+                recipeSet.clear();
+                sharedRecipeSet.clear();
+                fillListView(house);
+                fillList2View(house);
             }
         });
-
+        fillListView(house);
+        fillList2View(house);
 
         recipesButton.setTextColor(Color.parseColor("#5D993D"));
         recipesButton.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +133,13 @@ public class SavedRecipe extends AppCompatActivity {
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
         });
-
+        mapsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SavedRecipe.this, MapsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
+        });
         savedRecipeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,6 +152,7 @@ public class SavedRecipe extends AppCompatActivity {
     }
 
     void fillListView(final String house){
+        recipeSet.clear();
         db.collection("Household").document(house).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
@@ -162,6 +173,34 @@ public class SavedRecipe extends AppCompatActivity {
                         }
                         adapterRecipe = new CustomAdapterSharedRecipe(recipeSet, getApplicationContext(), house);
                         sharedRecipeList.setAdapter(adapterRecipe);
+                    }
+                });
+            }
+        });
+    }
+
+    void fillList2View(final String house){
+        sharedRecipeSet.clear();
+        db.collection("Household").document(house).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                final String[] temp_recipe = documentSnapshot.getString("recipe_shared_with_friends").split(" ");
+                final ArrayList<String> shared_recipe = new ArrayList<>(Arrays.asList(temp_recipe));
+                db.collection("SavedRecipe").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for(QueryDocumentSnapshot ds: queryDocumentSnapshots){
+                            if(shared_recipe.contains(ds.getId())){
+                                String id = ds.getId();
+                                String title = ds.getString("recipe_title");
+                                String owner = ds.getString("recipe_owner");
+                                String desc = ds.getString("recipe_procedure");
+                                String timestamp = ds.getString("timestamp");
+                                sharedRecipeSet.add(new RecipeListViewItem(id, owner, timestamp, title, desc));
+                            }
+                        }
+                        sharedAdapterRecipe = new CustomAdapterRecipeShared(sharedRecipeSet, getApplicationContext(), house);
+                        recipeShared.setAdapter(sharedAdapterRecipe);
                     }
                 });
             }

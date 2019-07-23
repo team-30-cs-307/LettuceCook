@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Calendar;
@@ -60,10 +61,9 @@ public class Friends extends AppCompatActivity {
     private Button friendsButton;
     private Button stockButton;
     private Button recipesButton;
+    private Button mapsButton;
 
     private Button friendRequestsButton;
-    private Button showUsersButton;
-    private TextView listOfUsers;
 
     ListView listFriends;
     ListView listView;
@@ -73,7 +73,6 @@ public class Friends extends AppCompatActivity {
     private ImageButton showNotiButton;
     private String friendToBeAdded;
     private ListView requests_invites;
-    private Button showRequestsButton;
     private RequestAdapter requestListAdapter;
     private ArrayList<String> requests = new ArrayList<>();
 
@@ -83,14 +82,14 @@ public class Friends extends AppCompatActivity {
     private ArrayList<String> notification_title = new ArrayList<String>();
     private ArrayList<String> notification_body = new ArrayList<>();
     private ArrayList<String> sender = new ArrayList<>();
-    private ArrayList<String[]> noti_details = new ArrayList<String[]>();
+    private ArrayList<InAppNotiCollection> notis = new ArrayList<>();
 
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     private String householdName;
     String friendRequests;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
 
@@ -98,33 +97,44 @@ public class Friends extends AppCompatActivity {
         stockButton = findViewById(R.id.buttonStock);
         friendsButton = findViewById(R.id.buttonFriends);
         recipesButton = findViewById(R.id.buttonRecipes);
+        mapsButton = findViewById(R.id.buttonMaps);
 
-        showUsersButton = findViewById(R.id.showUsers);
-        listOfUsers = findViewById(R.id.listUsers);
         listFriends = findViewById(R.id.listviewFriends);
 
-        final ArrayList<String> arrayFriends = new ArrayList<>();
-        final ArrayList<String> arrayHouseholds = new ArrayList<>();
-        //final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//        db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+//                for (DocumentSnapshot ds : queryDocumentSnapshots) {
+//                    if (ds.getString("household")!=null && !arrayHouseholds.contains(ds.getString("household"))) {
+//                        arrayFriends.add(ds.getString("username"));
+//                        arrayHouseholds.add(ds.getString("household"));
+//                    }
+//                }
+//            }
+//        });
+        db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-                    if (ds.getString("household")!=null && !arrayHouseholds.contains(ds.getString("household"))) {
-                        arrayFriends.add(ds.getString("username"));
-                        arrayHouseholds.add(ds.getString("household"));
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                String house = documentSnapshot.getString("household");
+                db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String t = documentSnapshot.getString("friends");
+                        final ArrayList<String> arrayFriends =  new ArrayList<>(Arrays.asList(t.split(" ")));
+                        adapter = new ArrayAdapter<>(
+                                Friends.this,
+                                android.R.layout.simple_list_item_1,
+                                arrayFriends);
+                        listFriends.setAdapter(adapter);
                     }
-                }
+                });
             }
         });
         //  arrayFriends.addAll(Arrays.asList(getResources().getStringArray(R.array.array_friends)));
 
-        adapter = new ArrayAdapter<>(
-                Friends.this,
-                android.R.layout.simple_list_item_1,
-                arrayHouseholds);
-        listFriends.setAdapter(adapter);
 
         coordinatorLayout = (DrawerLayout) findViewById(R.id.activity_drawer);
 //        additem.performClick();
@@ -134,31 +144,56 @@ public class Friends extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
             }
-        });
-
-
-        listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
-                Notifications n = new Notifications();
-                try {
-                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
-                notiCollection.sendInAppNotification(notiCollection);
-                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+            public void onSwipeLeft(){
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
             }
         });
 
+        listFriends.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                AlertDialog.Builder inv_confir = new AlertDialog.Builder(Friends.this);
+                System.out.println("INVITE: "+adapter.getItem(i));
+                inv_confir.setMessage("Do you want to invite "+ adapter.getItem(i)+" the house for dinner?")
+                        .setCancelable(true)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int posi) {
+                                System.out.println("INVITE: " + adapter.getItem(i));
+                                RequestQueue requestQueue = Volley.newRequestQueue(Friends.this);
+                                Notifications n = new Notifications();
+                                try {
+                                    System.out.println("INVITE: " + adapter.getItem(i));
+                                    n.sendNotification(adapter.getItem(i),"We would like to invite you over for dinner", adapter.getItem(i), requestQueue);
+                                } catch (InstantiationException | IllegalAccessException e) {
+                                    e.printStackTrace();
+                                }
+                                InAppNotiCollection notiCollection = new InAppNotiCollection(adapter.getItem(i), user.getUid(), "Dinner Invitation", adapter.getItem(i) + " has invited you over", Calendar.getInstance().getTime().toString());
+                                notiCollection.sendInAppNotification(notiCollection);
+                                Toast.makeText(Friends.this, "Sent invite to  " + adapter.getItem(i), Toast.LENGTH_LONG).show();
+                                dialogInterface.cancel();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = inv_confir.create();
+                alertDialog.show();
+
+
+            }
+        });
+
+        getRequests();
         showNotiButton = findViewById(R.id.showNotiButton);
 
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         friendRequestsButton = findViewById(R.id.friendRequest);
-        showRequestsButton = findViewById(R.id.showRequests);
 
         showNotiButton = findViewById(R.id.showNotiButton);
         requests_invites = findViewById(R.id.requests_and_invites);
@@ -185,11 +220,11 @@ public class Friends extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
-
-        showUsersButton.setOnClickListener(new View.OnClickListener() {
+        mapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                showTheUsers();
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
         });
 
@@ -201,7 +236,8 @@ public class Friends extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String hName = documentSnapshot.getString("household");
-                        showNoti(hName);
+                        Boolean noti_stat = documentSnapshot.getBoolean("noti");
+                        showNoti(hName, noti_stat);
                     }
                 });
 
@@ -209,47 +245,72 @@ public class Friends extends AppCompatActivity {
             }
         });
 
-        showRequestsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getRequests();
-            }
-        });
+
 
         final Context obj = this;
         friendRequestsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(obj);
+                View mView = getLayoutInflater().inflate(R.layout.dialog_spinner, null);
                 builder.setTitle("Enter household name to send friend request to");
+                final Spinner spinner = (Spinner) mView.findViewById(R.id.spinner);
 
 // Set up the input
-                final EditText input = new EditText(obj);
-// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                builder.setView(input);
+//                final EditText input = new EditText(obj);
+//// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//                // input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                builder.setView(input);
+                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String house = documentSnapshot.getString("household");
+                        db.collection("Household").document(house).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                final String friends = documentSnapshot.getString("friends");
+                                db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        final ArrayAdapter<String> adapter;
+                                        ArrayList<String> houses = new ArrayList<>();
+                                        for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                                            if(!friends.contains(ds.getId()))
+                                                houses.add(ds.getId());
+                                        }
+                                        adapter = new ArrayAdapter<String>(obj,android.R.layout.simple_spinner_item,houses);
+                                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                        spinner.setAdapter(adapter);
+                                    }
+                                });
 
-// Set up the buttons
+                            }
+                        });
+                    }
+                });
+
+                // Set up the buttons
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
-                        friendToBeAdded = input.getText().toString();
+                    //    friendToBeAdded = input.getText().toString();
+                            db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    ArrayList<String> houses = new ArrayList<>();
+                                    for (DocumentSnapshot ds : queryDocumentSnapshots) {
+                                        houses.add(ds.getId());
+                                    }
+                                    //    sendFriendRequest(friendToBeAdded);
+                                        sendFriendRequest(spinner.getSelectedItem().toString());
+                                        Toast.makeText(Friends.this, "Spinner: " + spinner.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
 
-                        db.collection("Household").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                ArrayList<String> houses = new ArrayList<>();
-                                for (DocumentSnapshot ds : queryDocumentSnapshots) {
-                                    houses.add(ds.getId());
-                                }
-                                if(!houses.contains(friendToBeAdded)){
-                                    Toast.makeText(Friends.this, "Invalid household name!", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                else{
-                                    sendFriendRequest(friendToBeAdded);
-                                }
-                            }
+                                    //    }
+                        }
+
+
+
+
                         });
 
                         //System.out.println("getting username " +userToBeAdded);
@@ -260,11 +321,13 @@ public class Friends extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                        dialog.dismiss();
                     }
                 });
+                builder.setView(mView);
+                AlertDialog dialog = builder.create();
+                dialog.show();
 
-                builder.show();
             }
         });
 
@@ -287,48 +350,12 @@ public class Friends extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String s) {
                 adapter.getFilter().filter(s);
+                listFriends.setVisibility(View.VISIBLE);
                 return false;
             }
         });
         return super.onCreateOptionsMenu(menu);
     }
-
-    public void showTheUsers(){
-        final FirebaseFirestore db =  FirebaseFirestore.getInstance();
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        // store the user details in a userCollection class
-        System.out.println(user.getUid());
-        final DocumentReference dr = db.collection("Users").document(user.getUid());
-        dr.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(final DocumentSnapshot documentSnapshot) {
-                final String hName = documentSnapshot.getString("household");
-                    final DocumentReference dr2 = db.collection("Household").document(hName);
-                    dr2.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot2) {
-                            db.collection("Users").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                                @Override
-                                public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                                    for(DocumentSnapshot ds : queryDocumentSnapshots ){
-                                        if(ds.getString("household").equals(hName)){
-                                            listOfUsers.append(ds.getString("username") + "\n");
-                                        }
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-                    // household.addMember(user.getUid());
-                    db.collection("Users").document(user.getUid()).update("invited", "");
-                    //   db.collection("Household").document(hName).update("members", household.getMembers());
-
-            }
-        });
-
-    }
-
 
     public void sendFriendRequest(final String friend) {
 
@@ -345,26 +372,35 @@ public class Friends extends AppCompatActivity {
                 house.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        String friends = documentSnapshot.getString("friends");
                         String friendRequests = documentSnapshot.getString("friendRequests");
-                        if (friendRequests == null) {
-                            friendRequests = hName;
-                        } else {
-                            friendRequests += " " + hName;
-                        }
-                        // System.out.println("this is fififiififiififfi "+friendRequests);
-                        db.collection("Household").document(friend).update("friendRequests", friendRequests);
 
-                         /*Sends notification if a household send a friend request to another user*/
-                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                        Notifications n = new Notifications();
-                        try {
-                            n.sendNotification("Friend Request", householdName + "has sent you a friend request!", friend, requestQueue);
-                        } catch (InstantiationException e1) {
-                            e1.printStackTrace();
-                        } catch (IllegalAccessException e1) {
-                            e1.printStackTrace();
+                        if(friends.contains(hName)){
+                            Toast.makeText(Friends.this,"You are already friends with " + hName, Toast.LENGTH_LONG);
                         }
+                        else if(friendRequests.contains(hName)){
+                            Toast.makeText(Friends.this,"Friend Request has already has been sent to " + hName, Toast.LENGTH_LONG);
+                        }
+                        else {
+                            if (friendRequests == null) {
+                                friendRequests = hName + " ";
+                            } else {
+                                friendRequests += hName + " ";
+                            }
+                            // System.out.println("this is fififiififiififfi "+friendRequests);
+                            db.collection("Household").document(friend).update("friendRequests", friendRequests);
 
+                            /*Sends notification if a household send a friend request to another user*/
+                            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                            Notifications n = new Notifications();
+                            try {
+                                n.sendNotification("Friend Request", householdName + "has sent you a friend request!", friend, requestQueue);
+                            } catch (InstantiationException e1) {
+                                e1.printStackTrace();
+                            } catch (IllegalAccessException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                         return;
 
                     }
@@ -385,21 +421,13 @@ public class Friends extends AppCompatActivity {
                 db.collection("Household").document(householdName).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        System.out.println(documentSnapshot.getString("friendRequests") + "here");
-                        String[] inviteForHousehold = documentSnapshot.getString("friendRequests").toString().split(" ");
-                        ArrayList<String> requests = new ArrayList<>();
-                        final int size = inviteForHousehold.length;
-                        for (int i = 0; i < size; i++) {
-                            requests.add(inviteForHousehold[i]);
+                        String tempo = documentSnapshot.getString("friendRequests");
+                        //if(tempo)
+                        String[] inviteForHousehold = tempo.split(" ");
+                        ArrayList<String> requests = new ArrayList<>(Arrays.asList(inviteForHousehold));
+                        requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
+                        requests_invites.setAdapter(requestListAdapter);
 
-                        }
-                        for (String j : requests) {
-                            if (!j.equals(" ") && !j.equals("")) {
-                                requestListAdapter = new Friends.RequestAdapter(getApplicationContext(), requests);
-
-                                requests_invites.setAdapter(requestListAdapter);
-                            }
-                        }
                     }
                 });
             }
@@ -423,9 +451,9 @@ public class Friends extends AppCompatActivity {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         String currFriend = documentSnapshot.getString("friends");
                         if(currFriend == null){
-                            currFriend = newFriend;
+                            currFriend = newFriend + " ";
                         }else{
-                            currFriend += " " + newFriend;
+                            currFriend +=  newFriend + " ";
                         }
                         String[] currFriendRequests = documentSnapshot.getString("friendRequests").split(" ");
                         String newFriendRequests = removeFriendRequest(currFriendRequests, newFriend);
@@ -436,10 +464,11 @@ public class Friends extends AppCompatActivity {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 String friend = documentSnapshot.getString("friends");
+                                getRequests();
                                 if (friend == null) {
-                                    friend = hName;
+                                    friend = (hName + " ");
                                 } else {
-                                    friend += " " + hName;
+                                    friend += (hName + " ");
                                 }
                                 // System.out.println("this is fififiififiififfi "+friendRequests);
                                 db.collection("Household").document(newFriend).update("friends", friend);
@@ -463,6 +492,7 @@ public class Friends extends AppCompatActivity {
             }
         });
         requests.remove(newFriend);
+
     }
 
     public void decline(final String removeFriend){
@@ -480,10 +510,12 @@ public class Friends extends AppCompatActivity {
                         String newfriendRequests = removeFriendRequest(requests, removeFriend);
                         db.collection("Household").document(hName).update("friendRequests", newfriendRequests);
                         Toast.makeText(Friends.this, "Invitation declined!", Toast.LENGTH_LONG).show();
+                        getRequests();
                     }
                 });
             }
         });
+
     }
 
     private String removeFriendRequest(String [] mems, String user){
@@ -493,110 +525,211 @@ public class Friends extends AppCompatActivity {
         for(int i=0; i< mems.length; i++){
             if(!mems[i].equalsIgnoreCase(user)){
                 if(newMems.length()==0){
-                    newMems = mems[i];
+                    newMems = mems[i] + " ";
                 }
                 else {
-                    newMems += " " + mems[i];
+                    newMems += mems[i] + " ";
                 }
             }
         }
         return newMems;
     }
 
-    public void showNoti(final String household){
+    public void showNoti(final String household, final Boolean noti){
 
         final FirebaseFirestore db =  FirebaseFirestore.getInstance();
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
-        View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
-        mBuilder.setView(mView);
-        listView = mView.findViewById(R.id.noti_view);
-        final AlertDialog dialog = mBuilder.create();
-        dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+        if(noti == true) {
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(Friends.this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_noti_view, null);
+            mBuilder.setView(mView);
+            listView = mView.findViewById(R.id.noti_view);
+            final AlertDialog dialog = mBuilder.create();
+            dialog.getWindow().getAttributes().windowAnimations = R.style.PauseDialogAnimation;
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
 
-        ImageButton back_button = mView.findViewById(R.id.back_button);
+            final ImageButton back_button = mView.findViewById(R.id.back_button);
 
-        notification_body.clear();
-        notification_title.clear();
-        sender.clear();
-
-        db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                final ArrayList<String> notifications = new ArrayList<String>(Arrays.asList(documentSnapshot.get("noti_list").toString().split(" ")));
-                db.collection("Notification").orderBy("timeStamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            for(QueryDocumentSnapshot ds: queryDocumentSnapshots){
-                            if(notifications.contains(ds.getId())){
-                                notification_body.add(ds.get("noti_body").toString());
-                                notification_title.add(ds.get("noti_title").toString());
-                                sender.add(ds.get("sender_userName").toString());
-                            }
-                        }
-                        CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
-                        listView.setAdapter(customAdapter);
-                    }
-                });
-            }
-        });
-
-        back_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if(notification_title.get(i).contains("Dinner")){
-                    AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
-                    inv.setMessage("Do you accept their invitation")
-                            .setCancelable(false)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            notification_body.clear();
+            notification_title.clear();
+            sender.clear();
+            db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    //      if (documentSnapshot.getBoolean("noti")) {
+                    db.collection("Household").document(household).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            final ArrayList<String> notifications = new ArrayList<String>(Arrays.asList(documentSnapshot.get("noti_list").toString().split(" ")));
+                            db.collection("Notification").orderBy("timeStamp", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                                 @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Accepted!",householdName+" wants to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    for (QueryDocumentSnapshot ds : queryDocumentSnapshots) {
+                                        if (notifications.contains(ds.getId())) {
+                                            notification_body.add(ds.get("noti_body").toString());
+                                            notification_title.add(ds.get("noti_title").toString());
+                                            sender.add(ds.get("sender_userName").toString());
+                                        }
                                     }
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                    Notifications n = new Notifications();
-                                    try {
-                                        n.sendNotification("Rejected!",householdName+" doesn't want to come over!", user.getUid(), requestQueue);
-                                    } catch (InstantiationException e1) {
-                                        e1.printStackTrace();
-                                    } catch (IllegalAccessException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                    dialogInterface.cancel();
+                                    CustomAdapter customAdapter = new CustomAdapter(notification_title, notification_body, sender);
+                                    listView.setAdapter(customAdapter);
                                 }
                             });
-                    AlertDialog alertDialog = inv.create();
-                    alertDialog.show();
-                    // }
+                        }
+                    });
 
+                    back_button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                        @Override
+                        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            if (notification_title.get(i).contains("Dinner")) {
+                                dialog.dismiss();
+                                final int selected = i;
+
+                                AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+                                inv.setMessage("Do you accept their invitation")
+                                        .setCancelable(false)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Accepted!", house + " wants to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                    }
+                                                });
+
+                                                // finish();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(final DialogInterface dialogInterface, int i) {
+                                                db.collection("Users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        String house = documentSnapshot.getString("household");
+
+                                                        final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                        Notifications n = new Notifications();
+                                                        try {
+                                                            n.sendNotification("Rejected!", householdName + " doesn't want to come over!", givingHousehold, requestQueue);
+                                                        } catch (InstantiationException e1) {
+                                                            e1.printStackTrace();
+                                                        } catch (IllegalAccessException e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                        dialogInterface.cancel();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                AlertDialog alertDialog = inv.create();
+                                alertDialog.show();
+                                // }
+
+                            } else if (notification_title.get(i).contains("Asking")) {
+                                dialog.dismiss();
+                                final int selected = i;
+
+                                AlertDialog.Builder inv = new AlertDialog.Builder(Friends.this);
+                                inv.setMessage("Do you want to share the ingredient?")
+                                        .setCancelable(true)
+                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String givingingr = notification_title.get(selected).substring(11);
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                db.collection("Household").document(givingHousehold).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                        Grocery gr = new Grocery();
+                                                        gr.addItemToGroceryCollection(givingingr, "", "stock", givingHousehold);
+                                                    }
+                                                });
+                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                Notifications n = new Notifications();
+                                                try {
+                                                    n.sendNotification("Ingredient found!", householdName + " has the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                //  finish();
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String givingHousehold = notification_body.get(selected).substring(0, notification_body.get(selected).indexOf(' '));
+                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                                                Notifications n = new Notifications();
+
+                                                try {
+                                                    n.sendNotification("No Luck!", householdName + " doesn't have the ingredient", givingHousehold, requestQueue);
+                                                } catch (InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                dialogInterface.cancel();
+                                            }
+                                        });
+                                AlertDialog alertDialog = inv.create();
+                                alertDialog.show();
+                                // }
+
+                            }
+                            return true;
+                        }
+                    });
+                    // }
                 }
-                return true;
-            }
-        });
+            });
+        }
+        else{
+            new AlertDialog.Builder(Friends.this)
+                    .setTitle("Notifications cannot be viewed")
+                    .setMessage("Set Notification toggle to on to view notificatonsAre you sure you want to delete this entry!")
+
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton("Change the Setting", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            finish();
+                            startActivity(new Intent(Friends.this,MainActivity.class));
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
     }
 
 
@@ -650,14 +783,15 @@ public class Friends extends AppCompatActivity {
         Context context;
 
         public RequestAdapter(Context context, ArrayList<String> invites) {
-
             this.invites = invites;
             this.context = context;
-
         }
         @Override
         public int getCount() {
-            return this.invites.size();
+            if(invites.get(0).equals(""))
+                return 0;
+            else
+                return this.invites.size();
         }
 
         @Override
